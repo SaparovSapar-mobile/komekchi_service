@@ -46,6 +46,7 @@ class _DetailScreenState extends State<DetailScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
     return Scaffold(
       backgroundColor: AppColor.primary,
       appBar: AppBar(
@@ -650,7 +651,7 @@ class _DetailScreenState extends State<DetailScreen> {
                             Row(
                               children: [
                                 Container(
-                                  width: 125,
+                                  width: screenWidth * 0.32,
                                   height: 53,
                                   padding: const EdgeInsets.only(
                                     left: 16.0,
@@ -684,38 +685,40 @@ class _DetailScreenState extends State<DetailScreen> {
                                   ),
                                 ),
                                 const SizedBox(width: 12),
-                                GestureDetector(
-                                  onTap: () {
-                                    context.push("/date");
-                                  },
-                                  child: Container(
-                                    width: 228,
-                                    height: 53,
-                                    padding: const EdgeInsets.symmetric(
-                                      horizontal: 38.5,
-                                    ),
-                                    decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(10),
-                                      color: AppColor.primary,
-                                    ),
-                                    child: Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      children: [
-                                        Text(
-                                          "Tassyklamak",
-                                          style: TextStyle(
-                                            fontSize: 16,
+                                Expanded(
+                                  child: GestureDetector(
+                                    onTap: () {
+                                      context.push("/date");
+                                    },
+                                    child: Container(
+                                      width: screenWidth * 0.6,
+                                      height: 53,
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 38.5,
+                                      ),
+                                      decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.circular(10),
+                                        color: AppColor.primary,
+                                      ),
+                                      child: Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        children: [
+                                          Text(
+                                            "Tassyklamak",
+                                            style: TextStyle(
+                                              fontSize: 16,
+                                              color: Colors.white,
+                                            ),
+                                          ),
+                                          const SizedBox(width: 4.5),
+                                          Icon(
+                                            Icons.arrow_forward,
+                                            size: 23,
                                             color: Colors.white,
                                           ),
-                                        ),
-                                        const SizedBox(width: 8),
-                                        Icon(
-                                          Icons.arrow_forward,
-                                          size: 23,
-                                          color: Colors.white,
-                                        ),
-                                      ],
+                                        ],
+                                      ),
                                     ),
                                   ),
                                 ),

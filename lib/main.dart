@@ -18,8 +18,22 @@ class MyApp extends StatelessWidget {
         return MaterialApp.router(
           debugShowCheckedModeBanner: false,
           themeMode: mode,
-          theme: ThemeData.light(),
-          darkTheme: ThemeData.dark(),
+          theme: ThemeData.light().copyWith(
+            pageTransitionsTheme: const PageTransitionsTheme(
+              builders: {
+                TargetPlatform.iOS: CupertinoPageTransitionsBuilder(),
+                TargetPlatform.android: ZoomPageTransitionsBuilder(),
+              }
+            )
+          ),
+          darkTheme: ThemeData.dark().copyWith(
+              pageTransitionsTheme: const PageTransitionsTheme(
+                  builders: {
+                    TargetPlatform.iOS: CupertinoPageTransitionsBuilder(),
+                    TargetPlatform.android: ZoomPageTransitionsBuilder(),
+                  }
+              )
+          ),
           routerConfig: appRouter,
         );
       },

@@ -56,8 +56,8 @@ class _AuthScreenState extends State<AuthScreen>
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final bg = isDark ? const Color(0xFF121212) : const Color(0xFFF5F5F5);
-    final cardBg = isDark ? const Color(0xFF1E1E1E) : Colors.white;
+    final bg = isDark ? const Color(0xFF121212) : const Color(0xFFFFFFFF);
+    final cardBg = isDark ? const Color(0xFF1E1E1E) : Color(0xFFF6F8FD);
     final textColor = isDark ? Colors.white : const Color(0xFF1A1A2E);
     final borderColor = isDark ? const Color(0xFF333333) : const Color(0xFFD0D7FB);
 
@@ -111,26 +111,24 @@ class _AuthScreenState extends State<AuthScreen>
                 decoration: BoxDecoration(
                   color: cardBg,
                   borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: borderColor),
                 ),
                 child: TabBar(
                   controller: _tabController,
                   dividerColor: Colors.transparent,
                   indicator: BoxDecoration(
-                    color: isDark ? const Color(0xFF2A2A2A) : const Color(0xFFEEF0FF),
+                    color: isDark ? const Color(0xFF2A2A2A) : const Color(0xFFFFFFFF),
                     borderRadius: BorderRadius.circular(10),
-                    border: Border.all(color: AppColor.primary.withOpacity(0.3)),
                   ),
                   indicatorSize: TabBarIndicatorSize.tab,
                   indicatorPadding: const EdgeInsets.all(3),
-                  labelColor: AppColor.primary,
+                  labelColor: AppColor.titleTextLight,
                   unselectedLabelColor: Colors.grey,
-                  labelStyle: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
+                  labelStyle: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600, fontFamily: "Inter", height: 1.2, letterSpacing: 0),
                   unselectedLabelStyle: const TextStyle(fontSize: 14, fontWeight: FontWeight.w400),
                   splashFactory: NoSplash.splashFactory,
                   overlayColor: WidgetStateProperty.all(Colors.transparent),
                   tabs: const [
-                    Tab(text: 'Hasaba durmak'),
+                    Tab(text: 'Hasaba durmak',),
                     Tab(text: 'Agza bolmak'),
                   ],
                 ),

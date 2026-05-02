@@ -232,12 +232,14 @@ class _SelectedDateState extends State<SelectedDate> {
                                 ],
                               ),
                               const SizedBox(width: 8),
-                              Text(
-                                'Eger siz hyzmat sargyt edip, soň pikirlerňizi\nüýtgetseňiz ýa-da hyzmatdan ýüz öwürseňiz, hyzma...',
-                                style: TextStyle(
-                                  fontSize: 12,
-                                  color: Color(0xFFFF6600),
-                                  height: 1.4,
+                              Expanded(
+                                child: Text(
+                                  'Eger siz hyzmat sargyt edip, soň pikirlerňizi üýtgetseňiz ýa-da hyzmatdan ýüz öwürseňiz, hyzma...',
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    color: Color(0xFFFF6600),
+                                    height: 1.4,
+                                  ),
                                 ),
                               ),
                             ],

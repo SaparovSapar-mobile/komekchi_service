@@ -148,10 +148,8 @@ class AllCategoryScreen extends StatelessWidget {
             // List
             Expanded(
               child: Container(
-                padding: const EdgeInsets.only(bottom: 60),
                 color: const Color(0xFFF5F7FF),
                 child: Container(
-
                   margin: const EdgeInsets.symmetric(
                     vertical: 10,
                     horizontal: 15,

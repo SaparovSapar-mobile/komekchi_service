@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:go_router/go_router.dart';
 import 'package:komekchi_service/features/presentation/pages/auth/auth_screen.dart.dart';
 import 'package:komekchi_service/features/presentation/pages/auth/forgot_pass.dart';
@@ -41,7 +42,7 @@ final appRouter = GoRouter(
     ),
     GoRoute(path: '/sms', builder: (_, __) => const SmsScreen()),
     GoRoute(path: '/check', builder: (_, __) => const CheckScreen()),
-    GoRoute(path: '/main', builder: (_, __) => const MainScreen()),
+    GoRoute(path: '/main', pageBuilder: (context, state) =>  CupertinoPage(child:const MainScreen())),
     GoRoute(path: '/forgot', builder: (_, __) => const ForgotPass()),
     GoRoute(path: '/aksiya', builder: (_, __) => const AksiyalarScreen()),
     GoRoute(path: '/date', builder: (_, __) => const SelectDate()),
