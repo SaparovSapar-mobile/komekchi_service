@@ -1,7 +1,7 @@
 // Vyzyvay pervый bottomsheet:
 import 'package:flutter/material.dart';
 
-import '../../../../../core/utils/app_theme.dart';
+import '../../../../../core/utils/theme/app_colors.dart';
 import '../map_screen.dart';
 
 void showSalgyBottomSheet(BuildContext context) {

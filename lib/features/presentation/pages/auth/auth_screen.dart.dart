@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
-import 'package:komekchi_service/core/utils/app_theme.dart';
 import 'package:komekchi_service/main.dart';
+
+import '../../../../core/utils/theme/app_colors.dart';
 
 class AuthScreen extends StatefulWidget {
   final bool showLogin;
@@ -18,7 +19,8 @@ class _AuthScreenState extends State<AuthScreen>
 
   bool _obscureLoginPassword = true;
   final TextEditingController _loginPhoneController = TextEditingController();
-  final TextEditingController _loginPasswordController = TextEditingController();
+  final TextEditingController _loginPasswordController =
+      TextEditingController();
 
   bool _obscureRegPassword = true;
   bool _obscureConfirm = true;
@@ -56,13 +58,22 @@ class _AuthScreenState extends State<AuthScreen>
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final bg = isDark ? const Color(0xFF121212) : const Color(0xFFFFFFFF);
-    final cardBg = isDark ? const Color(0xFF1E1E1E) : Color(0xFFF6F8FD);
-    final textColor = isDark ? Colors.white : const Color(0xFF1A1A2E);
-    final borderColor = isDark ? const Color(0xFF333333) : const Color(0xFFD0D7FB);
+    final bg = isDark ? AppColor.bgBlogDark : AppColor.bgBlogLight;
+    final cardBg = isDark ? AppColor.bgBlogDark : AppColor.bgBlogLight;
+    final textColor = isDark ? AppColor.titleTextDark : AppColor.titleTextLight;
+    final borderColor = isDark ? const Color(0xFF333333) : AppColor.borderColor;
 
     return Scaffold(
       backgroundColor: bg,
+      appBar: AppBar(
+        toolbarHeight: 0,
+        backgroundColor: isDark ? AppColor.bgBlogDark : AppColor.bgBlogLight,
+        systemOverlayStyle: SystemUiOverlayStyle(
+          statusBarColor: isDark ? AppColor.bgBlogDark : AppColor.bgBlogLight,
+          statusBarIconBrightness: isDark ? Brightness.light : Brightness.dark,
+          statusBarBrightness: isDark ? Brightness.light : Brightness.dark,
+        ),
+      ),
       body: SafeArea(
         child: Column(
           children: [
@@ -73,7 +84,11 @@ class _AuthScreenState extends State<AuthScreen>
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   IconButton(
-                    icon: Icon(Icons.arrow_back_ios, color: textColor, size: 20),
+                    icon: Icon(
+                      Icons.arrow_back_ios,
+                      color: textColor,
+                      size: 20,
+                    ),
                     onPressed: () => context.pop(),
                   ),
                   Text(
@@ -95,40 +110,56 @@ class _AuthScreenState extends State<AuthScreen>
                     onPressed: () {
                       themeNotifier.value =
                           themeNotifier.value == ThemeMode.light
-                              ? ThemeMode.dark
-                              : ThemeMode.light;
+                          ? ThemeMode.dark
+                          : ThemeMode.light;
                     },
                   ),
                 ],
               ),
             ),
-
+            Container(
+              color: isDark ? AppColor.bgPageDark : AppColor.bgPageLight,
+              height: 6,
+              width: double.infinity,
+              margin: const EdgeInsets.only(bottom: 10),
+            ),
             // ─── TabBar ───
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16),
               child: Container(
                 height: 48,
                 decoration: BoxDecoration(
-                  color: cardBg,
+                  color: isDark ? AppColor.bgPageDark : AppColor.bgPageLight,
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: TabBar(
                   controller: _tabController,
                   dividerColor: Colors.transparent,
                   indicator: BoxDecoration(
-                    color: isDark ? const Color(0xFF2A2A2A) : const Color(0xFFFFFFFF),
+                    color: cardBg,
                     borderRadius: BorderRadius.circular(10),
                   ),
                   indicatorSize: TabBarIndicatorSize.tab,
                   indicatorPadding: const EdgeInsets.all(3),
-                  labelColor: AppColor.titleTextLight,
-                  unselectedLabelColor: Colors.grey,
-                  labelStyle: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600, fontFamily: "Inter", height: 1.2, letterSpacing: 0),
-                  unselectedLabelStyle: const TextStyle(fontSize: 14, fontWeight: FontWeight.w400),
+                  labelColor: isDark
+                      ? AppColor.titleTextDark
+                      : AppColor.titleTextLight,
+                  unselectedLabelColor: AppColor.descriptionTextLight,
+                  labelStyle: const TextStyle(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w600,
+                    fontFamily: "Inter",
+                    height: 1.2,
+                    letterSpacing: 0,
+                  ),
+                  unselectedLabelStyle: const TextStyle(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w400,
+                  ),
                   splashFactory: NoSplash.splashFactory,
                   overlayColor: WidgetStateProperty.all(Colors.transparent),
                   tabs: const [
-                    Tab(text: 'Hasaba durmak',),
+                    Tab(text: 'Hasaba durmak'),
                     Tab(text: 'Agza bolmak'),
                   ],
                 ),
@@ -146,12 +177,22 @@ class _AuthScreenState extends State<AuthScreen>
                   // ── Login tab ──
                   SingleChildScrollView(
                     padding: const EdgeInsets.symmetric(horizontal: 16),
-                    child: _buildLoginForm(isDark, cardBg, textColor, borderColor),
+                    child: _buildLoginForm(
+                      isDark,
+                      cardBg,
+                      textColor,
+                      borderColor,
+                    ),
                   ),
                   // ── Register tab ──
                   SingleChildScrollView(
                     padding: const EdgeInsets.symmetric(horizontal: 16),
-                    child: _buildRegisterForm(isDark, cardBg, textColor, borderColor),
+                    child: _buildRegisterForm(
+                      isDark,
+                      cardBg,
+                      textColor,
+                      borderColor,
+                    ),
                   ),
                 ],
               ),
@@ -164,8 +205,13 @@ class _AuthScreenState extends State<AuthScreen>
 
   // ─── LOGIN FORM ─────────────────────────────────────────────────────────────
 
-  Widget _buildLoginForm(bool isDark, Color cardBg, Color textColor, Color borderColor) {
-    final inputBg = isDark ? const Color(0xFF2A2A2A) : const Color(0xFFF7F7F7);
+  Widget _buildLoginForm(
+    bool isDark,
+    Color cardBg,
+    Color textColor,
+    Color borderColor,
+  ) {
+    final inputBg = isDark ? AppColor.bgPageDark : AppColor.bgPageLight;
     final hintColor = isDark ? Colors.white38 : Colors.black38;
     const blue = AppColor.primary;
 
@@ -176,16 +222,22 @@ class _AuthScreenState extends State<AuthScreen>
 
         Center(
           child: Image.asset(
-            "assets/images/logo/icons.jpg",
-            width: 58.76,
-            height: 58.76,
+            "assets/images/logo/phone.png",
+            height: 30,
+            width: 30,
           ),
         ),
         const SizedBox(height: 32),
 
         // Phone
-        Text('Telefon belgiňiz',
-            style: TextStyle(color: textColor, fontSize: 14, fontWeight: FontWeight.w500)),
+        Text(
+          'Telefon belgiňiz',
+          style: TextStyle(
+            color: textColor,
+            fontSize: 14,
+            fontWeight: FontWeight.w500,
+          ),
+        ),
         const SizedBox(height: 8),
         Row(
           children: [
@@ -208,8 +260,14 @@ class _AuthScreenState extends State<AuthScreen>
         const SizedBox(height: 16),
 
         // Password
-        Text('Açar sözi',
-            style: TextStyle(color: textColor, fontSize: 14, fontWeight: FontWeight.w500)),
+        Text(
+          'Açar sözi',
+          style: TextStyle(
+            color: textColor,
+            fontSize: 14,
+            fontWeight: FontWeight.w500,
+          ),
+        ),
         const SizedBox(height: 8),
         inputField(
           controller: _loginPasswordController,
@@ -221,11 +279,14 @@ class _AuthScreenState extends State<AuthScreen>
           obscure: _obscureLoginPassword,
           suffix: IconButton(
             icon: Icon(
-              _obscureLoginPassword ? Icons.visibility_off_outlined : Icons.visibility_outlined,
+              _obscureLoginPassword
+                  ? Icons.visibility_off_outlined
+                  : Icons.visibility_outlined,
               color: hintColor,
               size: 20,
             ),
-            onPressed: () => setState(() => _obscureLoginPassword = !_obscureLoginPassword),
+            onPressed: () =>
+                setState(() => _obscureLoginPassword = !_obscureLoginPassword),
           ),
         ),
 
@@ -233,10 +294,10 @@ class _AuthScreenState extends State<AuthScreen>
 
         TextButton(
           onPressed: () => context.push('/forgot'),
-          child: const Text(
+          child: Text(
             "Açar sözi ýatdan çykardym",
             style: TextStyle(
-              color: AppColor.primary,
+              color: isDark ? AppColor.titleTextDark : AppColor.primary,
               fontSize: 14,
               fontStyle: FontStyle.italic,
             ),
@@ -254,10 +315,14 @@ class _AuthScreenState extends State<AuthScreen>
               backgroundColor: blue,
               foregroundColor: Colors.white,
               elevation: 0,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(14),
+              ),
             ),
-            child: const Text('Geçmek',
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
+            child: const Text(
+              'Geçmek',
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+            ),
           ),
         ),
 
@@ -268,168 +333,219 @@ class _AuthScreenState extends State<AuthScreen>
 
   // ─── REGISTER FORM ──────────────────────────────────────────────────────────
 
-  Widget _buildRegisterForm(bool isDark, Color cardBg, Color textColor, Color borderColor) {
-    final inputBg = isDark ? const Color(0xFF2A2A2A) : const Color(0xFFF7F7F7);
-    final hintColor = isDark ? Colors.white38 : Colors.black38;
+  Widget _buildRegisterForm(
+    bool isDark,
+    Color cardBg,
+    Color textColor,
+    Color borderColor,
+  ) {
+    final inputBg = isDark ? AppColor.bgPageDark : AppColor.bgPageLight;
+    final hintColor = isDark ? AppColor.titleTextDark : AppColor.titleTextLight;
     const blue = AppColor.primary;
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const SizedBox(height: 8),
-
-        // Wezipeler
-        Text('Wezipeler',
-            style: TextStyle(color: textColor, fontSize: 14, fontWeight: FontWeight.w500)),
-        const SizedBox(height: 8),
-        Container(
-          height: 52,
-          decoration: BoxDecoration(
-            color: inputBg,
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: borderColor),
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const SizedBox(height: 8),
+          Text(
+            'Wezipeler',
+            style: TextStyle(
+              color: textColor,
+              fontSize: 14,
+              fontWeight: FontWeight.w500,
+            ),
           ),
-          padding: const EdgeInsets.symmetric(horizontal: 14),
-          child: DropdownButton<String>(
-            value: _selectedRole,
-            isExpanded: true,
-            underline: const SizedBox(),
-            dropdownColor: cardBg,
-            style: TextStyle(color: textColor, fontSize: 15),
-            icon: Icon(Icons.keyboard_arrow_down, color: hintColor),
-            items: _roles
-                .map((r) => DropdownMenuItem(
+          const SizedBox(height: 8),
+          Container(
+            height: 52,
+            decoration: BoxDecoration(
+              color: inputBg,
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: borderColor),
+            ),
+            padding: const EdgeInsets.symmetric(horizontal: 14),
+            child: DropdownButton<String>(
+              value: _selectedRole,
+              isExpanded: true,
+              underline: const SizedBox(),
+              dropdownColor: cardBg,
+              style: TextStyle(color: textColor, fontSize: 15),
+              icon: Icon(Icons.keyboard_arrow_down, color: hintColor),
+              items: _roles
+                  .map(
+                    (r) => DropdownMenuItem(
                       value: r,
                       child: Text(r, style: TextStyle(color: textColor)),
-                    ))
-                .toList(),
-            onChanged: (v) => setState(() => _selectedRole = v ?? _selectedRole),
+                    ),
+                  )
+                  .toList(),
+              onChanged: (v) =>
+                  setState(() => _selectedRole = v ?? _selectedRole),
+            ),
           ),
-        ),
 
-        const SizedBox(height: 16),
+          const SizedBox(height: 16),
 
-        // Ady Familýasy
-        Text('Ady Familýasy',
-            style: TextStyle(color: textColor, fontSize: 14, fontWeight: FontWeight.w500)),
-        const SizedBox(height: 8),
-        inputField(
-          controller: _nameController,
-          inputBg: inputBg,
-          text: "Adyňyzy giriziň",
-          borderColor: borderColor,
-          textColor: textColor,
-          hintColor: hintColor,
-        ),
+          // Ady Familýasy
+          Text(
+            'Ady Familýasy',
+            style: TextStyle(
+              color: textColor,
+              fontSize: 14,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+          const SizedBox(height: 8),
+          inputField(
+            controller: _nameController,
+            inputBg: inputBg,
+            text: "Adyňyzy giriziň",
+            borderColor: borderColor,
+            textColor: textColor,
+            hintColor: Colors.grey,
+          ),
 
-        const SizedBox(height: 16),
+          const SizedBox(height: 16),
 
-        // Phone
-        Text('Telefon belgiňiz',
-            style: TextStyle(color: textColor, fontSize: 14, fontWeight: FontWeight.w500)),
-        const SizedBox(height: 8),
-        Row(
-          children: [
-            codeBox('+993', textColor, inputBg, borderColor),
-            const SizedBox(width: 10),
-            Expanded(
-              child: inputField(
-                controller: _regPhoneController,
-                inputBg: inputBg,
-                type: FieldType.phone,
-                borderColor: borderColor,
-                textColor: textColor,
-                hintColor: hintColor,
-                keyboardType: TextInputType.phone,
+          // Phone
+          Text(
+            'Telefon belgiňiz',
+            style: TextStyle(
+              color: textColor,
+              fontSize: 14,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+          const SizedBox(height: 8),
+          Row(
+            children: [
+              codeBox('+993', textColor, inputBg, borderColor),
+              const SizedBox(width: 10),
+              Expanded(
+                child: inputField(
+                  controller: _regPhoneController,
+                  inputBg: inputBg,
+                  type: FieldType.phone,
+                  borderColor: borderColor,
+                  textColor: textColor,
+                  hintColor: hintColor,
+                  keyboardType: TextInputType.phone,
+                ),
+              ),
+            ],
+          ),
+
+          const SizedBox(height: 16),
+
+          // Password
+          Text(
+            'Açar sözi',
+            style: TextStyle(
+              color: textColor,
+              fontSize: 14,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+          const SizedBox(height: 8),
+          inputField(
+            controller: _regPasswordController,
+            inputBg: inputBg,
+            borderColor: borderColor,
+            textColor: textColor,
+            hintColor: hintColor,
+            obscure: _obscureRegPassword,
+            suffix: IconButton(
+              icon: Icon(
+                _obscureRegPassword
+                    ? Icons.visibility_off_outlined
+                    : Icons.visibility_outlined,
+                color: hintColor,
+                size: 20,
+              ),
+              onPressed: () =>
+                  setState(() => _obscureRegPassword = !_obscureRegPassword),
+            ),
+          ),
+
+          const SizedBox(height: 16),
+
+          // Confirm password
+          Text(
+            'Açar sözüňizi tassyklaň',
+            style: TextStyle(
+              color: textColor,
+              fontSize: 14,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+          const SizedBox(height: 8),
+          inputField(
+            controller: _confirmController,
+            inputBg: inputBg,
+            borderColor: borderColor,
+            textColor: textColor,
+            hintColor: hintColor,
+            obscure: _obscureConfirm,
+            suffix: IconButton(
+              icon: Icon(
+                _obscureConfirm
+                    ? Icons.visibility_off_outlined
+                    : Icons.visibility_outlined,
+                color: hintColor,
+                size: 20,
+              ),
+              onPressed: () =>
+                  setState(() => _obscureConfirm = !_obscureConfirm),
+            ),
+          ),
+
+          const SizedBox(height: 12),
+
+          // Checkbox
+          Row(
+            children: [
+              Checkbox(
+                value: _agreed,
+                activeColor: blue,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(4),
+                ),
+                onChanged: (v) => setState(() => _agreed = v ?? false),
+              ),
+              Text(
+                'Düzgünler bilen tanyşdym?',
+                style: TextStyle(
+                  color: textColor,
+                  fontSize: 14,
+                  fontStyle: FontStyle.italic,
+                ),
+              ),
+            ],
+          ),
+
+          const SizedBox(height: 20),
+
+          SizedBox(
+            width: double.infinity,
+            height: 54,
+            child: ElevatedButton(
+              onPressed: _agreed ? () => context.push("/sms") : null,
+              child: const Text(
+                'Agza bol',
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                  color: AppColor.titleTextDark,
+                ),
               ),
             ),
-          ],
-        ),
-
-        const SizedBox(height: 16),
-
-        // Password
-        Text('Açar sözi',
-            style: TextStyle(color: textColor, fontSize: 14, fontWeight: FontWeight.w500)),
-        const SizedBox(height: 8),
-        inputField(
-          controller: _regPasswordController,
-          inputBg: inputBg,
-          borderColor: borderColor,
-          textColor: textColor,
-          hintColor: hintColor,
-          obscure: _obscureRegPassword,
-          suffix: IconButton(
-            icon: Icon(
-              _obscureRegPassword ? Icons.visibility_off_outlined : Icons.visibility_outlined,
-              color: hintColor,
-              size: 20,
-            ),
-            onPressed: () => setState(() => _obscureRegPassword = !_obscureRegPassword),
           ),
-        ),
 
-        const SizedBox(height: 16),
-
-        // Confirm password
-        Text('Açar sözüňizi tassyklaň',
-            style: TextStyle(color: textColor, fontSize: 14, fontWeight: FontWeight.w500)),
-        const SizedBox(height: 8),
-        inputField(
-          controller: _confirmController,
-          inputBg: inputBg,
-          borderColor: borderColor,
-          textColor: textColor,
-          hintColor: hintColor,
-          obscure: _obscureConfirm,
-          suffix: IconButton(
-            icon: Icon(
-              _obscureConfirm ? Icons.visibility_off_outlined : Icons.visibility_outlined,
-              color: hintColor,
-              size: 20,
-            ),
-            onPressed: () => setState(() => _obscureConfirm = !_obscureConfirm),
-          ),
-        ),
-
-        const SizedBox(height: 12),
-
-        // Checkbox
-        Row(
-          children: [
-            Checkbox(
-              value: _agreed,
-              activeColor: blue,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
-              onChanged: (v) => setState(() => _agreed = v ?? false),
-            ),
-            Text(
-              'Düzgünler bilen tanyşdym?',
-              style: TextStyle(color: textColor, fontSize: 14, fontStyle: FontStyle.italic),
-            ),
-          ],
-        ),
-
-        const SizedBox(height: 20),
-
-        SizedBox(
-          width: double.infinity,
-          height: 54,
-          child: ElevatedButton(
-            onPressed: _agreed ? () => context.go("/sms") : null,
-            style: ElevatedButton.styleFrom(
-              backgroundColor: blue,
-              foregroundColor: Colors.white,
-              elevation: 0,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-            ),
-            child: const Text('Agza bol',
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
-          ),
-        ),
-
-        const SizedBox(height: 24),
-      ],
+          const SizedBox(height: 24),
+        ],
+      ),
     );
   }
 }
@@ -448,7 +564,11 @@ Widget codeBox(String code, Color textColor, Color inputBg, Color borderColor) {
     child: Center(
       child: Text(
         code,
-        style: TextStyle(color: textColor, fontSize: 16, fontWeight: FontWeight.w500),
+        style: TextStyle(
+          color: textColor,
+          fontSize: 16,
+          fontWeight: FontWeight.w500,
+        ),
       ),
     ),
   );
@@ -489,7 +609,8 @@ Widget inputField({
                     LengthLimitingTextInputFormatter(8),
                   ]
                 : [],
-            validator: validator ??
+            validator:
+                validator ??
                 (type == FieldType.phone
                     ? (value) {
                         if (value == null || value.length < 8) {

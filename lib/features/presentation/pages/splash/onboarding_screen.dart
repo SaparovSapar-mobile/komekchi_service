@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 import 'package:komekchi_service/main.dart';
-import '../../../../core/utils/app_theme.dart';
+import '../../../../core/utils/theme/app_colors.dart';
+import '../../../../core/utils/theme/app_theme.dart';
 
 class WalkthroughScreen extends StatefulWidget {
   const WalkthroughScreen({super.key});
@@ -56,21 +57,21 @@ class _WalkthroughScreenState extends State<WalkthroughScreen> {
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
 
-    final double fontSizeTitle = screenWidth * 0.05; // ~20px
-    final double fontSizeSubtitle = screenWidth * 0.04; // ~16px
-    final double fontSizeButton = screenWidth * 0.04; // ~16px
-    final double fontSizeSkip = screenWidth * 0.045; // ~18px
-    final double buttonHeight = screenHeight * 0.066; // ~56px
-    final double bottomPadding = screenHeight * 0.036; // ~30px
+    final double fontSizeTitle = screenWidth * 0.05;
+    final double fontSizeSubtitle = screenWidth * 0.04;
+    final double fontSizeButton = screenWidth * 0.04;
+    final double fontSizeSkip = screenWidth * 0.045;
+    final double buttonHeight = screenHeight * 0.066;
+    final double bottomPadding = screenHeight * 0.036;
 
     return Scaffold(
       appBar: AppBar(
         toolbarHeight: 0,
-        backgroundColor: AppColor.primary,
-        systemOverlayStyle: const SystemUiOverlayStyle(
-          statusBarColor: AppColor.primary,
-          statusBarIconBrightness: Brightness.light,
-          statusBarBrightness: Brightness.dark,
+        backgroundColor: isDark ? AppColor.bgPageDark : AppColor.bgPageLight,
+        systemOverlayStyle: SystemUiOverlayStyle(
+          statusBarColor: isDark ? AppColor.bgPageDark : AppColor.bgPageLight,
+          statusBarIconBrightness:isDark ? Brightness.light : Brightness.dark,
+          statusBarBrightness: isDark ? Brightness.light : Brightness.dark,
         ),
       ),
       body: GestureDetector(
@@ -88,26 +89,22 @@ class _WalkthroughScreenState extends State<WalkthroughScreen> {
           children: [
             // ─── Фон ───
             Container(
-              color: isDark ? const Color(0xFF3D3C3C) : const Color(0xFFF2F8FE),
+              color: isDark ? AppColor.bgPageDark : AppColor.bgPageLight,
             ),
 
-            // ✅ Column с Expanded — больше не будет overflow
             Column(
               children: [
-                // ─── Зона картинки — Expanded, занимает оставшееся место ───
                 Expanded(
                   child: SizedBox(
                     width: double.infinity,
                     child: Stack(
                       children: [
-                        // Градиентный блок
                         AnimatedSwitcher(
                           duration: const Duration(milliseconds: 100),
                           transitionBuilder: (child, animation) =>
                               FadeTransition(opacity: animation, child: child),
                           child: Container(
                             key: ValueKey('gradient_$_pageIndex'),
-                            // ✅ Адаптивные margin вместо фиксированных
                             margin: _pageIndex == 1
                                 ? EdgeInsets.symmetric(
                                     horizontal: screenWidth * 0.21,
@@ -141,7 +138,7 @@ class _WalkthroughScreenState extends State<WalkthroughScreen> {
                                           ? Alignment.centerLeft
                                           : Alignment.centerRight,
                                       colors: const [
-                                        Color(0xFF3D3C3C),
+                                        AppColor.bgPageDark,
                                         Color(0xFFFF994B),
                                       ],
                                     )
@@ -197,22 +194,18 @@ class _WalkthroughScreenState extends State<WalkthroughScreen> {
                   ),
                 ),
 
-                // ─── Нижний контейнер — ✅ без фиксированного height! ───
                 Container(
                   width: double.infinity,
                   height: screenHeight * 0.315,
-                  // ❌ Было: height: 281 (фиксированное — вызывало overflow!)
-                  // ✅ Стало: padding + контент сам определяет высоту
                   decoration: BoxDecoration(
                     borderRadius: const BorderRadius.only(
                       topLeft: Radius.circular(20),
                       topRight: Radius.circular(20),
                     ),
                     color: isDark
-                        ? const Color(0xFF333333)
-                        : const Color(0xFFF6F6F6),
+                        ? AppColor.bgBlogDark
+                        : AppColor.titleTextDark,
                   ),
-                  // ✅ Отступ снизу — место для кнопки (Positioned)
                   padding: EdgeInsets.only(
                     top: screenHeight * 0.008,
                     bottom: buttonHeight + bottomPadding + screenHeight * 0.02,
@@ -251,7 +244,7 @@ class _WalkthroughScreenState extends State<WalkthroughScreen> {
                                   color: isDark
                                       ? const Color(0xFFF6F6F6)
                                       : Colors.black,
-                                  fontSize: fontSizeTitle, // ✅ адаптивный
+                                  fontSize: fontSizeTitle,
                                   fontWeight: FontWeight.bold,
                                 ),
                               ),
@@ -260,8 +253,7 @@ class _WalkthroughScreenState extends State<WalkthroughScreen> {
                         ),
                       ),
 
-                      SizedBox(height: screenHeight * 0.012), // ~11px
-                      // ─── Подзаголовок ───
+                      SizedBox(height: screenHeight * 0.012),
                       Padding(
                         padding: EdgeInsets.symmetric(
                           horizontal: screenWidth * 0.06,
@@ -289,7 +281,7 @@ class _WalkthroughScreenState extends State<WalkthroughScreen> {
                                 key: ValueKey('subtitle_$_pageIndex'),
                                 textAlign: TextAlign.center,
                                 style: TextStyle(
-                                  fontSize: fontSizeSubtitle, // ✅ адаптивный
+                                  fontSize: fontSizeSubtitle,
                                   color: const Color(0xFFCCCCCC),
                                 ),
                               ),
@@ -298,8 +290,7 @@ class _WalkthroughScreenState extends State<WalkthroughScreen> {
                         ),
                       ),
 
-                      SizedBox(height: screenHeight * 0.040), // ~40px
-                      // ─── Dots ───
+                      SizedBox(height: screenHeight * 0.040),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: List.generate(
@@ -318,7 +309,7 @@ class _WalkthroughScreenState extends State<WalkthroughScreen> {
                             decoration: BoxDecoration(
                               borderRadius: BorderRadius.circular(10),
                               color: i == _pageIndex
-                                  ? const Color(0xFF264FED)
+                                  ? Theme.of(context).primaryColor
                                   : Colors.grey.shade400,
                             ),
                           ),
@@ -344,7 +335,7 @@ class _WalkthroughScreenState extends State<WalkthroughScreen> {
                             child: Container(
                               height: buttonHeight,
                               decoration: BoxDecoration(
-                                color: const Color(0xFF264FED),
+                                color: AppColor.primary,
                                 borderRadius: BorderRadius.circular(10),
                               ),
                               child: TextButton(
@@ -353,7 +344,7 @@ class _WalkthroughScreenState extends State<WalkthroughScreen> {
                                   "Agza bolmak",
                                   style: TextStyle(
                                     color: Colors.white,
-                                    fontSize: fontSizeButton, // ✅ адаптивный
+                                    fontSize: fontSizeButton,
                                   ),
                                 ),
                               ),
@@ -364,9 +355,7 @@ class _WalkthroughScreenState extends State<WalkthroughScreen> {
                             child: Container(
                               height: buttonHeight,
                               decoration: BoxDecoration(
-                                border: Border.all(
-                                  color: const Color(0xFF264FED),
-                                ),
+                                border: Border.all(color: AppColor.primary),
                                 borderRadius: BorderRadius.circular(10),
                               ),
                               child: TextButton(
@@ -375,9 +364,9 @@ class _WalkthroughScreenState extends State<WalkthroughScreen> {
                                   "Gezelenç",
                                   style: TextStyle(
                                     color: isDark
-                                        ? Colors.white
-                                        : const Color(0xFF264FED),
-                                    fontSize: fontSizeButton, // ✅ адаптивный
+                                        ? AppColor.bgBlogLight
+                                        : AppColor.primary,
+                                    fontSize: fontSizeButton,
                                   ),
                                 ),
                               ),
@@ -401,7 +390,7 @@ class _WalkthroughScreenState extends State<WalkthroughScreen> {
                           "Indiki",
                           style: TextStyle(
                             color: Colors.white,
-                            fontSize: fontSizeButton, // ✅ адаптивный
+                            fontSize: fontSizeButton,
                           ),
                         ),
                       ),
@@ -411,14 +400,14 @@ class _WalkthroughScreenState extends State<WalkthroughScreen> {
             // ─── Skip ───
             Positioned(
               left: screenWidth * 0.05,
-              top: screenHeight * 0.059, // ~50px адаптивно
+              top: screenHeight * 0.059,
               child: GestureDetector(
                 onTap: () => context.push('/login'),
                 child: Text(
                   "Skip",
                   style: TextStyle(
-                    color: const Color(0xFF264FED),
-                    fontSize: fontSizeSkip, // ✅ адаптивный
+                    color: isDark ? AppColor.titleTextDark : AppColor.primary,
+                    fontSize: fontSizeSkip,
                   ),
                 ),
               ),
@@ -427,27 +416,30 @@ class _WalkthroughScreenState extends State<WalkthroughScreen> {
             // ─── Dark mode toggle ───
             Positioned(
               right: screenWidth * 0.05,
-              top: screenHeight * 0.059,
+              top: screenHeight * 0.040,
               child: GestureDetector(
+                behavior: HitTestBehavior.translucent, // 🔥 важно
                 onTap: () {
                   themeNotifier.value = themeNotifier.value == ThemeMode.light
                       ? ThemeMode.dark
                       : ThemeMode.light;
                 },
-                child: isDark
-                    ? Container(
-                        padding: EdgeInsets.all(screenWidth * 0.023),
-                        child: Image.asset(
+                child: Container(
+                  width: 60, // 👈 увеличили зону нажатия
+                  height: 60,
+                  alignment: Alignment.center, // 👈 иконка по центру
+                  child: isDark
+                      ? Image.asset(
+                          "assets/images/logo/white.png",
+                          width: screenWidth * 0.038,
+                          height: screenWidth * 0.038,
+                        )
+                      : Image.asset(
                           "assets/images/logo/bedtimee.png",
-                          width: screenWidth * 0.041, // ~16px
-                          height: screenWidth * 0.041,
+                          width: screenWidth * 0.040,
+                          height: screenWidth * 0.040,
                         ),
-                      )
-                    : Image.asset(
-                        "assets/images/logo/bedtime1.png",
-                        width: screenWidth * 0.09, // ~35px
-                        height: screenWidth * 0.09,
-                      ),
+                ),
               ),
             ),
           ],

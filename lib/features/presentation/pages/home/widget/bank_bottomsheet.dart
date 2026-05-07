@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
-import '../../../../../core/utils/app_theme.dart';
+import '../../../../../core/utils/theme/app_colors.dart';
+import '../../../../../core/utils/theme/app_theme.dart';
 
 class BankBottomSheet extends StatefulWidget {
   final String? selected;

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:komekchi_service/core/utils/app_theme.dart';
+import 'package:komekchi_service/core/utils/theme/app_theme.dart';
+
+import '../../../../core/utils/theme/app_colors.dart';
 
 class SazlamalarScreen extends StatefulWidget {
   const SazlamalarScreen({super.key});

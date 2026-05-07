@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../core/utils/theme/app_colors.dart';
+
 class CheckScreen extends StatefulWidget {
   const CheckScreen({super.key});
 
@@ -106,10 +108,10 @@ class _CheckScreenState extends State<CheckScreen>
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final bg = isDark ? const Color(0xFF121212) : Colors.white;
-    final textColor = isDark ? Colors.white : const Color(0xFF1A1A2E);
-    const blue = Color(0xFF264FED);
-    const green = Color(0xFF4CAF50);
+    final bg = isDark ? AppColor.bgBlogDark : AppColor.bgBlogLight;
+    final cardBg = isDark ? AppColor.bgPageDark : AppColor.bgPageLight;
+    final textColor = isDark ? AppColor.titleTextDark : AppColor.titleTextLight;
+    final borderColor = isDark ? const Color(0xFF333333) : AppColor.borderColor;
 
     return Scaffold(
       backgroundColor: bg,
@@ -138,7 +140,7 @@ class _CheckScreenState extends State<CheckScreen>
                               height: 72,
                               decoration: BoxDecoration(
                                 shape: BoxShape.circle,
-                                border: Border.all(color: green, width: 2.5),
+                                border: Border.all(color: Colors.green, width: 2.5),
                               ),
                             ),
                             // Animated checkmark
@@ -148,7 +150,7 @@ class _CheckScreenState extends State<CheckScreen>
                                 size: const Size(36, 36),
                                 painter: _CheckmarkPainter(
                                   progress: _checkProgress.value,
-                                  color: green,
+                                  color: Colors.green,
                                   strokeWidth: 2.8,
                                 ),
                               ),
@@ -195,7 +197,7 @@ class _CheckScreenState extends State<CheckScreen>
                     child: ElevatedButton(
                       onPressed: () => context.go('/main'),
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: blue,
+                        backgroundColor: AppColor.primary,
                         foregroundColor: Colors.white,
                         elevation: 0,
                         shape: RoundedRectangleBorder(

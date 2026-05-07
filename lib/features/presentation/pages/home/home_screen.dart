@@ -1,11 +1,12 @@
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:komekchi_service/core/utils/app_theme.dart';
+import 'package:komekchi_service/core/utils/theme/app_theme.dart';
 import 'package:komekchi_service/features/presentation/pages/home/detail_screen/map.dart';
 import 'package:komekchi_service/features/presentation/pages/home/widget/banner_slider.dart';
 import 'package:komekchi_service/features/presentation/pages/home/widget/horizontal_service_list.dart';
 
+import '../../../../core/utils/theme/app_colors.dart';
 import 'widget/location.dart';
 
 class HomeScreen extends StatefulWidget {

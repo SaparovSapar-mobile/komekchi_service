@@ -45,6 +45,9 @@ dependencies:
   latlong2: ^0.9.1
   geolocator: ^14.0.2
   auto_size_text: ^3.0.0
+  flutter_bloc: ^9.1.1
+  equatable: ^2.0.8
+  get_it: ^9.2.1
 
 dev_dependencies:
   flutter_test:

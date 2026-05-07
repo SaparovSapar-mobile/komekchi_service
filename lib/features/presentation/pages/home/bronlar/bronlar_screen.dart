@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:komekchi_service/core/utils/app_theme.dart';
+
+import '../../../../../core/utils/theme/app_colors.dart';
 
 class BronlarScreen extends StatefulWidget {
   const BronlarScreen({super.key});

@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:komekchi_service/core/utils/app_theme.dart';
+import 'package:komekchi_service/core/utils/theme/app_theme.dart';
+
+import '../../../../../core/utils/theme/app_colors.dart';
 
 class SearchScreen extends StatefulWidget {
   const SearchScreen({super.key});

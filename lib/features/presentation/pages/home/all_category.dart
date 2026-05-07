@@ -1,10 +1,27 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
-import 'package:komekchi_service/core/utils/app_theme.dart';
+import 'package:komekchi_service/core/utils/theme/app_theme.dart';
+import 'package:komekchi_service/features/domain/entities/category.dart';
+import 'package:komekchi_service/features/presentation/bloc/cubit/get_category_cubit.dart';
 
-class AllCategoryScreen extends StatelessWidget {
+import '../../../../core/utils/theme/app_colors.dart';
+
+class AllCategoryScreen extends StatefulWidget {
   const AllCategoryScreen({super.key});
+
+  @override
+  State<AllCategoryScreen> createState() => _AllCategoryScreenState();
+}
+
+class _AllCategoryScreenState extends State<AllCategoryScreen> {
+  @override
+  void initState() {
+    super.initState();
+    // ✅ загружаем данные при открытии экрана
+    context.read<GetCategoryCubit>().fetchCategory();
+  }
 
   String getCurrentDate() {
     final now = DateTime.now();
@@ -14,52 +31,10 @@ class AllCategoryScreen extends StatelessWidget {
     return '$day.$month.$year';
   }
 
-  final List<CategoryItem> categories = const [
-    CategoryItem(
-      title: 'Elektrikçi',
-      image: 'assets/images/category/image1.png',
-    ),
-    CategoryItem(
-      title: 'Arassaçylyk',
-      image: 'assets/images/category/image2.png',
-    ),
-    CategoryItem(
-      title: 'Ýük daşaýjy',
-      image: 'assets/images/category/image3.png',
-    ),
-    CategoryItem(
-      title: 'Agaç ussasy',
-      image: 'assets/images/category/image4.png',
-    ),
-    CategoryItem(
-      title: 'Reňkleýji',
-      image: 'assets/images/category/image5.png',
-    ),
-    CategoryItem(title: 'Salon', image: 'assets/images/category/image6.png'),
-    CategoryItem(
-      title: 'Toý bezegleri',
-      image: 'assets/images/category/image7.png',
-    ),
-    CategoryItem(
-      title: 'Tehnika bejerijiler',
-      image: 'assets/images/category/image8.png',
-    ),
-    CategoryItem(
-      title: 'Öý abatlaýyş',
-      image: 'assets/images/category/image9.png',
-    ),
-    CategoryItem(
-      title: 'Maşyn ýuwmak',
-      image: 'assets/images/category/image11.png',
-    ),
-    CategoryItem(
-      title: 'Okuw gollanmalar',
-      image: 'assets/images/category/image12.png',
-    ),
-  ];
-
   @override
   Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+
     return Scaffold(
       backgroundColor: AppColor.primary,
       appBar: AppBar(
@@ -86,30 +61,33 @@ class AllCategoryScreen extends StatelessWidget {
           children: [
             // Header
             Padding(
-              padding: const EdgeInsets.symmetric(
-                horizontal: 31.0,
-                vertical: 10.31,
+              padding: EdgeInsets.symmetric(
+                horizontal: screenWidth * 0.08,
+                vertical: 10,
               ),
               child: Row(
                 children: [
                   Image.asset(
                     "assets/images/logo/mini_logo.png",
-                    width: 37.14,
-                    height: 38.42,
+                    width: screenWidth * 0.095,
+                    height: screenWidth * 0.098,
                   ),
                   const SizedBox(width: 4),
                   const Text(
                     "Kömekçi\nHyzmat",
                     style: TextStyle(
-                      fontSize: 10.0,
+                      fontSize: 10,
                       color: AppColor.primary,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
                   const Spacer(),
-                  Text(
-                    getCurrentDate(),
-                    style: const TextStyle(fontSize: 16, color: Colors.black),
+                  Flexible(
+                    child: Text(
+                      getCurrentDate(),
+                      style: const TextStyle(fontSize: 14, color: Colors.black),
+                      overflow: TextOverflow.ellipsis,
+                    ),
                   ),
                   const SizedBox(width: 2),
                   const Text("|"),
@@ -117,7 +95,7 @@ class AllCategoryScreen extends StatelessWidget {
                   const Icon(Icons.cloud, size: 16, color: Colors.black45),
                   const Text(
                     " 32° Aşgabat",
-                    style: TextStyle(fontSize: 16, color: Colors.black),
+                    style: TextStyle(fontSize: 14, color: Colors.black),
                   ),
                 ],
               ),
@@ -133,7 +111,7 @@ class AllCategoryScreen extends StatelessWidget {
                     icon: const Icon(Icons.arrow_back_ios_new, size: 18),
                   ),
                   const Text(
-                    'All Category',
+                    'Ähli kategoriýalar',
                     style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.w700,
@@ -145,7 +123,7 @@ class AllCategoryScreen extends StatelessWidget {
             ),
             const Divider(height: 1, color: Color(0xFFF5F7FF)),
 
-            // List
+            // ✅ BlocBuilder — слушаем состояние
             Expanded(
               child: Container(
                 color: const Color(0xFFF5F7FF),
@@ -158,15 +136,67 @@ class AllCategoryScreen extends StatelessWidget {
                     color: Colors.white,
                     borderRadius: BorderRadius.circular(10),
                   ),
-                  child: ListView.builder(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 10,
-                      vertical: 20,
-                    ),
-                    itemCount: categories.length,
-                    itemBuilder: (context, index) {
-                      final item = categories[index];
-                      return _CategoryTile(item: item);
+                  child: BlocBuilder<GetCategoryCubit, GetCategoryState>(
+                    builder: (context, state) {
+                      // ─── Загрузка ───
+                      if (state is GetCategoryLoading) {
+                        return const Center(child: CircularProgressIndicator());
+                      }
+
+                      // ─── Ошибка ───
+                      if (state is GetCategoryError) {
+                        return Center(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              const Icon(
+                                Icons.error_outline,
+                                color: Colors.red,
+                                size: 48,
+                              ),
+                              const SizedBox(height: 12),
+                              Text(
+                                state.message,
+                                textAlign: TextAlign.center,
+                                style: const TextStyle(color: Colors.red),
+                              ),
+                              const SizedBox(height: 16),
+                              ElevatedButton(
+                                onPressed: () {
+                                  context
+                                      .read<GetCategoryCubit>()
+                                      .fetchCategory();
+                                },
+                                child: const Text('Täzeden synanyşmak'),
+                              ),
+                            ],
+                          ),
+                        );
+                      }
+
+                      if (state is GetCategorySucces) {
+                        final items = state.dataCategory.data;
+
+                        if (items.isEmpty) {
+                          return const Center(
+                            child: Text('Kategoriýa tapylmady'),
+                          );
+                        }
+
+                        return ListView.builder(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 10,
+                            vertical: 20,
+                          ),
+                          itemCount: items.length,
+                          itemBuilder: (context, index) {
+                            final item = items[index];
+                            return _CategoryTile(item: item);
+                          },
+                        );
+                      }
+
+                      return const SizedBox();
                     },
                   ),
                 ),
@@ -180,14 +210,14 @@ class AllCategoryScreen extends StatelessWidget {
 }
 
 class _CategoryTile extends StatelessWidget {
-  final CategoryItem item;
+  final CategoryItem item; // ✅ CategoryItem (не Category)
   const _CategoryTile({required this.item});
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        context.push('/categoryId', extra: item.title);
+        context.push('/categoryId', extra: item.name);
       },
       child: Container(
         margin: const EdgeInsets.symmetric(vertical: 5),
@@ -198,11 +228,11 @@ class _CategoryTile extends StatelessWidget {
               height: 28,
               width: 28,
               decoration: BoxDecoration(
-                color: Color(0xFFF6F8FD),
+                color: const Color(0xFFF6F8FD),
                 borderRadius: BorderRadius.circular(4),
               ),
-              child: Image.asset(
-                item.image,
+              child: Image.network(
+                item.img_tm,
                 width: 28,
                 height: 28,
                 errorBuilder: (_, __, ___) => Container(
@@ -223,7 +253,7 @@ class _CategoryTile extends StatelessWidget {
             const SizedBox(width: 14),
             Expanded(
               child: Text(
-                item.title,
+                item.name,
                 style: const TextStyle(
                   fontSize: 15,
                   fontWeight: FontWeight.w500,
@@ -231,16 +261,10 @@ class _CategoryTile extends StatelessWidget {
                 ),
               ),
             ),
-            Icon(Icons.chevron_right, color: Colors.black, size: 22),
+            const Icon(Icons.chevron_right, color: Colors.black, size: 22),
           ],
         ),
       ),
     );
   }
-}
-
-class CategoryItem {
-  final String title;
-  final String image;
-  const CategoryItem({required this.title, required this.image});
 }

@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
-import 'package:komekchi_service/core/utils/app_theme.dart';
+import 'package:komekchi_service/core/utils/theme/app_theme.dart';
 import 'package:komekchi_service/features/presentation/pages/home/widget/bank_bottomsheet.dart';
 
+import '../../../../../core/utils/theme/app_colors.dart';
 import '../../auth/auth_screen.dart.dart';
 import 'tolegbottomsheet.dart';
 
@@ -261,11 +262,10 @@ class _SelectedDateState extends State<SelectedDate> {
                           controller: _nameController,
                           inputBg: const Color(0xFFF7F7F7),
                           borderColor: borderColor,
-                          type: FieldType.text,
                           textColor: textColor,
                           hintColor: Colors.black38,
                           text: "Adyňyzy giriziň",
-                          keyboardType: TextInputType.phone,
+                          keyboardType: TextInputType.text,
                           suffix: IconButton(
                             icon: Icon(
                               Icons.cancel,

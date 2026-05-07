@@ -18,7 +18,7 @@ import 'package:komekchi_service/features/presentation/pages/home/widget/select_
 import 'package:komekchi_service/features/presentation/pages/main_screen.dart/main_screen.dart';
 
 import '../../features/presentation/pages/auth/check_screen.dart';
-import '../../features/presentation/pages/auth/smsscreen.dart';
+import '../../features/presentation/pages/auth/sms_screen.dart';
 import '../../features/presentation/pages/home/aksiyalar_screen.dart';
 import '../../features/presentation/pages/home/widget/selected_date.dart';
 import '../../features/presentation/pages/splash/onboarding_screen.dart';

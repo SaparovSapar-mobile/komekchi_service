@@ -2,9 +2,9 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
-import 'package:komekchi_service/core/utils/app_theme.dart';
 import 'package:komekchi_service/features/presentation/pages/home/widget/nagilelik_bottomsheet.dart';
 
+import '../../../../../core/utils/theme/app_colors.dart';
 import 'map.dart';
 
 class DetailScreen extends StatefulWidget {

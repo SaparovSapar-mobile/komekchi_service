@@ -3,7 +3,8 @@ import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:geolocator/geolocator.dart';
 
-import '../../../../core/utils/app_theme.dart';
+import '../../../../core/utils/theme/app_colors.dart';
+import '../../../../core/utils/theme/app_theme.dart';
 
 class MapScreen extends StatefulWidget {
   final ValueChanged<String> onLocationSelected;
