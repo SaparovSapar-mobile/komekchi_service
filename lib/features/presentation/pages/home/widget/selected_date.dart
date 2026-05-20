@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 import 'package:komekchi_service/core/utils/theme/app_theme.dart';
+import 'package:komekchi_service/features/presentation/pages/home/home_screen.dart';
 import 'package:komekchi_service/features/presentation/pages/home/widget/bank_bottomsheet.dart';
 
 import '../../../../../core/utils/theme/app_colors.dart';
@@ -117,44 +118,8 @@ class _SelectedDateState extends State<SelectedDate> {
             // Header
             SizedBox(
               height: 49,
-              child: Padding(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 31.0,
-                  vertical: 10.31,
-                ),
-                child: Row(
-                  children: [
-                    Image.asset(
-                      "assets/images/logo/mini_logo.png",
-                      width: 37.14,
-                      height: 38.42,
-                    ),
-                    const SizedBox(width: 4),
-                    const Text(
-                      "Kömekçi\nHyzmat",
-                      style: TextStyle(
-                        fontSize: 10.0,
-                        color: AppColor.primary,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    const Spacer(),
-                    Text(
-                      getCurrentDate(),
-                      style: const TextStyle(fontSize: 16, color: Colors.black),
-                    ),
-                    const SizedBox(width: 2),
-                    const Text("|"),
-                    const SizedBox(width: 2),
-                    const Icon(Icons.cloud, size: 16, color: Colors.black45),
-                    const Text(
-                      " 32° Aşgabat",
-                      style: TextStyle(fontSize: 16, color: Colors.black),
-                    ),
-                  ],
-                ),
-              ),
-            ),
+              child: 
+             AppBarWidget(textColor) ),
             const Divider(height: 1, color: Color(0xFFF5F7FF)),
 
             // Back + Title

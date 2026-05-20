@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:komekchi_service/core/utils/theme/app_theme.dart';
 
 import '../../../../../core/utils/theme/app_colors.dart';
 
@@ -167,7 +166,7 @@ class _BannerSliderState extends State<BannerSlider> {
                       decoration: BoxDecoration(
                         color: _currentPage == index
                             ? AppColor.primary
-                            :  Colors.white,
+                            : Colors.white,
                         borderRadius: BorderRadius.circular(4),
                       ),
                     );
@@ -231,16 +230,18 @@ class BannerItem {
   BannerItem({required this.text, required this.image});
 }
 
-
 class DividerWidget extends StatelessWidget {
   const DividerWidget({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Container(
-      color: Colors.grey[100],
-      height: 5,
+      color: isDark ? AppColor.bgPageDark : AppColor.bgPageLight,
+      height: 6,
       width: double.infinity,
+      margin: const EdgeInsets.only(bottom: 10),
     );
   }
 }

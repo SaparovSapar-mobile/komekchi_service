@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 import 'package:komekchi_service/core/utils/theme/app_theme.dart';
+import 'package:komekchi_service/features/presentation/pages/home/home_screen.dart';
 
 import '../../../../../core/utils/theme/app_colors.dart';
 
@@ -93,16 +94,22 @@ class _SelectDateState extends State<SelectDate> {
     // ✅ Получаем размеры экрана
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final bg = isDark ? AppColor.bgBlogDark : AppColor.bgBlogLight;
+    final cardBg = isDark ? AppColor.bgBlogDark : AppColor.bgBlogLight;
+    final textColor =  AppColor.titleText(context);
+    final borderColor = isDark ? const Color(0xFF333333) : AppColor.borderColor;
+
 
     // ✅ Адаптивные размеры на основе ширины экрана
-    final double dayItemWidth = screenWidth * 0.135;      // ~54px на 390px экране
-    final double dayItemHeight = screenHeight * 0.067;    // ~56px на 844px экране
-    final double timeItemWidth = screenWidth * 0.27;      // ~107px на 390px экране
-    final double timeItemHeight = screenHeight * 0.046;   // ~39px на 844px экране
-    final double fontSizeSmall = screenWidth * 0.033;     // ~13px
-    final double fontSizeNormal = screenWidth * 0.04;     // ~16px
-    final double fontSizeMedium = screenWidth * 0.045;    // ~18px
-    final double horizontalPadding = screenWidth * 0.04;  // ~16px
+    final double dayItemWidth = screenWidth * 0.135; // ~54px на 390px экране
+    final double dayItemHeight = screenHeight * 0.067; // ~56px на 844px экране
+    final double timeItemWidth = screenWidth * 0.27; // ~107px на 390px экране
+    final double timeItemHeight = screenHeight * 0.046; // ~39px на 844px экране
+    final double fontSizeSmall = screenWidth * 0.033; // ~13px
+    final double fontSizeNormal = screenWidth * 0.04; // ~16px
+    final double fontSizeMedium = screenWidth * 0.045; // ~18px
+    final double horizontalPadding = screenWidth * 0.04; // ~16px
 
     return Scaffold(
       backgroundColor: AppColor.primary,
@@ -131,64 +138,7 @@ class _SelectDateState extends State<SelectDate> {
             // ✅ Header — адаптивный padding и шрифты
             SizedBox(
               height: screenHeight * 0.058, // ~49px
-              child: Padding(
-                padding: EdgeInsets.symmetric(
-                  horizontal: horizontalPadding,
-                  vertical: screenHeight * 0.012,
-                ),
-                child: Row(
-                  children: [
-                    Image.asset(
-                      "assets/images/logo/mini_logo.png",
-                      width: screenWidth * 0.095,   // ~37px
-                      height: screenWidth * 0.098,  // ~38px
-                    ),
-                    SizedBox(width: screenWidth * 0.01),
-                    Text(
-                      "Kömekçi\nHyzmat",
-                      style: TextStyle(
-                        fontSize: fontSizeSmall,  // ✅ адаптивный
-                        color: AppColor.primary,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    const Spacer(),
-                    // ✅ Оборачиваем правую часть в Flexible чтобы не вылезало
-                    Flexible(
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Text(
-                            getCurrentDate(),
-                            style: TextStyle(
-                              fontSize: fontSizeNormal, // ✅ адаптивный
-                              color: Colors.black,
-                            ),
-                          ),
-                          SizedBox(width: screenWidth * 0.005),
-                          const Text("|"),
-                          SizedBox(width: screenWidth * 0.005),
-                          Icon(
-                            Icons.cloud,
-                            size: screenWidth * 0.04, // ✅ адаптивный
-                            color: Colors.black45,
-                          ),
-                          Flexible(
-                            child: Text(
-                              " 32° Aşgabat",
-                              style: TextStyle(
-                                fontSize: fontSizeNormal, // ✅ адаптивный
-                                color: Colors.black,
-                              ),
-                              overflow: TextOverflow.ellipsis, // ✅ не вылезает
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ),
+              child: AppBarWidget(textColor),
             ),
             const Divider(height: 1, color: Color(0xFFF5F7FF)),
 
@@ -228,12 +178,12 @@ class _SelectDateState extends State<SelectDate> {
                 color: AppColor.bgPageLight,
                 child: Container(
                   padding: EdgeInsets.symmetric(
-                    vertical: screenHeight * 0.024,   // ✅ ~20px адаптивно
-                    horizontal: screenWidth * 0.018,  // ✅ ~7px адаптивно
+                    vertical: screenHeight * 0.024, // ✅ ~20px адаптивно
+                    horizontal: screenWidth * 0.018, // ✅ ~7px адаптивно
                   ),
                   margin: EdgeInsets.symmetric(
-                    horizontal: screenWidth * 0.036,  // ✅ ~14px адаптивно
-                    vertical: screenHeight * 0.012,   // ✅ ~10px адаптивно
+                    horizontal: screenWidth * 0.036, // ✅ ~14px адаптивно
+                    vertical: screenHeight * 0.012, // ✅ ~10px адаптивно
                   ),
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(10),
@@ -271,7 +221,9 @@ class _SelectDateState extends State<SelectDate> {
                               },
                               child: AnimatedContainer(
                                 duration: const Duration(milliseconds: 200),
-                                margin: EdgeInsets.only(right: screenWidth * 0.025),
+                                margin: EdgeInsets.only(
+                                  right: screenWidth * 0.025,
+                                ),
                                 width: dayItemWidth, // ✅ адаптивная ширина
                                 decoration: BoxDecoration(
                                   color: isSelected
@@ -291,7 +243,8 @@ class _SelectDateState extends State<SelectDate> {
                                     Text(
                                       _weekDayName(day),
                                       style: TextStyle(
-                                        fontSize: fontSizeNormal, // ✅ адаптивный
+                                        fontSize:
+                                            fontSizeNormal, // ✅ адаптивный
                                         color: const Color(0xFF90979F),
                                       ),
                                     ),
@@ -299,7 +252,8 @@ class _SelectDateState extends State<SelectDate> {
                                     Text(
                                       '${day.day}',
                                       style: TextStyle(
-                                        fontSize: fontSizeNormal, // ✅ адаптивный
+                                        fontSize:
+                                            fontSizeNormal, // ✅ адаптивный
                                         fontWeight: FontWeight.w700,
                                         color: Colors.black,
                                       ),
@@ -313,7 +267,6 @@ class _SelectDateState extends State<SelectDate> {
                       ),
 
                       SizedBox(height: screenHeight * 0.059), // ~50px адаптивно
-
                       // Wagty saýla
                       Text(
                         'Wagty saýla',
@@ -342,9 +295,13 @@ class _SelectDateState extends State<SelectDate> {
                               child: AnimatedContainer(
                                 duration: const Duration(milliseconds: 200),
                                 width: timeItemWidth, // ✅ адаптивная ширина
-                                margin: EdgeInsets.only(right: screenWidth * 0.013),
+                                margin: EdgeInsets.only(
+                                  right: screenWidth * 0.013,
+                                ),
                                 padding: EdgeInsets.symmetric(
-                                  horizontal: screenWidth * 0.015, // ✅ адаптивный padding
+                                  horizontal:
+                                      screenWidth *
+                                      0.015, // ✅ адаптивный padding
                                 ),
                                 decoration: BoxDecoration(
                                   color: isSelected
@@ -359,12 +316,14 @@ class _SelectDateState extends State<SelectDate> {
                                   ),
                                 ),
                                 child: Center(
-                                  child: FittedBox( // ✅ текст не вылезет никогда
+                                  child: FittedBox(
+                                    // ✅ текст не вылезет никогда
                                     fit: BoxFit.scaleDown,
                                     child: Text(
                                       _availableTimeSlots[index],
                                       style: TextStyle(
-                                        fontSize: fontSizeNormal, // ✅ адаптивный
+                                        fontSize:
+                                            fontSizeNormal, // ✅ адаптивный
                                         fontWeight: FontWeight.w500,
                                         color: Colors.black,
                                       ),
@@ -401,7 +360,7 @@ class _SelectDateState extends State<SelectDate> {
                               fontWeight: FontWeight.w400,
                               color: Colors.white,
                             ),
-                          ), 
+                          ),
                         ),
                       ),
                       SizedBox(height: screenHeight * 0.019), // ~16px адаптивно

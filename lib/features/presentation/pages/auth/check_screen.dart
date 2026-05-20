@@ -109,9 +109,9 @@ class _CheckScreenState extends State<CheckScreen>
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final bg = isDark ? AppColor.bgBlogDark : AppColor.bgBlogLight;
-    final cardBg = isDark ? AppColor.bgPageDark : AppColor.bgPageLight;
-    final textColor = isDark ? AppColor.titleTextDark : AppColor.titleTextLight;
-    final borderColor = isDark ? const Color(0xFF333333) : AppColor.borderColor;
+    // final cardBg = isDark ? AppColor.bgPageDark : AppColor.bgPageLight;
+    // final textColor = isDark ? AppColor.titleTextDark : AppColor.titleTextLight;
+    // final borderColor = isDark ? const Color(0xFF333333) : AppColor.borderColor;
 
     return Scaffold(
       backgroundColor: bg,
@@ -171,7 +171,7 @@ class _CheckScreenState extends State<CheckScreen>
                       child: Text(
                         'Tassyklandy!',
                         style: TextStyle(
-                          color: textColor,
+                          color: AppColor.titleText(context),
                           fontSize: 18,
                           fontWeight: FontWeight.w700,
                         ),

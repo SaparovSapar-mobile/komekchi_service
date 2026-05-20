@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:komekchi_service/core/utils/theme/app_theme.dart';
-import 'package:komekchi_service/features/presentation/pages/home/widget/banner_slider.dart';
 import 'package:komekchi_service/main.dart';
 
 import '../../../../core/utils/theme/app_colors.dart';
@@ -23,7 +21,6 @@ class _ForgotPassState extends State<ForgotPass>
   final TextEditingController _loginPasswordController =
       TextEditingController();
 
-  final TextEditingController _nameController = TextEditingController();
   final TextEditingController _confirmController = TextEditingController();
 
   @override
@@ -36,7 +33,6 @@ class _ForgotPassState extends State<ForgotPass>
   void dispose() {
     _loginPhoneController.dispose();
     _loginPasswordController.dispose();
-    _nameController.dispose();
     _confirmController.dispose();
     super.dispose();
   }
@@ -44,12 +40,11 @@ class _ForgotPassState extends State<ForgotPass>
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final bg = isDark ? const Color(0xFF121212) : const Color(0xFFF5F5F5);
-    final cardBg = isDark ? const Color(0xFF1E1E1E) : Colors.white;
-    final textColor = isDark ? Colors.white : const Color(0xFF1A1A2E);
-    final borderColor = isDark
-        ? const Color(0xFF333333)
-        : const Color(0xFFD0D7FB);
+
+    final bg = isDark ? AppColor.bgBlogDark : AppColor.bgBlogLight;
+    final cardBg = isDark ? AppColor.bgBlogDark : AppColor.bgBlogLight;
+    final textColor = AppColor.titleText(context);
+    final borderColor = isDark ? const Color(0xFF333333) : AppColor.borderColor;
 
     return Scaffold(
       backgroundColor: bg,
@@ -105,7 +100,7 @@ class _ForgotPassState extends State<ForgotPass>
                 ],
               ),
             ),
-            DividerWidget(),
+            // DividerWidget(),
             Expanded(
               child: SingleChildScrollView(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -161,7 +156,7 @@ class _ForgotPassState extends State<ForgotPass>
     Color textColor,
     Color borderColor,
   ) {
-    final inputBg = isDark ? const Color(0xFF2A2A2A) : const Color(0xFFF7F7F7);
+    final inputBg = isDark ? AppColor.bgPageDark : AppColor.bgPageLight;
     final hintColor = isDark ? Colors.white38 : Colors.black38;
     const blue = AppColor.primary;
 
@@ -171,9 +166,9 @@ class _ForgotPassState extends State<ForgotPass>
       children: [
         Center(
           child: Image.asset(
-            "assets/images/logo/icons.jpg",
-            width: 58.76,
-            height: 58.76,
+            "assets/images/logo/phone.png",
+            height: 30,
+            width: 30,
           ),
         ),
         const SizedBox(height: 32),
@@ -252,7 +247,7 @@ class _ForgotPassState extends State<ForgotPass>
         ),
         const SizedBox(height: 8),
         _inputField(
-          controller: _loginPasswordController,
+          controller: _confirmController,
           inputBg: inputBg,
           borderColor: borderColor,
           textColor: textColor,
@@ -277,7 +272,7 @@ class _ForgotPassState extends State<ForgotPass>
           width: double.infinity,
           height: 54,
           child: ElevatedButton(
-            onPressed: () => context.go("/sms"),
+            onPressed: () => context.push("/sms"),
             style: ElevatedButton.styleFrom(
               backgroundColor: blue,
               foregroundColor: Colors.white,

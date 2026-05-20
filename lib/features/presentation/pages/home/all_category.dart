@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
-import 'package:komekchi_service/core/utils/theme/app_theme.dart';
 import 'package:komekchi_service/features/domain/entities/category.dart';
 import 'package:komekchi_service/features/presentation/bloc/cubit/get_category_cubit.dart';
+import 'package:komekchi_service/features/presentation/pages/home/home_screen.dart';
 
 import '../../../../core/utils/theme/app_colors.dart';
 
@@ -33,7 +33,13 @@ class _AllCategoryScreenState extends State<AllCategoryScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final screenWidth = MediaQuery.of(context).size.width;
+    // final isDark = Theme.of(context).brightness == Brightness.dark;
+    // final bg = isDark ? AppColor.bgBlogDark : AppColor.bgBlogLight;
+    // final cardBg = isDark ? AppColor.bgBlogDark : AppColor.bgBlogLight;
+    final textColor =  AppColor.titleText(context);
+    // final borderColor = isDark ? const Color(0xFF333333) : AppColor.borderColor;
+
+    // final screenWidth = MediaQuery.of(context).size.width;
 
     return Scaffold(
       backgroundColor: AppColor.primary,
@@ -60,46 +66,8 @@ class _AllCategoryScreenState extends State<AllCategoryScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // Header
-            Padding(
-              padding: EdgeInsets.symmetric(
-                horizontal: screenWidth * 0.08,
-                vertical: 10,
-              ),
-              child: Row(
-                children: [
-                  Image.asset(
-                    "assets/images/logo/mini_logo.png",
-                    width: screenWidth * 0.095,
-                    height: screenWidth * 0.098,
-                  ),
-                  const SizedBox(width: 4),
-                  const Text(
-                    "Kömekçi\nHyzmat",
-                    style: TextStyle(
-                      fontSize: 10,
-                      color: AppColor.primary,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const Spacer(),
-                  Flexible(
-                    child: Text(
-                      getCurrentDate(),
-                      style: const TextStyle(fontSize: 14, color: Colors.black),
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ),
-                  const SizedBox(width: 2),
-                  const Text("|"),
-                  const SizedBox(width: 2),
-                  const Icon(Icons.cloud, size: 16, color: Colors.black45),
-                  const Text(
-                    " 32° Aşgabat",
-                    style: TextStyle(fontSize: 14, color: Colors.black),
-                  ),
-                ],
-              ),
-            ),
+           AppBarWidget(textColor),
+           
             Divider(height: 2, color: Colors.grey[100]),
 
             Padding(

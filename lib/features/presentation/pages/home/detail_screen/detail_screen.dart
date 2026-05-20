@@ -2,7 +2,8 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
-import 'package:komekchi_service/features/presentation/pages/home/widget/nagilelik_bottomsheet.dart';
+import 'package:komekchi_service/features/presentation/pages/home/detail_screen/nagilelik_bottomsheet.dart';
+import 'package:komekchi_service/features/presentation/pages/home/home_screen.dart';
 
 import '../../../../../core/utils/theme/app_colors.dart';
 import 'map.dart';
@@ -47,6 +48,12 @@ class _DetailScreenState extends State<DetailScreen> {
   @override
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
+    // final isDark = Theme.of(context).brightness == Brightness.dark;
+    // final bg = isDark ? AppColor.bgBlogDark : AppColor.bgBlogLight;
+    // final cardBg = isDark ? AppColor.bgBlogDark : AppColor.bgBlogLight;
+    final textColor =  AppColor.titleText(context);
+    // final borderColor = isDark ? const Color(0xFF333333) : AppColor.borderColor;
+
     return Scaffold(
       backgroundColor: AppColor.primary,
       appBar: AppBar(
@@ -71,43 +78,7 @@ class _DetailScreenState extends State<DetailScreen> {
         child: Column(
           children: [
             // Header
-            Padding(
-              padding: const EdgeInsets.symmetric(
-                horizontal: 31.0,
-                vertical: 10.31,
-              ),
-              child: Row(
-                children: [
-                  Image.asset(
-                    "assets/images/logo/mini_logo.png",
-                    width: 37.14,
-                    height: 38.42,
-                  ),
-                  const SizedBox(width: 4),
-                  const Text(
-                    "Kömekçi\nHyzmat",
-                    style: TextStyle(
-                      fontSize: 10.0,
-                      color: AppColor.primary,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const Spacer(),
-                  Text(
-                    getCurrentDate(),
-                    style: const TextStyle(fontSize: 16, color: Colors.black),
-                  ),
-                  const SizedBox(width: 2),
-                  const Text("|"),
-                  const SizedBox(width: 2),
-                  const Icon(Icons.cloud, size: 16, color: Colors.black45),
-                  const Text(
-                    " 32° Aşgabat",
-                    style: TextStyle(fontSize: 16, color: Colors.black),
-                  ),
-                ],
-              ),
-            ),
+            AppBarWidget(textColor), 
             Divider(height: 1, color: Color(0xFFF5F7FF)),
 
             // Back button + title + more
@@ -633,7 +604,11 @@ class _DetailScreenState extends State<DetailScreen> {
                               ),
                               child: Row(
                                 children: [
-                                  Image.asset("assets/images/icon/i.png", width: 20, height: 20,),
+                                  Image.asset(
+                                    "assets/images/icon/i.png",
+                                    width: 20,
+                                    height: 20,
+                                  ),
                                   const SizedBox(width: 8),
                                   Expanded(
                                     child: Text(

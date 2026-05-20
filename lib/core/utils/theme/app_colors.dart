@@ -1,34 +1,49 @@
 import 'package:flutter/material.dart';
-abstract class AppColor {
-  // Primary
-  static const Color primary = Color(0xFF2549E0);
+
+class AppColor {
+  AppColor._();
+
+  // ─── Primary ─────────────────────────────────────────────────────
+  static const Color primary   = Color(0xFF264FED);
   static const Color secondary = Color(0xFFFF6600);
-  static const Color secondaryAlt = Color(0xFFFE8E3A);
+  static const Color tertiary  = Color(0xFFFE8E3A);
 
-  // Warning / Status
-  static const Color vipCard = Color(0xFFE48121);
-  static const Color expertCard = Color(0xFFF8A800);
-  static const Color newCard = Color(0xFF07AA00);
-  static const Color gradus360 = Color(0xFFFF5950);
+  // ─── Warning / Special cards ─────────────────────────────────────
+  static const Color vipCard     = Color(0xFFFBB725);
+  static const Color exportCard  = Color(0xFFF3690D);
+  static const Color newCard     = Color(0xFF2BC171);
+  static const Color gradus360   = Color(0xFFFF5050);
 
-  // Info / System
-  static const Color error = Color(0xFFD20820);
-  static const Color success = Color(0xFF04B481);
-  static const Color borderColor = Color(0xFFD0D7FB);
+  // ─── Semantic ────────────────────────────────────────────────────
+  static const Color error   = Color(0xFFDC2626);
+  static const Color success = Color(0xFF047857);
+  static const Color loading = Color(0xFFF4F2F2);
 
-  // Light Background
+  // ─── Backgrounds ─────────────────────────────────────────────────
   static const Color bgPageLight = Color(0xFFF6F8FD);
   static const Color bgBlogLight = Color(0xFFFFFFFF);
+  static const Color bgPageDark  = Color(0xFF3D3C3C);
+  static const Color bgBlogDark  = Color(0xFF333333);
 
-  // Dark Background
-  static const Color bgPageDark = Color(0xFF3D3C3C);
-  static const Color bgBlogDark = Color(0xFF333333);
+  // ─── Text colors ─────────────────────────────────────────────────
+  static const Color titleLight       = Color(0xFF262626);
+  static const Color descriptionLight = Color(0xFF90979F);
+  static const Color titleDark        = Color(0xFFF6F6F6);
+  static const Color descriptionDark  = Color(0xFFCCCCCC);
+  static const Color borderColor = Color(0xFFD0D7FB);
 
-  // Light Text
-  static const Color titleTextLight = Color(0xFF262626);
-  static const Color descriptionTextLight = Color(0xFF90979F);
 
-  // Dark Text
-  static const Color titleTextDark = Color(0xFFF6F6F6);
-  static const Color descriptionTextDark = Color(0xFFCCCCCC);
+  // ─── Text helpers (используй с context) ──────────────────────────
+
+  /// Главный текст (заголовки, важный контент)
+  static Color titleText(BuildContext context) =>
+      Theme.of(context).brightness == Brightness.dark
+          ? titleDark
+          : titleLight;
+
+  /// Второстепенный текст (описания, подсказки)
+  static Color descriptionText(BuildContext context) =>
+      Theme.of(context).brightness == Brightness.dark
+          ? descriptionDark
+          : descriptionLight;
 }

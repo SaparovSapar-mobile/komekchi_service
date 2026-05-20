@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
-import 'package:komekchi_service/core/utils/theme/app_theme.dart';
 
 import '../../../../../core/utils/theme/app_colors.dart';
 
@@ -59,46 +58,6 @@ class _NagilelikScreenState extends State<NagilelikScreen> {
         ),
         child: Column(
           children: [
-            // Header
-            Padding(
-              padding: const EdgeInsets.symmetric(
-                horizontal: 31.0,
-                vertical: 10.31,
-              ),
-              child: Row(
-                children: [
-                  Image.asset(
-                    "assets/images/logo/mini_logo.png",
-                    width: 37.14,
-                    height: 38.42,
-                  ),
-                  const SizedBox(width: 4),
-                  const Text(
-                    "Kömekçi\nHyzmat",
-                    style: TextStyle(
-                      fontSize: 10.0,
-                      color: AppColor.primary,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const Spacer(),
-                  Text(
-                    getCurrentDate(),
-                    style: const TextStyle(fontSize: 16, color: Colors.black),
-                  ),
-                  const SizedBox(width: 2),
-                  const Text("|"),
-                  const SizedBox(width: 2),
-                  const Icon(Icons.cloud, size: 16, color: Colors.black45),
-                  const Text(
-                    " 32° Aşgabat",
-                    style: TextStyle(fontSize: 16, color: Colors.black),
-                  ),
-                ],
-              ),
-            ),
-            const Divider(height: 1, color: Color(0xFFF5F7FF)),
-
             // Back
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
@@ -130,11 +89,7 @@ class _NagilelikScreenState extends State<NagilelikScreen> {
                     // Icon + Title
                     Row(
                       children: [
-                        const Icon(
-                          Icons.flag_outlined,
-                          color: AppColor.primary,
-                          size: 26,
-                        ),
+                       Image.asset("assets/images/logo/flag.png", width: 26,height: 26,),
                         const SizedBox(width: 10),
                         const Text(
                           'Nagilelik bildirmek',
@@ -193,7 +148,7 @@ class _NagilelikScreenState extends State<NagilelikScreen> {
 
                     // Hat yazmak
                     const Text(
-                      'Hat yazmak',
+                      'Hat ýazmak',
                       style: TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.w500,
@@ -205,7 +160,7 @@ class _NagilelikScreenState extends State<NagilelikScreen> {
                       controller: _messageController,
                       maxLines: 6,
                       decoration: InputDecoration(
-                        hintText: 'Hat yaz',
+                        hintText: 'Hat ýaz',
                         hintStyle: TextStyle(
                           color: Colors.grey.shade400,
                           fontSize: 15,

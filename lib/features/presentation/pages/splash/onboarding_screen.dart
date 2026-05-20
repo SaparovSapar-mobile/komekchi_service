@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
+import 'package:komekchi_service/core/utils/theme/app_text_style.dart';
 import 'package:komekchi_service/main.dart';
 import '../../../../core/utils/theme/app_colors.dart';
 import '../../../../core/utils/theme/app_theme.dart';
@@ -63,6 +64,7 @@ class _WalkthroughScreenState extends State<WalkthroughScreen> {
     final double fontSizeSkip = screenWidth * 0.045;
     final double buttonHeight = screenHeight * 0.066;
     final double bottomPadding = screenHeight * 0.036;
+    final TextStyle textStyle = AppTextStyle.semiBold18; 
 
     return Scaffold(
       appBar: AppBar(
@@ -204,7 +206,7 @@ class _WalkthroughScreenState extends State<WalkthroughScreen> {
                     ),
                     color: isDark
                         ? AppColor.bgBlogDark
-                        : AppColor.titleTextDark,
+                        : AppColor.titleDark,
                   ),
                   padding: EdgeInsets.only(
                     top: screenHeight * 0.008,
@@ -406,7 +408,7 @@ class _WalkthroughScreenState extends State<WalkthroughScreen> {
                 child: Text(
                   "Skip",
                   style: TextStyle(
-                    color: isDark ? AppColor.titleTextDark : AppColor.primary,
+                    color: isDark ? AppColor.titleDark : AppColor.primary,
                     fontSize: fontSizeSkip,
                   ),
                 ),

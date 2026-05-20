@@ -1,13 +1,10 @@
-import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:komekchi_service/core/utils/theme/app_theme.dart';
 import 'package:komekchi_service/features/presentation/pages/home/detail_screen/map.dart';
 import 'package:komekchi_service/features/presentation/pages/home/widget/banner_slider.dart';
 import 'package:komekchi_service/features/presentation/pages/home/widget/horizontal_service_list.dart';
 
 import '../../../../core/utils/theme/app_colors.dart';
-import 'widget/location.dart';
 
 class HomeScreen extends StatefulWidget {
   final ScrollController scrollController;
@@ -18,16 +15,6 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  String getCurrentDate() {
-    final now = DateTime.now();
-
-    final day = now.day.toString().padLeft(2, '0');
-    final month = now.month.toString().padLeft(2, '0');
-    final year = now.year;
-
-    return '$day.$month.$year';
-  }
-
   final List<ServiceItem> services = [
     ServiceItem(
       title: 'Elektriçi',
@@ -68,8 +55,6 @@ class _HomeScreenState extends State<HomeScreen> {
     ),
   ];
 
-  
-
   final List<BizItem> biz = [
     BizItem(image: 'assets/images/bizbarada/image1.png'),
     BizItem(image: 'assets/images/bizbarada/image2.png'),
@@ -79,21 +64,27 @@ class _HomeScreenState extends State<HomeScreen> {
     BizItem(image: 'assets/images/bizbarada/image6.png'),
   ];
 
-  void _showLocationDialog(BuildContext context) {
-    showDialog(
-      context: context,
-      barrierDismissible: true, // закрыть при нажатии вне диалога
-      builder: (context) => const SalgymLocationDialog(),
-    );
-  }
+  // void _showLocationDialog(BuildContext context) {
+  //   showDialog(
+  //     context: context,
+  //     barrierDismissible: true, // закрыть при нажатии вне диалога
+  //     builder: (context) => const SalgymLocationDialog(),
+  //   );
+  // }
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final bg = isDark ? AppColor.bgBlogDark : AppColor.bgBlogLight;
+    final cardBg = isDark ? AppColor.bgBlogDark : AppColor.bgBlogLight;
+    final textColor =  AppColor.titleText(context);
+    // final borderColor = isDark ? const Color(0xFF333333) : AppColor.borderColor;
+
     return Container(
       width: double.infinity,
-      margin: EdgeInsets.only(top: 10),
+      margin: EdgeInsets.only(top: 8),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: bg,
         borderRadius: BorderRadius.only(
           topLeft: Radius.circular(20),
           topRight: Radius.circular(20),
@@ -102,43 +93,7 @@ class _HomeScreenState extends State<HomeScreen> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.start,
         children: [
-          Padding(
-            padding: const EdgeInsets.symmetric(
-              horizontal: 31.0,
-              vertical: 10.31,
-            ),
-            child: Row(
-              children: [
-                Image.asset(
-                  "assets/images/logo/mini_logo.png",
-                  width: 37.14,
-                  height: 38.42,
-                ),
-                const SizedBox(width: 4),
-                const Text(
-                  "Kömekçi\nHyzmat",
-                  style: TextStyle(
-                    fontSize: 10.0,
-                    color: AppColor.primary,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                const Spacer(),
-                Text(
-                  getCurrentDate(),
-                  style: TextStyle(fontSize: 16, color: Colors.black),
-                ),
-                const SizedBox(width: 2),
-                const Text("|"),
-                const SizedBox(width: 2),
-                const Icon(Icons.cloud, size: 16, color: Colors.black45),
-                const Text(
-                  " 32° Aşgabat",
-                  style: TextStyle(fontSize: 16, color: Colors.black),
-                ),
-              ],
-            ),
-          ),
+          AppBarWidget(textColor),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 20.0),
             child: Row(
@@ -155,13 +110,15 @@ class _HomeScreenState extends State<HomeScreen> {
                         height: 42,
                       ),
                       const SizedBox(width: 5),
-                      const Column(
+                      Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
                             "Salgym",
                             style: TextStyle(
-                              color: AppColor.primary,
+                              color: isDark
+                                  ? AppColor.titleDark
+                                  : AppColor.primary,
                               fontSize: 16,
                             ),
                           ),
@@ -170,14 +127,14 @@ class _HomeScreenState extends State<HomeScreen> {
                               Text(
                                 "Ýeriňizi giriziň ",
                                 style: TextStyle(
-                                  color: Color(0xFF262626),
+                                  color: textColor,
                                   fontSize: 16,
                                 ),
                               ),
                               Icon(
                                 Icons.keyboard_arrow_down,
                                 size: 18,
-                                color: Colors.black,
+                                color: textColor,
                               ),
                             ],
                           ),
@@ -204,6 +161,7 @@ class _HomeScreenState extends State<HomeScreen> {
           const SizedBox(height: 5),
           Expanded(
             child: SingleChildScrollView(
+              padding: EdgeInsets.only(bottom: MediaQuery.of(context).padding.bottom ),
               controller: widget.scrollController,
               child: Column(
                 children: [
@@ -229,7 +187,8 @@ class _HomeScreenState extends State<HomeScreen> {
                         ),
                     itemBuilder: (context, index) {
                       final item = services[index];
-                      final cellWidth = (MediaQuery.of(context).size.width - 28 - 8 * 4) / 5;
+                      final cellWidth =
+                          (MediaQuery.of(context).size.width - 28 - 8 * 4) / 5;
 
                       return Column(
                         children: [
@@ -247,7 +206,7 @@ class _HomeScreenState extends State<HomeScreen> {
                               height: cellWidth,
                               decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(10),
-                                color: Color(0xFFF6F8FD),
+                                color: cardBg,
                               ),
                               child: Image.asset(
                                 item.image,
@@ -262,7 +221,11 @@ class _HomeScreenState extends State<HomeScreen> {
                               item.title,
                               maxLines: 2,
                               textAlign: TextAlign.center,
-                              style: TextStyle(fontSize: MediaQuery.of(context).size.width * 0.028,),
+                              style: TextStyle(
+                                fontSize:
+                                    MediaQuery.of(context).size.width * 0.028,
+                                    color: textColor,
+                              ),
                             ),
                           ),
                         ],
@@ -342,12 +305,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       );
                     },
                   ),
-                  const DividerWidget(),
-                  const DividerWidget(),
-                  const DividerWidget(),
-                  const DividerWidget(),
-                  const DividerWidget(),
-                  const DividerWidget(),
+                  const SizedBox(height: 30),
                 ],
               ),
             ),
@@ -364,14 +322,17 @@ class Subtitle extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // final isDark = Theme.of(context).brightness == Brightness.dark;
+    final textColor =  AppColor.titleText(context);
+
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: 15.0, vertical: 10),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.start,
         children: [
-          Text(text),
+          Text(text, style: TextStyle(color: textColor),),
           SizedBox(width: 7),
-          Icon(Icons.keyboard_arrow_right, size: 20, color: Colors.black),
+          Icon(Icons.keyboard_arrow_right, size: 20, color: textColor),
         ],
       ),
     );
@@ -389,4 +350,40 @@ class BizItem {
   final String image;
 
   BizItem({required this.image});
+}
+
+Padding AppBarWidget(Color textColor) {
+
+
+  return Padding(
+    padding: const EdgeInsets.symmetric(horizontal: 28.0, vertical: 10.31),
+    child: Row(
+      children: [
+        Image.asset("assets/images/logo/appbar.png", width: 61, height: 29),
+        const Spacer(),
+        Text(
+          getCurrentDate(),
+          style: TextStyle(fontSize: 12, color: textColor),
+        ),
+        const SizedBox(width: 2),
+        const Text("|"),
+        const SizedBox(width: 2),
+         Icon(Icons.cloud, size: 12, color: textColor),
+         Text(
+          " 32° Aşgabat",
+          style: TextStyle(fontSize: 12, color: textColor),
+        ),
+      ],
+    ),
+  );
+}
+
+String getCurrentDate() {
+  final now = DateTime.now();
+
+  final day = now.day.toString().padLeft(2, '0');
+  final month = now.month.toString().padLeft(2, '0');
+  final year = now.year;
+
+  return '$day.$month.$year';
 }

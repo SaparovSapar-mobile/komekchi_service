@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:komekchi_service/features/presentation/pages/home/home_screen.dart';
 
+import '../../../../../core/utils/theme/app_colors.dart';
+
 class HorizontalServiceList extends StatelessWidget {
   final bool inAksiya;
   final String text;
@@ -67,6 +69,7 @@ class HorizontalServiceList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+      
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -129,6 +132,12 @@ class _ServiceCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final bg = isDark ? AppColor.bgBlogDark : AppColor.bgBlogLight;
+    final cardBg = isDark ? AppColor.bgBlogDark : AppColor.bgBlogLight;
+    final textColor =  AppColor.titleText(context);
+    final borderColor = isDark ? const Color(0xFF333333) : AppColor.borderColor;
+
     return GestureDetector(
       onTap: () {
         context.push(
@@ -169,10 +178,10 @@ class _ServiceCard extends StatelessWidget {
                 if (!inAksiya)
                   Text(
                     item.title,
-                    style: const TextStyle(
+                    style:  TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.w500,
-                      color: Colors.black,
+                      color: textColor,
                     ),
                   ),
                 Row(
@@ -180,9 +189,9 @@ class _ServiceCard extends StatelessWidget {
                     if (!inAksiya)
                       Text(
                         item.rating.toString(),
-                        style: const TextStyle(
+                        style:  TextStyle(
                           fontSize: 13,
-                          color: Colors.black87,
+                          color: textColor,
                         ),
                       ),
                     const SizedBox(width: 3),

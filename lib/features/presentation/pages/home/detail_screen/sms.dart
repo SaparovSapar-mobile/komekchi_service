@@ -4,6 +4,8 @@ import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 import 'package:komekchi_service/main.dart';
 
+import '../../../../../core/utils/theme/app_colors.dart';
+
 class Sms extends StatefulWidget {
   const Sms({super.key});
 
@@ -94,14 +96,16 @@ class _SmsState extends State<Sms> {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final bg = isDark ? const Color(0xFF121212) : Colors.white;
-    final textColor = isDark ? Colors.white : const Color(0xFF1A1A2E);
-    final borderColor = isDark
-        ? const Color(0xFF444444)
-        : const Color(0xFFDDDDDD);
     final activeBorder = const Color(0xFF3D5AFE);
     final inputBg = isDark ? const Color(0xFF1E1E1E) : Colors.white;
-    const blue = Color(0xFF3D5AFE);
+    const blue = AppColor.primary;
+
+
+    final bg = isDark ? AppColor.bgBlogDark : AppColor.bgBlogLight;
+    // final cardBg = isDark ? AppColor.bgBlogDark : AppColor.bgBlogLight;
+    final textColor =  AppColor.titleText(context);
+    final borderColor = isDark ? const Color(0xFF333333) : AppColor.borderColor;
+
 
     return Scaffold(
       backgroundColor: bg,
@@ -159,7 +163,7 @@ class _SmsState extends State<Sms> {
                 ),
               ),
 
-              const SizedBox(height: 40),
+              const SizedBox(height: 22),
 
               // SMS icon
               Container(
@@ -178,7 +182,7 @@ class _SmsState extends State<Sms> {
                 ),
               ),
 
-              const SizedBox(height: 28),
+              const SizedBox(height: 27),
 
               Text(
                 'Telefon belgiňize gelen kody giriziň',
@@ -281,7 +285,7 @@ class _SmsState extends State<Sms> {
                 ],
               ),
 
-              const SizedBox(height: 48),
+              const SizedBox(height: 44),
 
               // Confirm button
               SizedBox(
@@ -289,7 +293,7 @@ class _SmsState extends State<Sms> {
                 height: 54,
                 child: ElevatedButton(
                   onPressed: _isComplete
-                      ? () => context.go("/home")
+                      ? () => context.go("/main")
                       : null,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Color(0xFF264FED),

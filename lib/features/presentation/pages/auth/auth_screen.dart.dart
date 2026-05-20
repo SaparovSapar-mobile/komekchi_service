@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
+import 'package:komekchi_service/core/utils/theme/app_text_style.dart';
 import 'package:komekchi_service/main.dart';
 
 import '../../../../core/utils/theme/app_colors.dart';
@@ -31,6 +32,7 @@ class _AuthScreenState extends State<AuthScreen>
   final TextEditingController _regPhoneController = TextEditingController();
   final TextEditingController _regPasswordController = TextEditingController();
   final TextEditingController _confirmController = TextEditingController();
+    final TextStyle textStyle1 = AppTextStyle.semiBold16;
 
   @override
   void initState() {
@@ -60,8 +62,8 @@ class _AuthScreenState extends State<AuthScreen>
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final bg = isDark ? AppColor.bgBlogDark : AppColor.bgBlogLight;
     final cardBg = isDark ? AppColor.bgBlogDark : AppColor.bgBlogLight;
-    final textColor = isDark ? AppColor.titleTextDark : AppColor.titleTextLight;
     final borderColor = isDark ? const Color(0xFF333333) : AppColor.borderColor;
+    final TextStyle textStyle = AppTextStyle.semiBold18;
 
     return Scaffold(
       backgroundColor: bg,
@@ -86,17 +88,15 @@ class _AuthScreenState extends State<AuthScreen>
                   IconButton(
                     icon: Icon(
                       Icons.arrow_back_ios,
-                      color: textColor,
+                      color: AppColor.titleText(context),
                       size: 20,
                     ),
                     onPressed: () => context.pop(),
                   ),
                   Text(
                     _tabController.index == 0 ? 'Hasaba durmak' : 'Agza bolmak',
-                    style: TextStyle(
-                      color: textColor,
-                      fontSize: 18,
-                      fontWeight: FontWeight.w600,
+                    style: textStyle.copyWith(
+                      color: AppColor.titleText(context),
                     ),
                   ),
                   IconButton(
@@ -141,10 +141,8 @@ class _AuthScreenState extends State<AuthScreen>
                   ),
                   indicatorSize: TabBarIndicatorSize.tab,
                   indicatorPadding: const EdgeInsets.all(3),
-                  labelColor: isDark
-                      ? AppColor.titleTextDark
-                      : AppColor.titleTextLight,
-                  unselectedLabelColor: AppColor.descriptionTextLight,
+                  labelColor: AppColor.descriptionText(context),
+                  unselectedLabelColor: AppColor.descriptionLight,
                   labelStyle: const TextStyle(
                     fontSize: 13,
                     fontWeight: FontWeight.w600,
@@ -180,7 +178,7 @@ class _AuthScreenState extends State<AuthScreen>
                     child: _buildLoginForm(
                       isDark,
                       cardBg,
-                      textColor,
+                      AppColor.titleText(context),
                       borderColor,
                     ),
                   ),
@@ -190,7 +188,7 @@ class _AuthScreenState extends State<AuthScreen>
                     child: _buildRegisterForm(
                       isDark,
                       cardBg,
-                      textColor,
+                      AppColor.titleText(context),
                       borderColor,
                     ),
                   ),
@@ -297,7 +295,7 @@ class _AuthScreenState extends State<AuthScreen>
           child: Text(
             "Açar sözi ýatdan çykardym",
             style: TextStyle(
-              color: isDark ? AppColor.titleTextDark : AppColor.primary,
+              color: isDark ? AppColor.titleDark : AppColor.primary,
               fontSize: 14,
               fontStyle: FontStyle.italic,
             ),
@@ -310,7 +308,7 @@ class _AuthScreenState extends State<AuthScreen>
           width: double.infinity,
           height: 54,
           child: ElevatedButton(
-            onPressed: () => context.push("/sms"),
+            onPressed: () => context.push("/smsscreen"),
             style: ElevatedButton.styleFrom(
               backgroundColor: blue,
               foregroundColor: Colors.white,
@@ -340,7 +338,7 @@ class _AuthScreenState extends State<AuthScreen>
     Color borderColor,
   ) {
     final inputBg = isDark ? AppColor.bgPageDark : AppColor.bgPageLight;
-    final hintColor = isDark ? AppColor.titleTextDark : AppColor.titleTextLight;
+    final hintColor = AppColor.titleText(context);
     const blue = AppColor.primary;
 
     return Padding(
@@ -531,14 +529,10 @@ class _AuthScreenState extends State<AuthScreen>
             width: double.infinity,
             height: 54,
             child: ElevatedButton(
-              onPressed: _agreed ? () => context.push("/sms") : null,
-              child: const Text(
+              onPressed: _agreed ? () => context.push("/smsscreen") : null,
+              child:  Text(
                 'Agza bol',
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w600,
-                  color: AppColor.titleTextDark,
-                ),
+                style: textStyle1.copyWith(color: AppColor.titleText(context)),
               ),
             ),
           ),

@@ -97,10 +97,10 @@ class _SmsScreenState extends State<SmsScreen> {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final bg = isDark ? AppColor.bgBlogDark : AppColor.bgBlogLight;
     final cardBg = isDark ? AppColor.bgPageDark : AppColor.bgPageLight;
-    final textColor = isDark ? AppColor.titleTextDark : AppColor.titleTextLight;
+    final textColor =  AppColor.titleText(context);
     final borderColor = isDark ? const Color(0xFF333333) : AppColor.borderColor;
 
-
+  
     return Scaffold(
       appBar: AppBar(
         toolbarHeight: 0,
@@ -147,7 +147,7 @@ class _SmsScreenState extends State<SmsScreen> {
                 ),
               ),
 
-              const SizedBox(height: 40),
+              const SizedBox(height: 20),
 
               // SMS icon
               Container(

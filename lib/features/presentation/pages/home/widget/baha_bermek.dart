@@ -1,8 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
-
 import '../../../../../core/utils/theme/app_colors.dart';
-import '../../../../../core/utils/theme/app_theme.dart';
 
 void showNagilelikBottomSheet(BuildContext context) {
   showModalBottomSheet(

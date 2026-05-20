@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
+import 'package:komekchi_service/core/utils/theme/app_text_style.dart';
+import 'package:komekchi_service/features/presentation/pages/home/home_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:komekchi_service/core/utils/theme/app_theme.dart';
 
@@ -137,6 +139,13 @@ class _SearchScreenState extends State<SearchScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final bg = isDark ? AppColor.bgPageDark : AppColor.bgPageLight;
+    final cardBg = isDark ? AppColor.bgBlogDark : AppColor.bgBlogLight;
+    final textColor = AppColor.titleText(context);
+    final borderColor = isDark ? const Color(0xFF333333) : AppColor.borderColor;
+    final TextStyle textStyle = AppTextStyle.regular14;
+
     return Scaffold(
       backgroundColor: AppColor.primary,
       appBar: AppBar(
@@ -151,8 +160,8 @@ class _SearchScreenState extends State<SearchScreen> {
       body: Container(
         width: double.infinity,
         margin: const EdgeInsets.only(top: 10),
-        decoration: const BoxDecoration(
-          color: Colors.white,
+        decoration: BoxDecoration(
+          color: bg,
           borderRadius: BorderRadius.only(
             topLeft: Radius.circular(20),
             topRight: Radius.circular(20),
@@ -161,44 +170,7 @@ class _SearchScreenState extends State<SearchScreen> {
         child: Column(
           children: [
             // Header
-            Padding(
-              padding: const EdgeInsets.symmetric(
-                horizontal: 31.0,
-                vertical: 10.31,
-              ),
-              child: Row(
-                children: [
-                  Image.asset(
-                    "assets/images/logo/mini_logo.png",
-                    width: 37.14,
-                    height: 38.42,
-                  ),
-                  const SizedBox(width: 4),
-                  const Text(
-                    "Kömekçi\nHyzmat",
-                    style: TextStyle(
-                      fontSize: 10.0,
-                      color: AppColor.primary,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const Spacer(),
-                  Text(
-                    getCurrentDate(),
-                    style: const TextStyle(fontSize: 16, color: Colors.black),
-                  ),
-                  const SizedBox(width: 2),
-                  const Text("|"),
-                  const SizedBox(width: 2),
-                  const Icon(Icons.cloud, size: 16, color: Colors.black45),
-                  const Text(
-                    " 32° Aşgabat",
-                    style: TextStyle(fontSize: 16, color: Colors.black),
-                  ),
-                ],
-              ),
-            ),
-
+            AppBarWidget(textColor),
             // Search field
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 8),
@@ -206,11 +178,9 @@ class _SearchScreenState extends State<SearchScreen> {
                 controller: _searchController,
                 onSubmitted: _onSubmit,
                 decoration: InputDecoration(
+                  
                   hintText: 'Gözleg',
-                  hintStyle: TextStyle(
-                    color: Colors.grey.shade400,
-                    fontSize: 15,
-                  ),
+                  hintStyle: textStyle.copyWith(color: AppColor.descriptionText(context)),
                   prefixIcon: Icon(Icons.search, color: Colors.grey.shade400),
                   suffixIcon: _query.isNotEmpty
                       ? IconButton(
@@ -222,11 +192,11 @@ class _SearchScreenState extends State<SearchScreen> {
                         )
                       : null,
                   filled: true,
-                  fillColor: Colors.grey.shade100,
+                  fillColor: cardBg,
                   contentPadding: const EdgeInsets.symmetric(vertical: 12),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
-                    borderSide: BorderSide.none,
+                    borderSide: BorderSide(color: borderColor),
                   ),
                 ),
               ),
@@ -246,6 +216,13 @@ class _SearchScreenState extends State<SearchScreen> {
 
   // History + category list (query bosh wagty)
   Widget buildCategoryList() {
+    final TextStyle textStyle = AppTextStyle.medium12;
+    final TextStyle textStyle1 = AppTextStyle.semiBold14;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final bg = isDark ? AppColor.bgPageDark : AppColor.bgPageLight;
+    final cardBg = isDark ? AppColor.bgBlogDark : AppColor.bgBlogLight;
+    final textColor = AppColor.titleText(context);
+    final borderColor = isDark ? const Color(0xFF333333) : AppColor.borderColor;
     return ListView(
       padding: const EdgeInsets.symmetric(horizontal: 15),
       children: [
@@ -255,9 +232,9 @@ class _SearchScreenState extends State<SearchScreen> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text(
+               Text(
                 'Gözleg taryhy:',
-                style: TextStyle(fontSize: 14, color: Colors.black54),
+                style: textStyle1.copyWith(color: AppColor.descriptionText(context)),
               ),
               GestureDetector(
                 onTap: _clearHistory,
@@ -265,7 +242,7 @@ class _SearchScreenState extends State<SearchScreen> {
                   'All clear',
                   style: TextStyle(
                     fontSize: 13,
-                    color: AppColor.primary,
+                    color:isDark ? AppColor.bgBlogLight : AppColor.primary,
                     fontWeight: FontWeight.w500,
                   ),
                 ),
@@ -295,37 +272,71 @@ class _SearchScreenState extends State<SearchScreen> {
 
         // All Category
         const SizedBox(height: 8),
-        const Text(
-          'All Category',
-          style: TextStyle(fontSize: 17, fontWeight: FontWeight.w700),
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+          margin: EdgeInsets.only(
+            bottom: MediaQuery.of(
+              context,
+            ).padding.bottom.clamp(0.0, double.infinity),
+          ),
+          decoration: BoxDecoration(
+            color: cardBg,
+            borderRadius: BorderRadius.circular(10),
+          ),
+          child: Column(
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  const Text(
+                    'Ähli kategoriýalar',
+                    style: TextStyle(fontSize: 17, fontWeight: FontWeight.w700),
+                  ),
+                ],
+              ),
+              ...List.generate(categories.length, (index) {
+                final item = categories[index];
+                return Column(
+                  children: [
+                    ListTile(
+                      contentPadding: EdgeInsets.zero,
+                      leading: Container(
+                        decoration: BoxDecoration(
+                          color: bg,
+                          borderRadius: BorderRadius.circular(4),
+                        ),
+                        child: Image.asset(
+                          item.image,
+                          width: 28,
+                          height: 28,
+                          errorBuilder: (_, __, ___) => Icon(
+                            Icons.category,
+                            color: AppColor.primary,
+                            size: 28,
+                          ),
+                        ),
+                      ),
+                      title: Text(
+                        item.title,
+                        style: textStyle.copyWith(
+                          color: AppColor.titleText(context),
+                        ),
+                      ),
+                      trailing: Icon(
+                        Icons.chevron_right,
+                        color: Colors.grey.shade400,
+                      ),
+                      onTap: () {
+                        context.push("/categoryId", extra: item.title);
+                      },
+                    ),
+                  ],
+                );
+              }),
+            ],
+          ),
         ),
         const SizedBox(height: 8),
-        ...List.generate(categories.length, (index) {
-          final item = categories[index];
-          return Column(
-            children: [
-              ListTile(
-                contentPadding: EdgeInsets.zero,
-                leading: Image.asset(
-                  item.image,
-                  width: 32,
-                  height: 32,
-                  errorBuilder: (_, __, ___) =>
-                      Icon(Icons.category, color: AppColor.primary, size: 28),
-                ),
-                title: Text(item.title, style: const TextStyle(fontSize: 15)),
-                trailing: Icon(
-                  Icons.chevron_right,
-                  color: Colors.grey.shade400,
-                ),
-                onTap: () {
-                  context.push("/categoryId", extra: item.title);
-                },
-              ),
-              Divider(height: 1, color: Colors.grey.shade100),
-            ],
-          );
-        }),
       ],
     );
   }

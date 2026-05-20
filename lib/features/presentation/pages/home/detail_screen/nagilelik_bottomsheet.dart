@@ -1,15 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../../../../core/utils/theme/app_colors.dart';
-import '../../../../../core/utils/theme/app_theme.dart';
-
 void showNagilelikBottomSheet(BuildContext context) {
   showModalBottomSheet(
     context: context,
-    shape: const RoundedRectangleBorder(
-      borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-    ),
+    // shape: const RoundedRectangleBorder(
+    //   borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+    // ),
     builder: (context) => const _NagilelikBottomSheet(),
   );
 }
@@ -29,7 +26,6 @@ class _NagilelikBottomSheet extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Handle
           Center(
             child: Container(
               width: 40,
@@ -42,7 +38,6 @@ class _NagilelikBottomSheet extends StatelessWidget {
           ),
           const SizedBox(height: 16),
 
-          // Title
           const Text(
             'Sazlamalar',
             style: TextStyle(
@@ -53,7 +48,6 @@ class _NagilelikBottomSheet extends StatelessWidget {
           ),
           const SizedBox(height: 16),
 
-          // Nagilelik bildirmek button
           GestureDetector(
             onTap: () {
               Navigator.pop(context);
@@ -71,10 +65,10 @@ class _NagilelikBottomSheet extends StatelessWidget {
                       color: const Color(0xFFE8F0FF),
                       borderRadius: BorderRadius.circular(8),
                     ),
-                    child: const Icon(
-                      Icons.flag_outlined,
-                      color: AppColor.primary,
-                      size: 20,
+                    child: Image.asset(
+                      "assets/images/logo/flag.png",
+                      width: 26,
+                      height: 26,
                     ),
                   ),
                   const SizedBox(width: 10),

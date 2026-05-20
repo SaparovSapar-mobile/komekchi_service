@@ -7,6 +7,7 @@ import 'package:komekchi_service/features/presentation/pages/home/category_id.da
 import 'package:komekchi_service/features/presentation/pages/home/detail_screen/detail_screen.dart';
 import 'package:komekchi_service/features/presentation/pages/home/detail_screen/nagilelik.dart';
 import 'package:komekchi_service/features/presentation/pages/home/detail_screen/sms.dart';
+import 'package:komekchi_service/features/presentation/pages/home/search/serach_screen.dart';
 import 'package:komekchi_service/features/presentation/pages/home/widget/bell.dart';
 import 'package:komekchi_service/features/presentation/pages/home/widget/name_uchin_biz/about_screen.dart';
 import 'package:komekchi_service/features/presentation/pages/home/widget/name_uchin_biz/hyzmat.dart';
@@ -22,12 +23,10 @@ import '../../features/presentation/pages/auth/sms_screen.dart';
 import '../../features/presentation/pages/home/aksiyalar_screen.dart';
 import '../../features/presentation/pages/home/widget/selected_date.dart';
 import '../../features/presentation/pages/splash/onboarding_screen.dart';
-import '../../features/presentation/pages/splash/splash_screen.dart';
 
 final appRouter = GoRouter(
-  initialLocation: '/splash',
+  initialLocation: '/onboarding',
   routes: [
-    GoRoute(path: '/splash', builder: (context, state) => const SplashScreen()),
     GoRoute(
       path: '/onboarding',
       builder: (context, state) => const WalkthroughScreen(),
@@ -40,7 +39,7 @@ final appRouter = GoRouter(
       path: '/register',
       builder: (_, __) => const AuthScreen(showLogin: false),
     ),
-    GoRoute(path: '/sms', builder: (_, __) => const SmsScreen()),
+    GoRoute(path: '/smsscreen', builder: (_, __) => const SmsScreen()),
     GoRoute(path: '/check', builder: (_, __) => const CheckScreen()),
     GoRoute(path: '/main', pageBuilder: (context, state) =>  CupertinoPage(child:const MainScreen())),
     GoRoute(path: '/forgot', builder: (_, __) => const ForgotPass()),
@@ -54,6 +53,7 @@ final appRouter = GoRouter(
     GoRoute(path: '/hyzmatlar', builder: (_, __) => const Hyzmat()),
     GoRoute(path: '/nagilelik', builder: (_, __) => const NagilelikScreen()),
     GoRoute(path: '/sms', builder: (_, __) => const Sms()),
+    GoRoute(path: '/search', builder: (_, __) => const SearchScreen()),
     GoRoute(path: '/bells', builder: (_, __) => const BildirislerScreen()),
 
     GoRoute(path: '/selectedDate', builder: (_, __) => const SelectedDate()),
