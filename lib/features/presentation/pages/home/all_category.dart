@@ -2,8 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:komekchi_service/core/utils/app_constants.dart';
 import 'package:komekchi_service/features/domain/entities/category.dart';
-import 'package:komekchi_service/features/presentation/bloc/cubit/get_category_cubit.dart';
+import 'package:komekchi_service/features/presentation/bloc/category/get_category_cubit.dart';
 import 'package:komekchi_service/features/presentation/pages/home/home_screen.dart';
 
 import '../../../../core/utils/theme/app_colors.dart';
@@ -19,7 +20,6 @@ class _AllCategoryScreenState extends State<AllCategoryScreen> {
   @override
   void initState() {
     super.initState();
-    // ✅ загружаем данные при открытии экрана
     context.read<GetCategoryCubit>().fetchCategory();
   }
 
@@ -33,11 +33,12 @@ class _AllCategoryScreenState extends State<AllCategoryScreen> {
 
   @override
   Widget build(BuildContext context) {
-    // final isDark = Theme.of(context).brightness == Brightness.dark;
-    // final bg = isDark ? AppColor.bgBlogDark : AppColor.bgBlogLight;
-    // final cardBg = isDark ? AppColor.bgBlogDark : AppColor.bgBlogLight;
-    final textColor =  AppColor.titleText(context);
-    // final borderColor = isDark ? const Color(0xFF333333) : AppColor.borderColor;
+    final textColor = AppColor.titleText(context);
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    final bg = isDark ? AppColor.bgPageDark : AppColor.bgPageLight;
+    final cardBg = isDark ? AppColor.bgBlogDark : AppColor.bgBlogLight;
+    final borderColor = isDark ? const Color(0xFF333333) : AppColor.borderColor;
 
     // final screenWidth = MediaQuery.of(context).size.width;
 
@@ -55,8 +56,8 @@ class _AllCategoryScreenState extends State<AllCategoryScreen> {
       body: Container(
         width: double.infinity,
         margin: const EdgeInsets.only(top: 10),
-        decoration: const BoxDecoration(
-          color: Colors.white,
+        decoration:  BoxDecoration(
+          color: bg,
           borderRadius: BorderRadius.only(
             topLeft: Radius.circular(20),
             topRight: Radius.circular(20),
@@ -66,9 +67,9 @@ class _AllCategoryScreenState extends State<AllCategoryScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // Header
-           AppBarWidget(textColor),
-           
-            Divider(height: 2, color: Colors.grey[100]),
+            AppBarWidget(textColor, isDark),
+
+            Divider(height: 2, color: borderColor),
 
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
@@ -76,32 +77,32 @@ class _AllCategoryScreenState extends State<AllCategoryScreen> {
                 children: [
                   IconButton(
                     onPressed: () => context.pop(),
-                    icon: const Icon(Icons.arrow_back_ios_new, size: 18),
+                    icon: Icon(Icons.arrow_back_ios_new, size: 18, color: textColor),
                   ),
-                  const Text(
+                  Text(
                     'Ähli kategoriýalar',
                     style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.w700,
-                      color: Colors.black,
+                      color: textColor,
                     ),
                   ),
                 ],
               ),
             ),
-            const Divider(height: 1, color: Color(0xFFF5F7FF)),
+            Divider(height: 1, color: borderColor),
 
             // ✅ BlocBuilder — слушаем состояние
             Expanded(
               child: Container(
-                color: const Color(0xFFF5F7FF),
+                color: bg,
                 child: Container(
                   margin: const EdgeInsets.symmetric(
                     vertical: 10,
                     horizontal: 15,
                   ),
                   decoration: BoxDecoration(
-                    color: Colors.white,
+                    color: cardBg,
                     borderRadius: BorderRadius.circular(10),
                   ),
                   child: BlocBuilder<GetCategoryCubit, GetCategoryState>(
@@ -143,7 +144,7 @@ class _AllCategoryScreenState extends State<AllCategoryScreen> {
                       }
 
                       if (state is GetCategorySucces) {
-                        final items = state.dataCategory.data;
+                        final items = state.dataCategory;
 
                         if (items.isEmpty) {
                           return const Center(
@@ -183,9 +184,16 @@ class _CategoryTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final textColor = AppColor.titleText(context);
+    final iconBg = isDark ? AppColor.bgPageDark : const Color(0xFFF6F8FD);
+
     return GestureDetector(
       onTap: () {
-        context.push('/categoryId', extra: item.name);
+        context.push(
+          '/categoryId',
+          extra: {'uuid': item.uuid, 'title': item.nameTm},
+        );
       },
       child: Container(
         margin: const EdgeInsets.symmetric(vertical: 5),
@@ -196,18 +204,18 @@ class _CategoryTile extends StatelessWidget {
               height: 28,
               width: 28,
               decoration: BoxDecoration(
-                color: const Color(0xFFF6F8FD),
+                color: iconBg,
                 borderRadius: BorderRadius.circular(4),
               ),
               child: Image.network(
-                item.img_tm,
+                ApiConstants.imageUrl(item.iconImg),
                 width: 28,
                 height: 28,
                 errorBuilder: (_, __, ___) => Container(
                   width: 28,
                   height: 28,
                   decoration: BoxDecoration(
-                    color: const Color(0xFFF0F3FF),
+                    color: iconBg,
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: const Icon(
@@ -221,15 +229,15 @@ class _CategoryTile extends StatelessWidget {
             const SizedBox(width: 14),
             Expanded(
               child: Text(
-                item.name,
-                style: const TextStyle(
+                item.nameTm,
+                style: TextStyle(
                   fontSize: 15,
                   fontWeight: FontWeight.w500,
-                  color: Colors.black,
+                  color: textColor,
                 ),
               ),
             ),
-            const Icon(Icons.chevron_right, color: Colors.black, size: 22),
+            Icon(Icons.chevron_right, color: textColor, size: 22),
           ],
         ),
       ),

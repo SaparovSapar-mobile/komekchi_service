@@ -102,7 +102,7 @@ class _BronlarScreenState extends State<BronlarScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // Header
-          AppBarWidget(textColor),
+          AppBarWidget(textColor, isDark),
           // Title
            Padding(
             padding: EdgeInsets.symmetric(horizontal: 15, vertical: 12),

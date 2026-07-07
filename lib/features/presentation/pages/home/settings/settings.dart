@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:go_router/go_router.dart';
 import 'package:komekchi_service/core/utils/theme/app_text_style.dart';
 import 'package:komekchi_service/features/presentation/pages/home/home_screen.dart';
 
@@ -28,7 +29,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   String get _languageLabel {
     switch (_selectedLanguage) {
       case AppLanguage.turkmen:
-        return 'Turkmen';
+        return 'Türkmen';
       case AppLanguage.russian:
         return 'Rus dili';
       case AppLanguage.english:
@@ -90,7 +91,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
         child: Column(
           children: [
             // Header
-            AppBarWidget(textColor),
+            AppBarWidget(textColor, isDark),
 
             // Scrollable content
             Expanded(
@@ -174,7 +175,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                             );
                           },
                         ),
-                       
+
                         SettingsRow(
                           image: "assets/images/settings/luna.png",
                           iconColor: Colors.indigo,
@@ -343,7 +344,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
                             Icons.chevron_right,
                             color: Colors.grey.shade400,
                           ),
-                          onTap: () {},
+                          onTap: () {
+                            context.push('/contactUs');
+                          },
                         ),
                         SettingsRow(
                           image: "assets/images/settings/chat.png",
@@ -353,7 +356,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
                             Icons.chevron_right,
                             color: Colors.grey.shade400,
                           ),
-                          onTap: () {},
+                          onTap: () {
+                            context.push('/nagilelik');
+                          },
                         ),
                         SettingsRow(
                           image: "assets/images/settings/verify.png",

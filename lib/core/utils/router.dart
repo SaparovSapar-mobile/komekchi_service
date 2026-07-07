@@ -1,13 +1,22 @@
 import 'package:flutter/cupertino.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:komekchi_service/features/presentation/bloc/aksiya/aksiya_cubit.dart';
+import 'package:komekchi_service/features/presentation/bloc/aksiya/aksiya_detail_cubit.dart';
+import 'package:komekchi_service/features/presentation/bloc/search/search_cubit.dart';
+import 'package:komekchi_service/features/presentation/bloc/subcategory/subcategory_cubit.dart';
+import 'package:komekchi_service/features/presentation/bloc/subcategory/subcategory_detail_cubit.dart';
 import 'package:komekchi_service/features/presentation/pages/auth/auth_screen.dart.dart';
 import 'package:komekchi_service/features/presentation/pages/auth/forgot_pass.dart';
+import 'package:komekchi_service/features/presentation/pages/home/aksiya_detail_screen.dart';
 import 'package:komekchi_service/features/presentation/pages/home/all_category.dart';
 import 'package:komekchi_service/features/presentation/pages/home/category_id.dart';
 import 'package:komekchi_service/features/presentation/pages/home/detail_screen/detail_screen.dart';
-import 'package:komekchi_service/features/presentation/pages/home/detail_screen/nagilelik.dart';
+import 'package:komekchi_service/features/presentation/pages/home/detail_screen/issue/nagilelik.dart';
 import 'package:komekchi_service/features/presentation/pages/home/detail_screen/sms.dart';
 import 'package:komekchi_service/features/presentation/pages/home/search/serach_screen.dart';
+import 'package:komekchi_service/features/presentation/pages/home/settings/contact_us/contact_us_page.dart';
+import 'package:komekchi_service/features/presentation/pages/home/settings/contact_us/hat_yazmak_page.dart';
 import 'package:komekchi_service/features/presentation/pages/home/widget/bell.dart';
 import 'package:komekchi_service/features/presentation/pages/home/widget/name_uchin_biz/about_screen.dart';
 import 'package:komekchi_service/features/presentation/pages/home/widget/name_uchin_biz/hyzmat.dart';
@@ -17,6 +26,7 @@ import 'package:komekchi_service/features/presentation/pages/home/widget/name_uc
 import 'package:komekchi_service/features/presentation/pages/home/widget/name_uchin_biz/ynamdar.dart';
 import 'package:komekchi_service/features/presentation/pages/home/widget/select_date.dart';
 import 'package:komekchi_service/features/presentation/pages/main_screen.dart/main_screen.dart';
+import 'package:komekchi_service/injector.dart';
 
 import '../../features/presentation/pages/auth/check_screen.dart';
 import '../../features/presentation/pages/auth/sms_screen.dart';
@@ -41,9 +51,29 @@ final appRouter = GoRouter(
     ),
     GoRoute(path: '/smsscreen', builder: (_, __) => const SmsScreen()),
     GoRoute(path: '/check', builder: (_, __) => const CheckScreen()),
-    GoRoute(path: '/main', pageBuilder: (context, state) =>  CupertinoPage(child:const MainScreen())),
+    GoRoute(
+      path: '/main',
+      pageBuilder: (context, state) => CupertinoPage(child: const MainScreen()),
+    ),
     GoRoute(path: '/forgot', builder: (_, __) => const ForgotPass()),
-    GoRoute(path: '/aksiya', builder: (_, __) => const AksiyalarScreen()),
+    GoRoute(
+      path: '/aksiya',
+      builder: (_, __) => BlocProvider(
+        create: (_) => sl<AksiyaCubit>(),
+        child: const AksiyalarScreen(),
+      ),
+    ),
+    GoRoute(
+      path: '/aksiyaDetail',
+      builder: (context, state) {
+        final data = state.extra as Map<String, dynamic>;
+        final uuid = data['uuid'] as String;
+        return BlocProvider(
+          create: (_) => sl<AksiyaDetailCubit>()..fetchAksiyaById(uuid),
+          child: const AksiyaDetailScreen(),
+        );
+      },
+    ),
     GoRoute(path: '/date', builder: (_, __) => const SelectDate()),
     GoRoute(path: '/24goldaw', builder: (_, __) => const AboutScreen()),
     GoRoute(path: '/kepilligi', builder: (_, __) => const IshKepilligi()),
@@ -53,8 +83,16 @@ final appRouter = GoRouter(
     GoRoute(path: '/hyzmatlar', builder: (_, __) => const Hyzmat()),
     GoRoute(path: '/nagilelik', builder: (_, __) => const NagilelikScreen()),
     GoRoute(path: '/sms', builder: (_, __) => const Sms()),
-    GoRoute(path: '/search', builder: (_, __) => const SearchScreen()),
+    GoRoute(
+      path: '/search',
+      builder: (_, __) => BlocProvider(
+        create: (_) => sl<SearchCubit>(),
+        child: const SearchScreen(),
+      ),
+    ),
     GoRoute(path: '/bells', builder: (_, __) => const BildirislerScreen()),
+    GoRoute(path: '/contactUs', builder: (_, __) => const ContactUsPage()),
+    GoRoute(path: '/hatYazmak', builder: (_, __) => const HatYazmakPage()),
 
     GoRoute(path: '/selectedDate', builder: (_, __) => const SelectedDate()),
     GoRoute(
@@ -64,18 +102,25 @@ final appRouter = GoRouter(
     GoRoute(
       path: '/categoryId',
       builder: (context, state) {
-        final title = state.extra as String;
-        return CategoryId(title: title);
+        final data = state.extra as Map<String, dynamic>;
+        return BlocProvider(
+          create: (_) => sl<SubcategoryCubit>(),
+          child: CategoryId(
+            categoryUuid: data['uuid'] as String,
+            title: data['title'] as String,
+          ),
+        );
       },
     ),
     GoRoute(
       path: '/detail',
       builder: (context, state) {
         final data = state.extra as Map<String, dynamic>;
-        return DetailScreen(
-          title: data["title"],
-          image: data["image"],
-          titleImage: data["titleImage"],
+        final uuid = data['uuid'] as String;
+        return BlocProvider(
+          create: (_) =>
+              sl<SubcategoryDetailCubit>()..fetchSubcategoryById(uuid),
+          child: DetailScreen(uuid: uuid),
         );
       },
     ),

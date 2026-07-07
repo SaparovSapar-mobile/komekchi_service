@@ -66,14 +66,18 @@ class BronCard extends StatelessWidget {
                       child: Center(
                         child: Text(
                           'N°${item.number}',
-                          style:  textStyle1.copyWith(color: AppColor.titleText(context)),
+                          style: textStyle1.copyWith(
+                            color: AppColor.titleText(context),
+                          ),
                         ),
                       ),
                     ),
                     const SizedBox(height: 4),
                     Text(
                       item.date,
-                      style: textStyle2.copyWith(color: AppColor.titleText(context)),
+                      style: textStyle2.copyWith(
+                        color: AppColor.titleText(context),
+                      ),
                     ),
                   ],
                 ),
@@ -91,10 +95,15 @@ class BronCard extends StatelessWidget {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Text(
-                          item.rating.toString(),
-                          style: textStyle3,
+                        Flexible(
+                          child: Text(
+                            item.rating.toString(),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: textStyle3,
+                          ),
                         ),
+                        const SizedBox(width: 2),
                         const Icon(Icons.star, size: 15, color: Colors.amber),
                       ],
                     ),
@@ -162,7 +171,9 @@ class BronCard extends StatelessWidget {
                     decoration: BoxDecoration(
                       color: bg,
                       borderRadius: BorderRadius.circular(5),
-                      border: Border.all(color: Color(0xFFC6D2FF).withOpacity(0.2)),
+                      border: Border.all(
+                        color: Color(0xFFC6D2FF).withOpacity(0.2),
+                      ),
                     ),
                     child: Row(
                       children: [
@@ -193,21 +204,28 @@ class BronCard extends StatelessWidget {
                     decoration: BoxDecoration(
                       color: bg,
                       borderRadius: BorderRadius.circular(5),
-                      border: Border.all(color: Color(0xFFC6D2FF).withOpacity(0.2)),
+                      border: Border.all(
+                        color: Color(0xFFC6D2FF).withOpacity(0.2),
+                      ),
                     ),
                     child: Row(
-                      // 👈 убрали лишний Expanded, оставили просто Row
                       children: [
                         Text(
                           'Jemi: ',
-                          style: textStyle4.copyWith(color: AppColor.titleText(context)),
+                          style: textStyle4.copyWith(
+                            color: AppColor.titleText(context),
+                          ),
                         ),
-                        Text(
-                          item.price,
-                          style: const TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w700,
-                            color: Color(0xFF047857),
+                        Flexible(
+                          child: Text(
+                            item.price,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: const TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w700,
+                              color: Color(0xFF047857),
+                            ),
                           ),
                         ),
                       ],

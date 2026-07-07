@@ -1,5 +1,6 @@
 // Vyzyvay pervый bottomsheet:
 import 'package:flutter/material.dart';
+import 'package:komekchi_service/core/utils/theme/const.dart';
 
 import '../../../../../core/utils/theme/app_colors.dart';
 import '../map_screen.dart';
@@ -43,9 +44,14 @@ class _SalgyBottomSheetState extends State<_SalgyBottomSheet> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final bg = isDark ? AppColor.bgPageDark : AppColor.bgPageLight;
+    final cardBg = isDark ? AppColor.bgBlogDark : AppColor.bgBlogLight;
+    // final borderColor = isDark ? const Color(0xFF333333) : AppColor.borderColor;
+
     return Container(
       decoration: BoxDecoration(
-        color: const Color(0xFFFFFFFF),
+        color: cardBg,
         borderRadius: const BorderRadius.only(
           topLeft: Radius.circular(20),
           topRight: Radius.circular(20),
@@ -123,7 +129,7 @@ class _SalgyBottomSheetState extends State<_SalgyBottomSheet> {
                               : Colors.grey.shade300,
                           width: isSelected ? 6 : 1.5,
                         ),
-                        color: Colors.white,
+                        color: isDark ? AppColor.bgPageDark : Colors.white,
                       ),
                     ),
                   ],
@@ -133,26 +139,25 @@ class _SalgyBottomSheetState extends State<_SalgyBottomSheet> {
           }),
 
           // Divider
-          Divider(color: Colors.grey.shade200),
 
           // Başga
           GestureDetector(
             onTap: () {
-              final rootContext = Navigator.of(
-                context,
-                rootNavigator: true,
-              ).context;
-              Navigator.pop(context);
-              Future.delayed(const Duration(milliseconds: 300), () {
-                showSalgyAtiandyrBottomSheet(
-                  rootContext,
-                  onLocationAdded: (name) {
-                    Future.delayed(const Duration(milliseconds: 300), () {
-                      showSalgyBottomSheet(rootContext);
-                    });
-                  },
-                );
-              });
+              // final rootContext = Navigator.of(
+              //   context,
+              //   rootNavigator: true,
+              // ).context;
+              // Navigator.pop(context);
+              // Future.delayed(const Duration(milliseconds: 300), () {
+              //   showSalgyAtiandyrBottomSheet(
+              //     rootContext,
+              //     onLocationAdded: (name) {
+              //       Future.delayed(const Duration(milliseconds: 300), () {
+              //         showSalgyBottomSheet(rootContext);
+              //       });
+              //     },
+              //   );
+              // });
             },
             child: Padding(
               padding: const EdgeInsets.symmetric(vertical: 10),

@@ -1,41 +1,32 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:komekchi_service/core/utils/app_constants.dart';
+import 'package:komekchi_service/features/domain/entities/aksiya.dart';
+import 'package:komekchi_service/features/presentation/bloc/aksiya/aksiya_cubit.dart';
 import 'package:komekchi_service/features/presentation/pages/home/home_screen.dart';
 
 import '../../../../core/utils/theme/app_colors.dart';
 
-class AksiyalarScreen extends StatelessWidget {
+class AksiyalarScreen extends StatefulWidget {
   const AksiyalarScreen({super.key});
 
-  String getCurrentDate() {
-    final now = DateTime.now();
-    final day = now.day.toString().padLeft(2, '0');
-    final month = now.month.toString().padLeft(2, '0');
-    final year = now.year;
-    return '$day.$month.$year';
-  }
+  @override
+  State<AksiyalarScreen> createState() => _AksiyalarScreenState();
+}
 
-  final List<AksiyaItem> items = const [
-    AksiyaItem(image: 'assets/images/service/image_4.png'),
-    AksiyaItem(image: 'assets/images/service/image_5.png'),
-    AksiyaItem(image: 'assets/images/service/image_4.png'),
-    AksiyaItem(image: 'assets/images/service/image_5.png'),
-    AksiyaItem(image: 'assets/images/service/image_4.png'),
-    AksiyaItem(image: 'assets/images/service/image_5.png'),
-    AksiyaItem(image: 'assets/images/service/image_4.png'),
-    AksiyaItem(image: 'assets/images/service/image_5.png'),
-    AksiyaItem(image: 'assets/images/service/image_4.png'),
-    AksiyaItem(image: 'assets/images/service/image_5.png'),
-  ];
+class _AksiyalarScreenState extends State<AksiyalarScreen> {
+  @override
+  void initState() {
+    super.initState();
+    context.read<AksiyaCubit>().fetchAksiyalar();
+  }
 
   @override
   Widget build(BuildContext context) {
-    // final isDark = Theme.of(context).brightness == Brightness.dark;
-    // final bg = isDark ? AppColor.bgBlogDark : AppColor.bgBlogLight;
-    // final cardBg = isDark ? AppColor.bgBlogDark : AppColor.bgBlogLight;
-    final textColor =  AppColor.titleText(context);
-    // final borderColor = isDark ? const Color(0xFF333333) : AppColor.borderColor;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final textColor = AppColor.titleText(context);
 
     return Scaffold(
       backgroundColor: AppColor.primary,
@@ -61,8 +52,8 @@ class AksiyalarScreen extends StatelessWidget {
         child: Column(
           children: [
             // Header
-            AppBarWidget(textColor),
-            const Divider(height: 1, color: const Color(0xFFF5F7FF)),
+            AppBarWidget(textColor, isDark),
+            const Divider(height: 1, color: Color(0xFFF5F7FF)),
 
             // Back + Title + Search
             Padding(
@@ -93,23 +84,47 @@ class AksiyalarScreen extends StatelessWidget {
                 ],
               ),
             ),
-            const Divider(height: 1, color: const Color(0xFFF5F7FF)),
+            const Divider(height: 1, color: Color(0xFFF5F7FF)),
 
             // Grid
             Expanded(
               child: Container(
                 color: const Color(0xFFF5F7FF),
-                child: GridView.builder(
-                  padding: const EdgeInsets.symmetric(horizontal: 20),
-                  itemCount: items.length,
-                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 2,
-                    crossAxisSpacing: 10,
-                    mainAxisSpacing: 1,
-                    childAspectRatio: 1.4,
-                  ),
-                  itemBuilder: (context, index) {
-                    return _AksiyaCard(item: items[index]);
+                child: BlocBuilder<AksiyaCubit, AksiyaState>(
+                  builder: (context, state) {
+                    if (state is AksiyaLoading || state is AksiyaInitial) {
+                      return const Center(child: CircularProgressIndicator());
+                    }
+
+                    if (state is AksiyaError) {
+                      return Center(
+                        child: Text(
+                          state.message,
+                          style: const TextStyle(color: Colors.red),
+                        ),
+                      );
+                    }
+
+                    final items = (state as AksiyaSuccess).items;
+
+                    if (items.isEmpty) {
+                      return const Center(child: Text('Aksiýa tapylmady'));
+                    }
+
+                    return GridView.builder(
+                      padding: const EdgeInsets.symmetric(horizontal: 20),
+                      itemCount: items.length,
+                      gridDelegate:
+                          const SliverGridDelegateWithFixedCrossAxisCount(
+                            crossAxisCount: 2,
+                            crossAxisSpacing: 10,
+                            mainAxisSpacing: 1,
+                            childAspectRatio: 1.4,
+                          ),
+                      itemBuilder: (context, index) {
+                        return _AksiyaCard(item: items[index]);
+                      },
+                    );
                   },
                 ),
               ),
@@ -129,26 +144,21 @@ class _AksiyaCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        context.push("/detail", extra: item.image);
+        context.push("/aksiyaDetail", extra: {"uuid": item.uuid});
       },
       child: ClipRRect(
         borderRadius: BorderRadius.circular(14),
-        child: Image.asset(
+        child: Image.network(
+          ApiConstants.imageUrl(item.imgTm),
           width: 171.55,
           height: 104.51,
-          item.image,
+          fit: BoxFit.cover,
           errorBuilder: (_, __, ___) => Container(
-            color: Colors.transparent,
-            child: const Icon(Icons.person, size: 60, color: Colors.white30),
+            color: Colors.grey.shade200,
+            child: const Icon(Icons.image, size: 40, color: Colors.grey),
           ),
         ),
       ),
     );
   }
-}
-
-class AksiyaItem {
-  final String image;
-
-  const AksiyaItem({required this.image});
 }

@@ -420,7 +420,7 @@ class _WalkthroughScreenState extends State<WalkthroughScreen> {
               right: screenWidth * 0.05,
               top: screenHeight * 0.040,
               child: GestureDetector(
-                behavior: HitTestBehavior.translucent, // 🔥 важно
+                behavior: HitTestBehavior.translucent,
                 onTap: () {
                   themeNotifier.value = themeNotifier.value == ThemeMode.light
                       ? ThemeMode.dark

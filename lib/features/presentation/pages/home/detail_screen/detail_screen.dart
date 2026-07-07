@@ -1,23 +1,22 @@
-import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
-import 'package:komekchi_service/features/presentation/pages/home/detail_screen/nagilelik_bottomsheet.dart';
+import 'package:komekchi_service/core/utils/app_constants.dart';
+import 'package:komekchi_service/core/utils/theme/app_text_style.dart';
+import 'package:komekchi_service/core/utils/theme/const.dart';
+import 'package:komekchi_service/features/domain/entities/subcategory.dart';
+import 'package:komekchi_service/features/presentation/bloc/subcategory/subcategory_detail_cubit.dart';
+import 'package:komekchi_service/features/presentation/pages/home/detail_screen/issue/nagilelik_bottomsheet.dart';
 import 'package:komekchi_service/features/presentation/pages/home/home_screen.dart';
 
 import '../../../../../core/utils/theme/app_colors.dart';
 import 'map.dart';
+import 'price_item.dart';
 
 class DetailScreen extends StatefulWidget {
-  final String? title;
-  final String image;
-  final String? titleImage;
-  const DetailScreen({
-    super.key,
-    this.title,
-    required this.image,
-    this.titleImage,
-  });
+  final String uuid;
+  const DetailScreen({super.key, required this.uuid});
 
   @override
   State<DetailScreen> createState() => _DetailScreenState();
@@ -26,16 +25,7 @@ class DetailScreen extends StatefulWidget {
 class _DetailScreenState extends State<DetailScreen> {
   int quantity = 1;
   bool isFavorite = false;
-  int price = 50;
   bool isExpanded = false;
-
-  String getCurrentDate() {
-    final now = DateTime.now();
-    final day = now.day.toString().padLeft(2, '0');
-    final month = now.month.toString().padLeft(2, '0');
-    final year = now.year;
-    return '$day.$month.$year';
-  }
 
   @override
   void initState() {
@@ -47,12 +37,38 @@ class _DetailScreenState extends State<DetailScreen> {
 
   @override
   Widget build(BuildContext context) {
+    return BlocBuilder<SubcategoryDetailCubit, SubcategoryDetailState>(
+      builder: (context, state) {
+        if (state is SubcategoryDetailLoading || state is SubcategoryDetailInitial) {
+          return const Scaffold(
+            body: Center(child: CircularProgressIndicator()),
+          );
+        }
+
+        if (state is SubcategoryDetailError) {
+          return Scaffold(
+            body: Center(
+              child: Text(state.message, style: const TextStyle(color: Colors.red)),
+            ),
+          );
+        }
+
+        final item = (state as SubcategoryDetailSuccess).item;
+        return _buildContent(context, item);
+      },
+    );
+  }
+
+  Widget _buildContent(BuildContext context, SubcategoryItem item) {
     final screenWidth = MediaQuery.of(context).size.width;
-    // final isDark = Theme.of(context).brightness == Brightness.dark;
-    // final bg = isDark ? AppColor.bgBlogDark : AppColor.bgBlogLight;
-    // final cardBg = isDark ? AppColor.bgBlogDark : AppColor.bgBlogLight;
-    final textColor =  AppColor.titleText(context);
-    // final borderColor = isDark ? const Color(0xFF333333) : AppColor.borderColor;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final bg = isDark ? AppColor.bgPageDark : AppColor.bgPageLight;
+    final cardBg = isDark ? AppColor.bgBlogDark : AppColor.bgBlogLight;
+    final textColor = AppColor.titleText(context);
+    final TextStyle textStyle = AppTextStyle.semiBold12;
+    final price = item.paymentMethod.price;
+    final salePercent = item.paymentMethod.sale;
+    final warningText = item.warningDesc.descTm;
 
     return Scaffold(
       backgroundColor: AppColor.primary,
@@ -68,8 +84,8 @@ class _DetailScreenState extends State<DetailScreen> {
       body: Container(
         width: double.infinity,
         margin: const EdgeInsets.only(top: 10),
-        decoration: const BoxDecoration(
-          color: Colors.white,
+        decoration: BoxDecoration(
+          color: cardBg,
           borderRadius: BorderRadius.only(
             topLeft: Radius.circular(20),
             topRight: Radius.circular(20),
@@ -78,37 +94,39 @@ class _DetailScreenState extends State<DetailScreen> {
         child: Column(
           children: [
             // Header
-            AppBarWidget(textColor), 
-            Divider(height: 1, color: Color(0xFFF5F7FF)),
+            AppBarWidget(textColor, isDark),
+            DividerWidget(),
 
-            // Back button + title + more
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20.0),
+              padding: const EdgeInsets.symmetric(horizontal: 10.0),
               child: Row(
                 children: [
                   const SizedBox(height: 49),
                   IconButton(
                     onPressed: () => context.pop(),
-                    icon: const Icon(Icons.arrow_back_ios_new),
+                    icon: const Icon(Icons.arrow_back_ios_new, size: 15),
                   ),
                   const SizedBox(width: 10),
-                  Text(
-                    widget.title!,
-                    style: const TextStyle(
-                      fontSize: 16,
-                      color: Colors.black,
-                      fontWeight: FontWeight.w600,
+                  Expanded(
+                    child: Text(
+                      item.nameTm,
+                      overflow: TextOverflow.ellipsis,
+                      style: AppTextStyle.semiBold16.copyWith(
+                        color: AppColor.titleText(context),
+                      ),
                     ),
                   ),
-                  const Spacer(),
                   IconButton(
                     onPressed: () => showNagilelikBottomSheet(context),
-                    icon: const Icon(Icons.more_vert, color: Colors.black),
+                    icon: Icon(
+                      Icons.more_vert,
+                      color: AppColor.titleText(context),
+                    ),
                   ),
                 ],
               ),
             ),
-            Divider(height: 1, color: Color(0xFFF5F7FF)),
+            DividerWidget(),
 
             // Scrollable content
             Expanded(
@@ -117,37 +135,32 @@ class _DetailScreenState extends State<DetailScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     // Kartinka
-                    Stack(
-                      children: [
-                        Center(
-                          child: Padding(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 20.0,
-                              vertical: 10.0,
-                            ),
-                            child: ClipRRect(
-                              borderRadius: BorderRadius.circular(10),
-                              child: Image.asset(
-                                widget.image,
-                                width: 350,
-                                height: 184,
-                                // fit: BoxFit.cover,
-                                errorBuilder: (_, __, ___) => Container(
-                                  width: 350,
-                                  height: 184,
-                                  color: Colors.grey.shade200,
-                                  child: const Icon(
-                                    Icons.image,
-                                    size: 50,
-                                    color: Colors.grey,
-                                  ),
-                                ),
+                    Center(
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 20.0,
+                          vertical: 10.0,
+                        ),
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(10),
+                          child: Image.network(
+                            ApiConstants.imageUrl(item.img),
+                            width: 350,
+                            height: 184,
+                            fit: BoxFit.cover,
+                            errorBuilder: (_, __, ___) => Container(
+                              width: 350,
+                              height: 184,
+                              color: Colors.grey.shade200,
+                              child: const Icon(
+                                Icons.image,
+                                size: 50,
+                                color: Colors.grey,
                               ),
                             ),
                           ),
                         ),
-                        // Badge
-                      ],
+                      ),
                     ),
 
                     // Category breadcrumb
@@ -164,15 +177,20 @@ class _DetailScreenState extends State<DetailScreen> {
                               vertical: 6,
                             ),
                             decoration: BoxDecoration(
-                              color: Color(0xFFF5F5F5),
+                              color: isDark
+                                  ? AppColor.bgPageDark
+                                  : Color(0xFFF5F5F5),
                               borderRadius: BorderRadius.circular(6),
                             ),
-
-                            child: Text(
-                              "Kategoriýa",
-                              style: TextStyle(
-                                fontSize: 12,
-                                color: Color(0xFF666666),
+                            child: GestureDetector(
+                              onTap: () {
+                                context.pop();
+                              },
+                              child: Text(
+                                item.categoryName,
+                                style: textStyle.copyWith(
+                                  color: AppColor.descriptionText(context),
+                                ),
                               ),
                             ),
                           ),
@@ -183,19 +201,16 @@ class _DetailScreenState extends State<DetailScreen> {
                           ),
                           Container(
                             padding: const EdgeInsets.symmetric(
-                              horizontal: 12.0,
+                              horizontal: 6.0,
                               vertical: 6,
                             ),
                             decoration: BoxDecoration(
-                              color: Color(0xFFF5F5F5),
+                              color: isDark ? AppColor.bgPageDark : Color(0xFFF5F5F5),
                               borderRadius: BorderRadius.circular(6),
                             ),
                             child: Text(
-                              widget.title!,
-                              style: TextStyle(
-                                fontSize: 12,
-                                color: AppColor.primary,
-                              ),
+                              item.nameTm,
+                              style: AppTextStyle.semiBold12.copyWith(color: isDark ? AppColor.titleDark : AppColor.primary),
                             ),
                           ),
                         ],
@@ -206,136 +221,72 @@ class _DetailScreenState extends State<DetailScreen> {
                     Padding(
                       padding: EdgeInsets.symmetric(horizontal: 15),
                       child: Text(
-                        widget.titleImage!,
-                        style: TextStyle(
-                          fontSize: 22,
-                          fontWeight: FontWeight.w700,
-                          color: Colors.black,
-                        ),
+                        item.nameTm,
+                        style: AppTextStyle.semiBold20.copyWith(color: AppColor.titleText(context)),
                       ),
                     ),
                     const SizedBox(height: 8),
 
-                    // Views + favorite + rating
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 15),
-                      child: Row(
-                        children: [
-                          const Text(
-                            '10K',
-                            style: TextStyle(fontSize: 14, color: Colors.black),
-                          ),
-                          const SizedBox(width: 4),
-                          Icon(
-                            Icons.remove_red_eye_outlined,
-                            size: 16,
-                            color: Colors.black,
-                          ),
-                          const Spacer(),
-                          Container(
-                            width: 32,
-                            height: 30,
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(4),
-                              color: Color(0xFFF6F8FD),
-                            ),
-                            child: GestureDetector(
-                              onTap: () =>
-                                  setState(() => isFavorite = !isFavorite),
-                              child: Icon(
-                                isFavorite
-                                    ? Icons.favorite
-                                    : Icons.favorite_border,
-                                size: 22,
-                                color: isFavorite
-                                    ? Colors.red
-                                    : Colors.grey.shade400,
-                              ),
-                            ),
-                          ),
-                          const SizedBox(width: 10),
-                          Container(
-                            height: 30,
-                            width: 60,
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(4),
-                              color: Color(0xFFF6F8FD),
-                            ),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                const Text(
-                                  '4.7',
-                                  style: TextStyle(
-                                    fontSize: 18,
-                                    color: Colors.black,
-                                  ),
-                                ),
-                                const SizedBox(width: 3),
-                                const Icon(
-                                  Icons.star,
-                                  size: 20,
-                                  color: Colors.amber,
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    const SizedBox(height: 10),
-
-                    // Orange info banner
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 15),
-                      child: Container(
-                        width: double.infinity,
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 12,
-                          vertical: 8,
-                        ),
-                        decoration: BoxDecoration(
-                          color: Color(0xFFFCFBFB),
-                          borderRadius: BorderRadius.circular(8),
-                        ),
+                    if (item.is24_7 || item.isFeatured)
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 15),
                         child: Row(
                           children: [
-                            Image.asset(
-                              "assets/images/icon/image1.png",
-                              width: 16,
-                              height: 16,
-                            ),
-                            const SizedBox(width: 8),
-                            Expanded(
-                              child: RichText(
-                                text: TextSpan(
+                            if (item.is24_7)
+                              _Badge(text: "7/24"),
+                            if (item.is24_7 && item.isFeatured)
+                              const SizedBox(width: 6),
+                            if (item.isFeatured)
+                              _Badge(text: "Öňde baryjy"),
+                          ],
+                        ),
+                      ),
+                    const SizedBox(height: 10),
+
+                    // Warning / info banner
+                    if (warningText.isNotEmpty)
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 15),
+                        child: Container(
+                          width: double.infinity,
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 12,
+                            vertical: 8,
+                          ),
+                          decoration: BoxDecoration(
+                            color: bg,
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: Row(
+                            children: [
+                              Image.asset(
+                                "assets/images/icon/image1.png",
+                                width: 16,
+                                height: 16,
+                              ),
+                              const SizedBox(width: 8),
+                              Expanded(
+                                child: Text(
+                                  warningText,
                                   style: TextStyle(
                                     fontSize: 12,
                                     color: Color(0xFFFF6600),
                                   ),
-                                  children: const [
-                                    TextSpan(
-                                      text:
-                                          'Biziň arassaçylyk işleri hyzmatymyzda 40% arzanladyş bar! ',
-                                    ),
-                                  ],
                                 ),
                               ),
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
                       ),
-                    ),
                     const SizedBox(height: 24),
 
                     // Bahasy + counter
                     Container(
                       margin: const EdgeInsets.symmetric(horizontal: 15),
                       padding: const EdgeInsets.symmetric(horizontal: 15),
-
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(12),
-                        color: Color(0xFFF5F5F5),
+                        color: bg,
                       ),
                       child: Row(
                         children: [
@@ -346,11 +297,11 @@ class _DetailScreenState extends State<DetailScreen> {
                                 'Bahasy',
                                 style: TextStyle(
                                   fontSize: 14,
-                                  color: Color(0xFF3D3C3C),
+                                  color: AppColor.titleText(context),
                                 ),
                               ),
                               Text(
-                                '50 tmt',
+                                '$price tmt',
                                 style: TextStyle(
                                   fontSize: 20,
                                   fontWeight: FontWeight.w700,
@@ -365,17 +316,15 @@ class _DetailScreenState extends State<DetailScreen> {
                             children: [
                               GestureDetector(
                                 onTap: () {
-                                  if (quantity > 1)
-                                    setState(() {
-                                      quantity--;
-                                      price -= 50;
-                                    });
+                                  if (quantity > 1) {
+                                    setState(() => quantity--);
+                                  }
                                 },
                                 child: Container(
                                   width: 36,
                                   height: 36,
                                   decoration: BoxDecoration(
-                                    color: Colors.white,
+                                    color: bg,
                                     borderRadius: BorderRadius.circular(8),
                                     border: Border.all(
                                       color: Colors.grey.shade300,
@@ -399,10 +348,7 @@ class _DetailScreenState extends State<DetailScreen> {
                               ),
                               GestureDetector(
                                 onTap: () {
-                                  setState(() {
-                                    quantity++;
-                                    price += 50;
-                                  });
+                                  setState(() => quantity++);
                                 },
                                 child: Container(
                                   width: 32,
@@ -442,29 +388,20 @@ class _DetailScreenState extends State<DetailScreen> {
                       padding: const EdgeInsets.symmetric(horizontal: 15),
                       child: RichText(
                         text: TextSpan(
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 15,
-                            color: Colors.black54,
+                            color: AppColor.titleText(context),
                             fontWeight: FontWeight.w400,
                             height: 1.5,
                           ),
                           children: [
-                            TextSpan(
-                              text: isExpanded
-                                  ? 'Hapyny gündelik wagtlarda, nahardan öň ya-da soň kabul etmek maslahat berilýär. Hapynyň ýokumly täsirleri adatça 15-30 minutdan soň başlaýar we 4-6 sagat dowam edýär.'
-                                  : 'Hapyny gündelik wagtlarda, nahardan öň ya-da soň kabul etmek maslahat berilýär. Hapynyň ýokumly täsirleri adatça 15-30 minutdan soň başlaýar... ',
-                            ),
-
-                            TextSpan(
-                              text: isExpanded ? ' Ýygna' : ' Ähliisini Okamak',
-                              style: TextStyle(color: AppColor.primary),
-                              recognizer: TapGestureRecognizer()
-                                ..onTap = () {
-                                  setState(() {
-                                    isExpanded = !isExpanded;
-                                  });
-                                },
-                            ),
+                            TextSpan(text: item.descTm),
+                            if (item.paymentMethod.consultation)
+                              TextSpan(
+                                text: isExpanded
+                                    ? ' Maslahat bermek hyzmaty hem elýeterlidir.'
+                                    : '',
+                              ),
                           ],
                         ),
                       ),
@@ -474,91 +411,80 @@ class _DetailScreenState extends State<DetailScreen> {
                     // Action buttons: Call, Chat, Map, Share
                     Padding(
                       padding: const EdgeInsets.symmetric(vertical: 16),
-                      child: Column(
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                         children: [
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          Column(
                             children: [
-                              Column(
-                                children: [
-                                  Image.asset(
-                                    "assets/images/details/image1.png",
-                                    height: 60,
-                                    width: 60,
-                                  ),
-                                  const SizedBox(height: 4),
-                                  Text(
-                                    "Jaň etmek",
-                                    style: TextStyle(
-                                      fontSize: 10,
-                                      fontWeight: FontWeight.w500,
-                                      color: Color(0xFF3D3C3C),
-                                    ),
-                                  ),
-                                ],
+                              Image.asset(
+                                "assets/images/details/image1.png",
+                                height: 60,
+                                width: 60,
                               ),
-                              Column(
-                                children: [
-                                  Image.asset(
-                                    "assets/images/details/image2.png",
-                                    height: 60,
-                                    width: 60,
-                                  ),
-                                  const SizedBox(height: 4),
-
-                                  Text(
-                                    "SMS",
-                                    style: TextStyle(
-                                      fontSize: 10,
-                                      fontWeight: FontWeight.w500,
-                                      color: Color(0xFF3D3C3C),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              Column(
-                                children: [
-                                  Image.asset(
-                                    "assets/images/details/image3.png",
-                                    height: 60,
-                                    width: 60,
-                                  ),
-                                  const SizedBox(height: 4),
-
-                                  Text(
-                                    "Karta",
-                                    style: TextStyle(
-                                      fontSize: 10,
-                                      fontWeight: FontWeight.w500,
-                                      color: Color(0xFF3D3C3C),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              Column(
-                                children: [
-                                  Image.asset(
-                                    "assets/images/details/image4.png",
-                                    height: 60,
-                                    width: 60,
-                                  ),
-                                  const SizedBox(height: 4),
-
-                                  Text(
-                                    "Paýlaşmak",
-                                    style: TextStyle(
-                                      fontSize: 10,
-                                      fontWeight: FontWeight.w500,
-                                      color: Color(0xFF3D3C3C),
-                                    ),
-                                  ),
-                                ],
+                              const SizedBox(height: 4),
+                              Text(
+                                "Jaň etmek",
+                                style: TextStyle(
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.w500,
+                                  color: AppColor.titleText(context),
+                                ),
                               ),
                             ],
                           ),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                            children: [],
+                          Column(
+                            children: [
+                              Image.asset(
+                                "assets/images/details/image2.png",
+                                height: 60,
+                                width: 60,
+                              ),
+                              const SizedBox(height: 4),
+                              Text(
+                                "SMS",
+                                style: TextStyle(
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.w500,
+                                  color: AppColor.titleText(context),
+                                ),
+                              ),
+                            ],
+                          ),
+                          Column(
+                            children: [
+                              Image.asset(
+                                "assets/images/details/image3.png",
+                                height: 60,
+                                width: 60,
+                              ),
+                              const SizedBox(height: 4),
+                              Text(
+                                "Karta",
+                                style: TextStyle(
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.w500,
+                                  color: AppColor.titleText(context),
+                                ),
+                              ),
+                            ],
+                          ),
+                          Column(
+                            children: [
+                              Image.asset(
+                                "assets/images/details/image4.png",
+                                height: 60,
+                                width: 60,
+                              ),
+                              const SizedBox(height: 4),
+                              Text(
+                                "Paýlaşmak",
+                                style: TextStyle(
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.w500,
+                                  color: AppColor.titleText(context),
+                                ),
+                              ),
+                            ],
                           ),
                         ],
                       ),
@@ -569,7 +495,7 @@ class _DetailScreenState extends State<DetailScreen> {
                       margin: const EdgeInsets.symmetric(horizontal: 10),
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(20),
-                        color: Color(0xFFF5F5F5),
+                        color: bg,
                       ),
                       child: Padding(
                         padding: const EdgeInsets.symmetric(
@@ -579,49 +505,22 @@ class _DetailScreenState extends State<DetailScreen> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            _PriceRow(
+                            PriceRow(
                               label: 'Hyzmat bahasy:',
-                              value: '200 TMT',
+                              value: '$price TMT',
                             ),
                             const SizedBox(height: 8),
-                            _PriceRow(label: 'Arzanladyş:', value: '15%'),
-                            const SizedBox(height: 8),
-                            _PriceRow(
-                              label: 'Maslahat bermek:',
-                              value: '20.00 man',
+                            PriceRow(
+                              label: 'Arzanladyş:',
+                              value: '$salePercent%',
                             ),
-                            const SizedBox(height: 12),
-
-                            Container(
-                              width: double.infinity,
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 12,
-                                vertical: 10,
+                            if (item.paymentMethod.consultation) ...[
+                              const SizedBox(height: 8),
+                              PriceRow(
+                                label: 'Maslahat bermek:',
+                                value: '${item.paymentMethod.forPersonPrice} man',
                               ),
-                              decoration: BoxDecoration(
-                                color: Colors.orange.shade50,
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                              child: Row(
-                                children: [
-                                  Image.asset(
-                                    "assets/images/icon/i.png",
-                                    width: 20,
-                                    height: 20,
-                                  ),
-                                  const SizedBox(width: 8),
-                                  Expanded(
-                                    child: Text(
-                                      'Töleg şertleri: 100% göteriml öňünden bank ulgamynyň üsti bilen tölemek şertinde.',
-                                      style: TextStyle(
-                                        fontSize: 12,
-                                        color: Colors.orange.shade800,
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
+                            ],
                             const SizedBox(height: 12),
                             Row(
                               children: [
@@ -629,12 +528,13 @@ class _DetailScreenState extends State<DetailScreen> {
                                   width: screenWidth * 0.32,
                                   height: 53,
                                   padding: const EdgeInsets.only(
-                                    left: 16.0,
+                                    left: 14.0,
                                     top: 4,
-                                    bottom: 4,
+                                    bottom: 2,
                                   ),
                                   decoration: BoxDecoration(
-                                    color: Colors.white,
+                                    color: Color(0xFFF6F8FD),
+                                    border: Border.all(color: Color(0xFFC6D2FF)),
                                     borderRadius: BorderRadius.circular(12),
                                   ),
                                   child: Column(
@@ -666,10 +566,9 @@ class _DetailScreenState extends State<DetailScreen> {
                                       context.push("/date");
                                     },
                                     child: Container(
-                                      width: screenWidth * 0.6,
                                       height: 53,
                                       padding: const EdgeInsets.symmetric(
-                                        horizontal: 38.5,
+                                        horizontal: 8,
                                       ),
                                       decoration: BoxDecoration(
                                         borderRadius: BorderRadius.circular(10),
@@ -679,11 +578,15 @@ class _DetailScreenState extends State<DetailScreen> {
                                         mainAxisAlignment:
                                             MainAxisAlignment.center,
                                         children: [
-                                          Text(
-                                            "Tassyklamak",
-                                            style: TextStyle(
-                                              fontSize: 16,
-                                              color: Colors.white,
+                                          Flexible(
+                                            child: Text(
+                                              "Tassyklamak",
+                                              style: TextStyle(
+                                                fontSize: 16,
+                                                color: Colors.white,
+                                              ),
+                                              maxLines: 1,
+                                              overflow: TextOverflow.ellipsis,
                                             ),
                                           ),
                                           const SizedBox(width: 4.5),
@@ -715,37 +618,26 @@ class _DetailScreenState extends State<DetailScreen> {
   }
 }
 
-class _PriceRow extends StatelessWidget {
-  final String label;
-  final String value;
-
-  const _PriceRow({required this.label, required this.value});
+class _Badge extends StatelessWidget {
+  final String text;
+  const _Badge({required this.text});
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Text(
-          label,
-          style: TextStyle(fontSize: 14, color: Colors.grey.shade600),
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+      decoration: BoxDecoration(
+        color: AppColor.primary.withOpacity(0.1),
+        borderRadius: BorderRadius.circular(6),
+      ),
+      child: Text(
+        text,
+        style: TextStyle(
+          fontSize: 11,
+          fontWeight: FontWeight.w600,
+          color: AppColor.primary,
         ),
-        Text(
-          value,
-          style: const TextStyle(
-            fontSize: 14,
-            fontWeight: FontWeight.w500,
-            color: Colors.black,
-          ),
-        ),
-      ],
+      ),
     );
   }
-}
-
-class ServiceItem {
-  final String title;
-  final String image;
-
-  ServiceItem({required this.title, required this.image});
 }

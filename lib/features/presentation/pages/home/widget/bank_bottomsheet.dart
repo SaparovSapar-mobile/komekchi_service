@@ -17,10 +17,7 @@ class _BankBottomSheetState extends State<BankBottomSheet> {
 
   final List<BankItem> items = const [
     BankItem(title: 'Rysgal bank', subtitle: "assets/images/icon/rysgal.png"),
-    BankItem(
-      title: 'Halk bank',
-      subtitle: "assets/images/icon/halkbank.png",
-    ),
+    BankItem(title: 'Halk bank', subtitle: "assets/images/icon/halkbank.png"),
     BankItem(title: 'Sebagat bank', subtitle: "assets/images/icon/senagat.png"),
   ];
 
@@ -75,7 +72,7 @@ class _BankBottomSheetState extends State<BankBottomSheet> {
               },
               child: Container(
                 height: 59,
-                width: 351,
+                width: double.infinity,
                 color: Colors.transparent,
                 // padding: const EdgeInsets.symmetric(vertical: 14),
                 child: Row(
@@ -85,23 +82,28 @@ class _BankBottomSheetState extends State<BankBottomSheet> {
                       child: Row(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Image.asset(item.subtitle, width: 67, height: 45,),
+                          Image.asset(item.subtitle, width: 67, height: 45),
                           const SizedBox(width: 8),
 
-                          Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Text(
-                                item.title,
-                                style: TextStyle(
-                                  fontSize: 14,
-                                  fontWeight: isSelected
-                                      ? FontWeight.w600
-                                      : FontWeight.w400,
-                                  color: Colors.black,
+                          Flexible(
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  item.title,
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    fontWeight: isSelected
+                                        ? FontWeight.w600
+                                        : FontWeight.w400,
+                                    color: Colors.black,
+                                  ),
                                 ),
-                              ),
-                            ],
+                              ],
+                            ),
                           ),
                         ],
                       ),

@@ -1,10 +1,11 @@
 import 'package:dio/dio.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class ApiService {
   final Dio dio = Dio();
 
-  static const String baseUrl = 'http://216.250.14.29:8124/client/user';
+  static final String baseUrl = dotenv.env['BASE_URL']!;
 
   ApiService() {
     dio.options
@@ -105,74 +106,19 @@ class ApiService {
     return null;
   }
 
-    Future<Response> sendDeviceId(Map<String, dynamic> data) async {
-    final response = await dio.post('/auth/get-device-id', data: data);
-    return response;
-  }
-
-  // =======================
-  // 🔥 ЛОГАУТ
-  // =======================
   Future<void> logout() async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.clear();
   }
 
-Future<Map<String, dynamic>?> checkHealth() async {
-  try {
-    final response = await dio.get('/users/health/check');
-    
-    if (response.statusCode == 200) {
-      return response.data;
-    }
-  } catch (e) {
-    print("❌ Ошибка health check: $e");
-  }
-  return null;
-}
+  // Вызови один раз при старте приложения
 
-
-  // =======================
-  // 🔥 ЛОГИН / OTP
-  // =======================
-
-  Future<void> sendPhoneNumber(String phoneNumber) async {
-    try {
-      await dio.post(
-        '/auth/user-login-phone',
-        data: {"phone_number": phoneNumber},
-      );
-
-      final prefs = await SharedPreferences.getInstance();
-      await prefs.setString('phone_number', phoneNumber);
-
-      print("📩 OTP отправлен");
-    } catch (e) {
-      throw Exception("Ошибка отправки номера: $e");
-    }
+  // Шаг 1: пользователь вводит номер → бэкенд генерирует OTP
+  // и шлёт send_otp на otp_send app → SMS уходит юзеру
+  Future<void> sendPhoneForOtp(String phone) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('phone', phone);
   }
 
-  Future<void> confirmOtp(String otp) async {
-    try {
-      final prefs = await SharedPreferences.getInstance();
-      final phone = prefs.getString('phone_number');
-
-      final response = await dio.post(
-        '/auth/user-phone-confirmation',
-        data: {"otp": otp, "phone_number": phone},
-      );
-
-      final token = response.data['access_token'];
-      final refresh = response.data['refresh_token'];
-
-      if (token != null) await prefs.setString('auth_token', token);
-      if (refresh != null) await prefs.setString('refresh_token', refresh);
-
-      await prefs.setBool('is_logged_in', true);
-
-      print("🔥 Пользователь вошёл. Токены сохранены.");
-    } catch (e) {
-      print("❌ Ошибка OTP: $e");
-    }
-  }
+  // Шаг 2: пользователь ввёл OTP из SMS → верифицируем
 }

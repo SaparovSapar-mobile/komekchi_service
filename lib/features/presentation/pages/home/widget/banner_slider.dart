@@ -1,7 +1,10 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:komekchi_service/core/utils/app_constants.dart';
+import 'package:komekchi_service/features/domain/entities/banners.dart';
 import '../../../../../core/utils/theme/app_colors.dart';
+import '../../../bloc/banner/banner_cubit.dart';
 
 class BannerSlider extends StatefulWidget {
   const BannerSlider({super.key});
@@ -14,37 +17,22 @@ class _BannerSliderState extends State<BannerSlider> {
   final PageController _pageController = PageController();
   int _currentPage = 0;
   Timer? _timer;
-
-  final List<BannerItem> banners = [
-    BannerItem(
-      text: 'Biz siziň\nhyzmatyňyzda...',
-      image: 'assets/images/banner.png',
-    ),
-    BannerItem(
-      text: 'Iň gowy\nhyzmatlar...',
-      image: 'assets/images/banner.png',
-    ),
-    BannerItem(
-      text: 'Hünärmenler\nbilen işle...',
-      image: 'assets/images/banner.png',
-    ),
-  ];
+  List<BannerItem> _banners = [];
 
   @override
   void initState() {
     super.initState();
-    _startAutoScroll();
+    context.read<BannerCubit>().fetchBanners();
   }
 
-  void _startAutoScroll() {
+  void _startAutoScroll(int length) {
+    _timer?.cancel();
+    if (length <= 1) return;
     _timer = Timer.periodic(const Duration(seconds: 4), (timer) {
-      if (_currentPage < banners.length - 1) {
-        _currentPage++;
-      } else {
-        _currentPage = 0;
-      }
+      if (!mounted) return;
+      final next = (_currentPage + 1) % length;
       _pageController.animateToPage(
-        _currentPage,
+        next,
         duration: const Duration(milliseconds: 400),
         curve: Curves.easeInOut,
       );
@@ -60,188 +48,199 @@ class _BannerSliderState extends State<BannerSlider> {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(16),
-        child: Stack(
-          children: [
-            // PageView s bannerami
-            SizedBox(
-              height: 142,
-              child: PageView.builder(
-                controller: _pageController,
-                itemCount: banners.length,
-                onPageChanged: (index) {
-                  setState(() => _currentPage = index);
-                },
-                itemBuilder: (context, index) {
-                  return _buildBannerItem(banners[index]);
-                },
-              ),
-            ),
+    return BlocConsumer<BannerCubit, BannerState>(
+      listener: (context, state) {
+        if (state is BannerSuccess) {
+          _banners = state.banner;
+          _startAutoScroll(_banners.length);
+        }
+      },
+      builder: (context, state) {
+        if (state is BannerLoading) {
+          return const SizedBox(
+            height: 142,
+            child: Center(child: CircularProgressIndicator()),
+          );
+        }
 
-            // Levaya strелка
-            Positioned(
-              left: 8,
-              top: 0,
-              bottom: 0,
-              child: Center(
-                child: GestureDetector(
-                  onTap: () {
-                    if (_currentPage > 0) {
-                      _pageController.previousPage(
-                        duration: const Duration(milliseconds: 400),
-                        curve: Curves.easeInOut,
-                      );
-                    }
-                  },
-                  child: Container(
-                    width: 28,
-                    height: 28,
-                    decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(0.5),
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    child: const Icon(
-                      Icons.chevron_left,
-                      size: 20,
-                      color: Colors.black,
-                    ),
-                  ),
-                ),
-              ),
-            ),
+        if (state is BannerError) {
+          return SizedBox(
+            height: 142,
+            child: Center(child: Text(state.message)),
+          );
+        }
 
-            // Pravaya strelka
-            Positioned(
-              right: 8,
-              top: 0,
-              bottom: 0,
-              child: Center(
-                child: GestureDetector(
-                  onTap: () {
-                    if (_currentPage < banners.length - 1) {
-                      _pageController.nextPage(
-                        duration: const Duration(milliseconds: 400),
-                        curve: Curves.easeInOut,
-                      );
-                    }
-                  },
-                  child: Container(
-                    width: 28,
-                    height: 28,
-                    decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(0.5),
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    child: const Icon(
-                      Icons.chevron_right,
-                      size: 20,
-                      color: Colors.black,
-                    ),
-                  ),
-                ),
-              ),
-            ),
+        if (state is BannerSuccess) {
+          final banners = state.banner;
 
-            // Indikatory (tochki)
-            Positioned(
-              bottom: 10,
-              left: 10,
-              child: Container(
-                padding: const EdgeInsets.symmetric(vertical: 1),
-                decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.5),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: List.generate(banners.length, (index) {
-                    return AnimatedContainer(
-                      duration: const Duration(milliseconds: 300),
-                      margin: const EdgeInsets.symmetric(horizontal: 3),
-                      width: _currentPage == index ? 20 : 8,
-                      height: 8,
-                      decoration: BoxDecoration(
-                        color: _currentPage == index
-                            ? AppColor.primary
-                            : Colors.white,
-                        borderRadius: BorderRadius.circular(4),
+          return Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+            child: SizedBox(
+              height: 125,
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(16),
+                child: Stack(
+                  children: [
+                    // PageView занимает весь Stack
+                    PageView.builder(
+                      controller: _pageController,
+                      itemCount: banners.length,
+                      onPageChanged: (index) {
+                        setState(() => _currentPage = index);
+                      },
+                      itemBuilder: (context, index) {
+                        return _buildBannerItem(banners[index]);
+                      },
+                    ),
+
+                    // Левая стрелка
+                    // Positioned(
+                    //   left: 8,
+                    //   top: 0,
+                    //   bottom: 0,
+                    //   child: Center(
+                    //     child: GestureDetector(
+                    //       onTap: () {
+                    //         _pageController.previousPage(
+                    //           duration: const Duration(milliseconds: 400),
+                    //           curve: Curves.easeInOut,
+                    //         );
+                    //       },
+                    //       child: Container(
+                    //         width: 28,
+                    //         height: 28,
+                    //         decoration: BoxDecoration(
+                    //           color: Colors.white.withOpacity(0.5),
+                    //           borderRadius: BorderRadius.circular(10),
+                    //         ),
+                    //         child: const Icon(
+                    //           Icons.chevron_left,
+                    //           size: 20,
+                    //           color: Colors.black,
+                    //         ),
+                    //       ),
+                    //     ),
+                    //   ),
+                    // ),
+
+                    // Правая стрелка
+                    // Positioned(
+                    //   right: 8,
+                    //   top: 0,
+                    //   bottom: 0,
+                    //   child: Center(
+                    //     child: GestureDetector(
+                    //       onTap: () {
+                    //         _pageController.nextPage(
+                    //           duration: const Duration(milliseconds: 400),
+                    //           curve: Curves.easeInOut,
+                    //         );
+                    //       },
+                    //       child: Container(
+                    //         width: 28,
+                    //         height: 28,
+                    //         decoration: BoxDecoration(
+                    //           color: Colors.white.withOpacity(0.5),
+                    //           borderRadius: BorderRadius.circular(10),
+                    //         ),
+                    //         child: const Icon(
+                    //           Icons.chevron_right,
+                    //           size: 20,
+                    //           color: Colors.black,
+                    //         ),
+                    //       ),
+                    //     ),
+                    //   ),
+                    // ),
+
+                    // Индикаторы
+                    Positioned(
+                      bottom: 10,
+                      left: 10,
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 4,
+                          vertical: 4,
+                        ),
+                        decoration: BoxDecoration(
+                          color: Colors.white.withOpacity(0.5),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: List.generate(banners.length, (index) {
+                            return AnimatedContainer(
+                              duration: const Duration(milliseconds: 300),
+                              margin: const EdgeInsets.symmetric(horizontal: 3),
+                              width: _currentPage == index ? 20 : 8,
+                              height: 8,
+                              decoration: BoxDecoration(
+                                color: _currentPage == index
+                                    ? AppColor.primary
+                                    : Colors.white,
+                                borderRadius: BorderRadius.circular(4),
+                              ),
+                            );
+                          }),
+                        ),
                       ),
-                    );
-                  }),
+                    ),
+                  ],
                 ),
               ),
             ),
-          ],
-        ),
-      ),
+          );
+        }
+
+        return const SizedBox.shrink();
+      },
     );
   }
 
-  Widget _buildBannerItem(BannerItem banner) {
+  Widget _buildBannerItem(BannerItem item) {
+    final url = ApiConstants.imageUrl(item.imgTm);
     return Stack(
       fit: StackFit.expand,
       children: [
-        // Izobrazhenie
-        Image.asset(
-          banner.image,
+        Image.network(
+          url,
           fit: BoxFit.cover,
+          loadingBuilder: (context, child, progress) {
+            if (progress == null) return child;
+            return const Center(child: CircularProgressIndicator());
+          },
           errorBuilder: (context, error, stackTrace) {
-            return Container(color: AppColor.primary);
+            return Image.asset('assets/images/banner.png', fit: BoxFit.cover);
           },
         ),
-        // Temniy gradient
-        Container(
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              colors: [Colors.black.withOpacity(0.4), Colors.transparent],
-              begin: Alignment.centerLeft,
-              end: Alignment.centerRight,
-            ),
-          ),
-        ),
-        // Tekst
-        Positioned(
-          left: 40,
-          top: 0,
-          bottom: 0,
-          child: Center(
-            child: Text(
-              banner.text,
-              style: const TextStyle(
-                color: Colors.white,
-                fontSize: 21.97,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ),
-        ),
+        // Тёмный градиент
+        // Container(
+        //   decoration: BoxDecoration(
+        //     gradient: LinearGradient(
+        //       colors: [Colors.black.withOpacity(0.4), Colors.transparent],
+        //       begin: Alignment.centerLeft,
+        //       end: Alignment.centerRight,
+        //     ),
+        //   ),
+        // ),
+        // Текст
+        // Positioned(
+        //   left: 40,
+        //   right: 60,
+        //   top: 0,
+        //   bottom: 0,
+        //   child: Center(
+        //     child: Text(
+        //       item.name,
+        //       style: const TextStyle(
+        //         color: Colors.white,
+        //         fontSize: 21.97,
+        //         fontWeight: FontWeight.bold,
+        //       ),
+        //     ),
+        //   ),
+        // ),
       ],
-    );
-  }
-}
-
-class BannerItem {
-  final String text;
-  final String image;
-
-  BannerItem({required this.text, required this.image});
-}
-
-class DividerWidget extends StatelessWidget {
-  const DividerWidget({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-
-    return Container(
-      color: isDark ? AppColor.bgPageDark : AppColor.bgPageLight,
-      height: 6,
-      width: double.infinity,
-      margin: const EdgeInsets.only(bottom: 10),
     );
   }
 }

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 import 'package:komekchi_service/core/utils/theme/app_theme.dart';
+import 'package:komekchi_service/core/utils/theme/const.dart';
 import 'package:komekchi_service/features/presentation/pages/home/home_screen.dart';
 
 import '../../../../../core/utils/theme/app_colors.dart';
@@ -95,7 +96,7 @@ class _SelectDateState extends State<SelectDate> {
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final bg = isDark ? AppColor.bgBlogDark : AppColor.bgBlogLight;
+    final bg = isDark ? AppColor.bgPageDark : AppColor.bgPageLight;
     final cardBg = isDark ? AppColor.bgBlogDark : AppColor.bgBlogLight;
     final textColor =  AppColor.titleText(context);
     final borderColor = isDark ? const Color(0xFF333333) : AppColor.borderColor;
@@ -111,6 +112,9 @@ class _SelectDateState extends State<SelectDate> {
     final double fontSizeMedium = screenWidth * 0.045; // ~18px
     final double horizontalPadding = screenWidth * 0.04; // ~16px
 
+
+    
+
     return Scaffold(
       backgroundColor: AppColor.primary,
       appBar: AppBar(
@@ -125,8 +129,8 @@ class _SelectDateState extends State<SelectDate> {
       body: Container(
         width: double.infinity,
         margin: const EdgeInsets.only(top: 10),
-        decoration: const BoxDecoration(
-          color: Colors.white,
+        decoration:  BoxDecoration(
+          color: cardBg,
           borderRadius: BorderRadius.only(
             topLeft: Radius.circular(20),
             topRight: Radius.circular(20),
@@ -138,9 +142,9 @@ class _SelectDateState extends State<SelectDate> {
             // ✅ Header — адаптивный padding и шрифты
             SizedBox(
               height: screenHeight * 0.058, // ~49px
-              child: AppBarWidget(textColor),
+              child: AppBarWidget(textColor, isDark),
             ),
-            const Divider(height: 1, color: Color(0xFFF5F7FF)),
+            const DividerWidget(),
 
             // ✅ Back + Title
             SizedBox(
@@ -164,18 +168,18 @@ class _SelectDateState extends State<SelectDate> {
                       style: TextStyle(
                         fontSize: fontSizeNormal, // ✅ адаптивный
                         fontWeight: FontWeight.bold,
-                        color: Colors.black,
+                        color: AppColor.titleText(context),
                       ),
                     ),
                   ],
                 ),
               ),
             ),
-            const Divider(height: 1, color: Color(0xFFF5F7FF)),
+            // const DividerWidget(),
 
             Expanded(
               child: Container(
-                color: AppColor.bgPageLight,
+                color: cardBg,
                 child: Container(
                   padding: EdgeInsets.symmetric(
                     vertical: screenHeight * 0.024, // ✅ ~20px адаптивно
@@ -187,7 +191,8 @@ class _SelectDateState extends State<SelectDate> {
                   ),
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(10),
-                    color: const Color(0xFFFFFFFF),
+                    color: bg,
+                    // border: Border.all(color: Color(0xFFC6D2FF))
                   ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -198,7 +203,7 @@ class _SelectDateState extends State<SelectDate> {
                         style: TextStyle(
                           fontSize: fontSizeMedium, // ✅ адаптивный
                           fontWeight: FontWeight.w700,
-                          color: Colors.black,
+                          color: AppColor.titleText(context),
                         ),
                       ),
                       SizedBox(height: screenHeight * 0.012),
@@ -273,7 +278,7 @@ class _SelectDateState extends State<SelectDate> {
                         style: TextStyle(
                           fontSize: fontSizeMedium, // ✅ адаптивный
                           fontWeight: FontWeight.w700,
-                          color: Colors.black,
+                          color: AppColor.titleText(context),
                         ),
                       ),
                       SizedBox(height: screenHeight * 0.012),

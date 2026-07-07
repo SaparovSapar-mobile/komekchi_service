@@ -49,7 +49,7 @@ class Hyzmat extends StatelessWidget {
         child: Column(
           children: [
             // Header
-            AppBarWidget(textColor), const Divider(height: 1, color: Color(0xFFF5F7FF)),
+            AppBarWidget(textColor, isDark), const Divider(height: 1, color: Color(0xFFF5F7FF)),
 
             // Back
             Padding(

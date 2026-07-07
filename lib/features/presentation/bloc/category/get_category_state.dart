@@ -12,7 +12,7 @@
   final class GetCategoryLoading extends GetCategoryState {}
 
   final class GetCategorySucces extends GetCategoryState {
-    final Category dataCategory;
+    final List<CategoryItem> dataCategory;
 
     GetCategorySucces({required this.dataCategory});
     @override

@@ -49,7 +49,7 @@ class IshTertibi extends StatelessWidget {
         child: Column(
           children: [
             // Header
-            AppBarWidget(textColor), Divider(height: 1, color: Color(0xFFF5F7FF)),
+            AppBarWidget(textColor, isDark), Divider(height: 1, color: Color(0xFFF5F7FF)),
 
             // Back
             Padding(

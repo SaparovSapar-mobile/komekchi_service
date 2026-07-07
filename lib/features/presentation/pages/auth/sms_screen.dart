@@ -2,7 +2,9 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
+import '../../../../core/api_service.dart';
 import '../../../../core/utils/theme/app_colors.dart';
 
 class SmsScreen extends StatefulWidget {
@@ -21,6 +23,8 @@ class _SmsScreenState extends State<SmsScreen> {
   int _secondsLeft = 5;
   Timer? _timer;
   bool _canResend = false;
+  bool _isLoading = false;
+  String? _error;
 
   @override
   void initState() {
@@ -34,9 +38,21 @@ class _SmsScreenState extends State<SmsScreen> {
     });
   }
 
-  void _startTimer() {
-    _secondsLeft = 60;
-    _canResend = false;
+
+  void _startTimer() async {
+    // Resend API call
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final phone = prefs.getString('phone');
+      final name = prefs.getString('name');
+      final password = prefs.getString('password');
+      if (phone != null && name != null && password != null) await ApiService().sendPhoneForOtp(phone);
+    } catch (_) {}
+
+    setState(() {
+      _secondsLeft = 60;
+      _canResend = false;
+    });
     _timer?.cancel();
     _timer = Timer.periodic(const Duration(seconds: 1), (t) {
       if (_secondsLeft == 0) {
@@ -97,10 +113,9 @@ class _SmsScreenState extends State<SmsScreen> {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final bg = isDark ? AppColor.bgBlogDark : AppColor.bgBlogLight;
     final cardBg = isDark ? AppColor.bgPageDark : AppColor.bgPageLight;
-    final textColor =  AppColor.titleText(context);
+    final textColor = AppColor.titleText(context);
     final borderColor = isDark ? const Color(0xFF333333) : AppColor.borderColor;
 
-  
     return Scaffold(
       appBar: AppBar(
         toolbarHeight: 0,
@@ -154,14 +169,16 @@ class _SmsScreenState extends State<SmsScreen> {
                 width: 59,
                 height: 59,
                 decoration: BoxDecoration(
-                  color: isDark
-                      ? AppColor.bgPageDark
-                      : AppColor.bgPageLight,
+                  color: isDark ? AppColor.bgPageDark : AppColor.bgPageLight,
                   borderRadius: BorderRadius.circular(18),
                 ),
                 child: Padding(
                   padding: const EdgeInsets.all(15.0),
-                  child: Image.asset("assets/images/logo/sms.png", height: 20, width: 20,),
+                  child: Image.asset(
+                    "assets/images/logo/sms.png",
+                    height: 20,
+                    width: 20,
+                  ),
                 ),
               ),
 
@@ -214,7 +231,9 @@ class _SmsScreenState extends State<SmsScreen> {
                             enabledBorder: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(12),
                               borderSide: BorderSide(
-                                color: hasValue ? AppColor.primary : borderColor,
+                                color: hasValue
+                                    ? AppColor.primary
+                                    : borderColor,
                                 width: hasValue ? 1.5 : 1,
                               ),
                             ),
@@ -233,6 +252,15 @@ class _SmsScreenState extends State<SmsScreen> {
                   );
                 }),
               ),
+
+              if (_error != null) ...[
+                const SizedBox(height: 12),
+                Text(
+                  _error!,
+                  style: const TextStyle(color: Colors.red, fontSize: 13),
+                  textAlign: TextAlign.center,
+                ),
+              ],
 
               const SizedBox(height: 20),
 
@@ -274,11 +302,25 @@ class _SmsScreenState extends State<SmsScreen> {
               SizedBox(
                 width: double.infinity,
                 height: 54,
-                child: ElevatedButton(  
+                child: ElevatedButton(
                   // в sms_screen.dart
-                  onPressed: _isComplete
-                      ? () => context.go('/check')
-                      : null,
+                  onPressed:(){},
+                  child: _isLoading
+                      ? const SizedBox(
+                          width: 24,
+                          height: 24,
+                          child: CircularProgressIndicator(
+                            color: Colors.white,
+                            strokeWidth: 2,
+                          ),
+                        )
+                      : const Text(
+                          'Tassyklamak',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Color(0xFF264FED),
                     disabledBackgroundColor: Color(0xFF264FED).withOpacity(0.5),
@@ -287,10 +329,6 @@ class _SmsScreenState extends State<SmsScreen> {
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(14),
                     ),
-                  ),
-                  child: const Text(
-                    'Tassyklamak',
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
                   ),
                 ),
               ),

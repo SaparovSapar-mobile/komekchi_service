@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../../../core/utils/theme/app_colors.dart';
+
 void showNagilelikBottomSheet(BuildContext context) {
   showModalBottomSheet(
     context: context,
@@ -16,9 +18,13 @@ class _NagilelikBottomSheet extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final bg = isDark ? AppColor.bgPageDark : AppColor.bgPageLight;
+    final cardBg = isDark ? AppColor.bgBlogDark : AppColor.bgBlogLight;
+    final textColor =  AppColor.titleText(context);
     return Container(
       decoration: BoxDecoration(
-        color: Color(0xFFFFFFFF),
+        color: bg,
         borderRadius: BorderRadius.circular(15),
       ),
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
@@ -38,12 +44,12 @@ class _NagilelikBottomSheet extends StatelessWidget {
           ),
           const SizedBox(height: 16),
 
-          const Text(
+           Text(
             'Sazlamalar',
             style: TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.w700,
-              color: Colors.black,
+              color: textColor,
             ),
           ),
           const SizedBox(height: 16),
@@ -54,30 +60,30 @@ class _NagilelikBottomSheet extends StatelessWidget {
               context.push('/nagilelik');
             },
             child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 10),
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Container(
-                    width: 36,
-                    height: 36,
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+                    width: 35,
+                    height: 37,
                     decoration: BoxDecoration(
-                      color: const Color(0xFFE8F0FF),
-                      borderRadius: BorderRadius.circular(8),
+                    color: cardBg,
+                      borderRadius: BorderRadius.circular(8)
                     ),
                     child: Image.asset(
                       "assets/images/logo/flag.png",
-                      width: 26,
-                      height: 26,
+                      fit: BoxFit.contain,
                     ),
                   ),
                   const SizedBox(width: 10),
-                  const Text(
+                   Text(
                     'Nagilelik bildirmek',
                     style: TextStyle(
                       fontSize: 15,
                       fontWeight: FontWeight.w500,
-                      color: Colors.black,
+                      color: textColor,
                     ),
                   ),
                 ],

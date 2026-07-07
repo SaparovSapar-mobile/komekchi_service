@@ -1,221 +1,152 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:komekchi_service/core/utils/app_constants.dart';
+import 'package:komekchi_service/features/domain/entities/subcategory.dart';
+import 'package:komekchi_service/features/presentation/bloc/subcategory/subcategory_cubit.dart';
 import 'package:komekchi_service/features/presentation/pages/home/home_screen.dart';
+import 'package:komekchi_service/injector.dart';
 
 import '../../../../../core/utils/theme/app_colors.dart';
 
-class HorizontalServiceList extends StatelessWidget {
-  final bool inAksiya;
+class HorizontalServiceList extends StatefulWidget {
+  final bool is24_7;
+  final bool isFeatured;
   final String text;
 
   const HorizontalServiceList({
     super.key,
-    required this.inAksiya,
+    this.is24_7 = false,
+    this.isFeatured = false,
     required this.text,
   });
 
-  final List<ServiceCardItem> items = const [
-    ServiceCardItem(
-      title: 'Elektrikçi',
-      rating: 4.7,
-      image: 'assets/images/service/image_1.png',
-    ),
-    ServiceCardItem(
-      title: 'Arassaçylyk',
-      rating: 4.7,
-      image: 'assets/images/service/image_2.png',
-    ),
-    ServiceCardItem(
-      title: 'Agaç ussa',
-      rating: 4.8,
-      image: 'assets/images/service/image_3.png',
-    ),
-    ServiceCardItem(
-      title: 'Elektrikçi',
-      rating: 4.7,
-      image: 'assets/images/service/image_1.png',
-    ),
-    ServiceCardItem(
-      title: 'Arassaçylyk',
-      rating: 4.7,
-      image: 'assets/images/service/image_2.png',
-    ),
-    ServiceCardItem(
-      title: 'Agaç ussa',
-      rating: 4.8,
-      image: 'assets/images/service/image_3.png',
-    ),
-    ServiceCardItem(
-      title: 'Agaç ussa',
-      rating: 4.8,
-      image: 'assets/images/service/image_4.png',
-    ),
-    ServiceCardItem(
-      title: 'Elektrikçi',
-      rating: 4.7,
-      image: 'assets/images/service/image_5.png',
-    ),
-    ServiceCardItem(
-      title: 'Arassaçylyk',
-      rating: 4.7,
-      image: 'assets/images/service/image_4.png',
-    ),
-    ServiceCardItem(
-      title: 'Agaç ussa',
-      rating: 4.8,
-      image: 'assets/images/service/image_5.png',
-    ),
-  ];
+  @override
+  State<HorizontalServiceList> createState() => _HorizontalServiceListState();
+}
+
+class _HorizontalServiceListState extends State<HorizontalServiceList> {
+  late final SubcategoryCubit _cubit = sl<SubcategoryCubit>();
+
+  @override
+  void initState() {
+    super.initState();
+    _cubit.fetchSubcategories(
+      is24_7: widget.is24_7 ? true : null,
+      isFeatured: widget.isFeatured ? true : null,
+    );
+  }
+
+  @override
+  void dispose() {
+    _cubit.close();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
-      
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         GestureDetector(
           onTap: () {
-            text == "Aksiýalar"
-                ? context.push("/aksiya")
-                : context.push("/categoryId", extra: text);
+            context.push(
+              "/allCategory",
+            );
           },
-          child: Subtitle(text: text),
+          child: Subtitle(text: widget.text),
         ),
-        SizedBox(height: 5),
-        if (!inAksiya)
-          SizedBox(
-            height: 164,
-            child: ListView.builder(
-              scrollDirection: Axis.horizontal,
-              padding: const EdgeInsets.only(left: 20),
-              itemCount: 6,
-              itemBuilder: (context, index) {
-                return _ServiceCard(
-                  item: items[index],
-                  inAksiya: inAksiya,
-                  text: text,
+        const SizedBox(height: 5),
+        SizedBox(
+          height: 164,
+          child: BlocBuilder<SubcategoryCubit, SubcategoryState>(
+            bloc: _cubit,
+            builder: (context, state) {
+              if (state is SubcategoryLoading || state is SubcategoryInitial) {
+                return const Center(child: CircularProgressIndicator());
+              }
+
+              if (state is SubcategoryError) {
+                return Center(
+                  child: Text(
+                    state.message,
+                    style: const TextStyle(color: Colors.red),
+                  ),
                 );
-              },
-            ),
+              }
+
+              final items = (state as SubcategorySuccess).items;
+
+              if (items.isEmpty) {
+                return const Center(child: Text('Hyzmat tapylmady'));
+              }
+
+              return ListView.builder(
+                scrollDirection: Axis.horizontal,
+                padding: const EdgeInsets.only(left: 20),
+                itemCount: items.length,
+                itemBuilder: (context, index) {
+                  return _ServiceCard(item: items[index]);
+                },
+              );
+            },
           ),
-        if (inAksiya)
-          SizedBox(
-            height: 120,
-            child: ListView.builder(
-              scrollDirection: Axis.horizontal,
-              padding: const EdgeInsets.only(left: 20),
-              itemCount: items.length - 6,
-              itemBuilder: (context, index) {
-                return _ServiceCard(
-                  item: items[index + 6],
-                  inAksiya: inAksiya,
-                  text: text,
-                );
-              },
-            ),
-          ),
+        ),
       ],
     );
   }
 }
 
 class _ServiceCard extends StatelessWidget {
-  final ServiceCardItem item;
-  final String text;
-  final bool inAksiya;
+  final SubcategoryItem item;
 
-  const _ServiceCard({
-    required this.item,
-    required this.inAksiya,
-    required this.text,
-  });
+  const _ServiceCard({required this.item});
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    final bg = isDark ? AppColor.bgBlogDark : AppColor.bgBlogLight;
-    final cardBg = isDark ? AppColor.bgBlogDark : AppColor.bgBlogLight;
-    final textColor =  AppColor.titleText(context);
-    final borderColor = isDark ? const Color(0xFF333333) : AppColor.borderColor;
+    final textColor = AppColor.titleText(context);
 
     return GestureDetector(
       onTap: () {
-        context.push(
-          "/detail",
-          extra: {"title": text, "image": item.image, "titleImage": item.title},
-        );
+        context.push("/detail", extra: {"uuid": item.uuid});
       },
       child: Container(
-        width: inAksiya ? 174 : 160,
+        width: 160,
         margin: const EdgeInsets.only(right: 10),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Kartinka
             ClipRRect(
               borderRadius: BorderRadius.circular(9.46),
-              child: Image.asset(
-                item.image,
-                width: inAksiya ? 174 : 160,
-                height: inAksiya ? 106 : 110,
+              child: Image.network(
+                ApiConstants.imageUrl(item.img),
+                width: 160,
+                height: 110,
                 fit: BoxFit.cover,
                 errorBuilder: (context, error, stackTrace) {
                   return Container(
-                    width: inAksiya ? 174 : 160,
-                    height: inAksiya ? 106 : 110,
+                    width: 160,
+                    height: 110,
                     color: Colors.grey.shade200,
                     child: const Icon(Icons.image, color: Colors.grey),
                   );
                 },
               ),
             ),
-            if (!inAksiya) const SizedBox(height: 8),
-
-            // Nazvanie + reiting
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                if (!inAksiya)
-                  Text(
-                    item.title,
-                    style:  TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w500,
-                      color: textColor,
-                    ),
-                  ),
-                Row(
-                  children: [
-                    if (!inAksiya)
-                      Text(
-                        item.rating.toString(),
-                        style:  TextStyle(
-                          fontSize: 13,
-                          color: textColor,
-                        ),
-                      ),
-                    const SizedBox(width: 3),
-                    if (!inAksiya)
-                      const Icon(Icons.star, size: 14, color: Colors.amber),
-                  ],
-                ),
-              ],
+            const SizedBox(height: 8),
+            Text(
+              item.nameTm,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.w500,
+                color: textColor,
+              ),
             ),
           ],
         ),
       ),
     );
   }
-}
-
-class ServiceCardItem {
-  final String title;
-  final double rating;
-  final String image;
-
-  const ServiceCardItem({
-    required this.title,
-    required this.rating,
-    required this.image,
-  });
 }

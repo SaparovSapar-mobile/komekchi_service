@@ -1,30 +1,31 @@
-
-class Category {
-  final bool status;
-  final String message;
-  final String code;
-  final List<CategoryItem> data;
-
-  Category({
-    required this.status,
-    required this.message,
-    required this.code,
-    required this.data,
-  });
-}
+import 'common.dart';
 
 class CategoryItem {
   final String uuid;
-  final String name;
-  final String img_tm;
-  final String img_en;
-  final String img_ru;
+  final String nameTm;
+  final String nameRu;
+  final String nameEn;
+  final String descTm;
+  final String descRu;
+  final String descEn;
+  final String iconImg;
+  final PaymentMethod paymentMethod;
+  final WarningDesc warningDesc;
+  final String createdAt;
+  final String updatedAt;
 
-  CategoryItem({
+  const CategoryItem({
     required this.uuid,
-    required this.name,
-    required this.img_tm,
-    required this.img_en,
-    required this.img_ru,
+    required this.nameTm,
+    required this.nameRu,
+    required this.nameEn,
+    required this.descTm,
+    required this.descRu,
+    required this.descEn,
+    required this.iconImg,
+    required this.paymentMethod,
+    required this.warningDesc,
+    required this.createdAt,
+    required this.updatedAt,
   });
 }

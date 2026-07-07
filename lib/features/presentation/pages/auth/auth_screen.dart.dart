@@ -4,7 +4,9 @@ import 'package:go_router/go_router.dart';
 import 'package:komekchi_service/core/utils/theme/app_text_style.dart';
 import 'package:komekchi_service/main.dart';
 
+import '../../../../core/api_service.dart';
 import '../../../../core/utils/theme/app_colors.dart';
+import 'parts/auth_helper.dart';
 
 class AuthScreen extends StatefulWidget {
   final bool showLogin;
@@ -32,7 +34,7 @@ class _AuthScreenState extends State<AuthScreen>
   final TextEditingController _regPhoneController = TextEditingController();
   final TextEditingController _regPasswordController = TextEditingController();
   final TextEditingController _confirmController = TextEditingController();
-    final TextStyle textStyle1 = AppTextStyle.semiBold16;
+  final TextStyle textStyle1 = AppTextStyle.semiBold16;
 
   @override
   void initState() {
@@ -308,7 +310,18 @@ class _AuthScreenState extends State<AuthScreen>
           width: double.infinity,
           height: 54,
           child: ElevatedButton(
-            onPressed: () => context.push("/smsscreen"),
+            // Сначала сохраняем номер и отправляем на сервер
+            onPressed: () async {
+              final phone = '+993${_loginPhoneController.text.trim()}';
+              try {
+                await ApiService().sendPhoneForOtp(phone);
+                if (context.mounted) context.push("/smsscreen");
+              } catch (e) {
+                ScaffoldMessenger.of(
+                  context,
+                ).showSnackBar(SnackBar(content: Text('Ýalňyşlyk: $e')));
+              }
+            },
             style: ElevatedButton.styleFrom(
               backgroundColor: blue,
               foregroundColor: Colors.white,
@@ -529,10 +542,22 @@ class _AuthScreenState extends State<AuthScreen>
             width: double.infinity,
             height: 54,
             child: ElevatedButton(
-              onPressed: _agreed ? () => context.push("/smsscreen") : null,
-              child:  Text(
+              onPressed: _agreed
+                  ? () async {
+                      final phone = '+993${_regPhoneController.text.trim()}';
+                      try {
+                        await ApiService().sendPhoneForOtp(phone);
+                        if (context.mounted) context.push("/smsscreen");
+                      } catch (e) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text('Ýalňyşlyk: $e')),
+                        );
+                      }
+                    }
+                  : null,
+              child: Text(
                 'Agza bol',
-                style: textStyle1.copyWith(color: AppColor.titleText(context)),
+                style: textStyle1.copyWith(color: AppColor.titleDark),
               ),
             ),
           ),
@@ -542,88 +567,4 @@ class _AuthScreenState extends State<AuthScreen>
       ),
     );
   }
-}
-
-// ─── HELPERS ────────────────────────────────────────────────────────────────
-
-Widget codeBox(String code, Color textColor, Color inputBg, Color borderColor) {
-  return Container(
-    height: 52,
-    padding: const EdgeInsets.symmetric(horizontal: 14),
-    decoration: BoxDecoration(
-      color: inputBg,
-      borderRadius: BorderRadius.circular(12),
-      border: Border.all(color: borderColor),
-    ),
-    child: Center(
-      child: Text(
-        code,
-        style: TextStyle(
-          color: textColor,
-          fontSize: 16,
-          fontWeight: FontWeight.w500,
-        ),
-      ),
-    ),
-  );
-}
-
-enum FieldType { phone, code, text }
-
-Widget inputField({
-  required TextEditingController controller,
-  String? text,
-  required Color inputBg,
-  required Color borderColor,
-  required Color textColor,
-  required Color hintColor,
-  FieldType type = FieldType.text,
-  bool obscure = false,
-  TextInputType keyboardType = TextInputType.text,
-  Widget? suffix,
-  String? Function(String?)? validator,
-}) {
-  return Container(
-    height: 52,
-    decoration: BoxDecoration(
-      color: inputBg,
-      borderRadius: BorderRadius.circular(12),
-      border: Border.all(color: borderColor),
-    ),
-    child: Row(
-      children: [
-        Expanded(
-          child: TextFormField(
-            controller: controller,
-            obscureText: obscure,
-            keyboardType: keyboardType,
-            inputFormatters: type == FieldType.phone
-                ? [
-                    FilteringTextInputFormatter.digitsOnly,
-                    LengthLimitingTextInputFormatter(8),
-                  ]
-                : [],
-            validator:
-                validator ??
-                (type == FieldType.phone
-                    ? (value) {
-                        if (value == null || value.length < 8) {
-                          return "Dolzhno byt 8 cifr";
-                        }
-                        return null;
-                      }
-                    : null),
-            style: TextStyle(color: textColor, fontSize: 15),
-            decoration: InputDecoration(
-              hintText: text,
-              border: InputBorder.none,
-              contentPadding: const EdgeInsets.symmetric(horizontal: 14),
-              hintStyle: TextStyle(color: hintColor),
-            ),
-          ),
-        ),
-        if (suffix != null) suffix,
-      ],
-    ),
-  );
 }
