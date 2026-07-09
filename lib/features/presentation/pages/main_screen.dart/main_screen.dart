@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:komekchi_service/features/presentation/bloc/order/order_cubit.dart';
 import 'package:komekchi_service/features/presentation/bloc/search/search_cubit.dart';
 import 'package:komekchi_service/features/presentation/pages/home/bronlar/bronlar_screen.dart';
 import 'package:komekchi_service/features/presentation/pages/home/settings/settings.dart';
@@ -90,7 +91,10 @@ class _MainScreenState extends State<MainScreen> {
             create: (_) => sl<SearchCubit>(),
             child: const SearchScreen(),
           ),
-          BronlarScreen(),
+          BlocProvider(
+            create: (_) => sl<OrderCubit>()..fetchOrders(),
+            child: const BronlarScreen(),
+          ),
           SettingsScreen(),
         ],
       ),
@@ -191,7 +195,7 @@ class _MainScreenState extends State<MainScreen> {
                 borderRadius: BorderRadius.circular(8),
                 color: isDark
                     ? (isSelected ? AppColor.bgBlogDark : AppColor.bgPageDark)
-                    : Color(0xFFF6F8FD),
+                    :  isSelected ?  Color(0xFFF6F8FD) : Colors.transparent,
               ),
               child: Icon(
                 icon,

@@ -1,5 +1,6 @@
 import 'package:komekchi_service/features/domain/entities/subcategory.dart';
 
+import '../../../core/utils/text_utils.dart';
 import 'common_model.dart';
 
 class SubcategoryItemModel extends SubcategoryItem {
@@ -30,9 +31,9 @@ class SubcategoryItemModel extends SubcategoryItem {
       nameTm: json['name_tm'] ?? '',
       nameRu: json['name_ru'] ?? '',
       nameEn: json['name_en'] ?? '',
-      descTm: json['desc_tm'] ?? '',
-      descRu: json['desc_ru'] ?? '',
-      descEn: json['desc_en'] ?? '',
+      descTm: stripHtml(json['desc_tm']),
+      descRu: stripHtml(json['desc_ru']),
+      descEn: stripHtml(json['desc_en']),
       img: json['img'] ?? '',
       is24_7: json['is_24_7'] ?? false,
       isFeatured: json['is_featured'] ?? false,

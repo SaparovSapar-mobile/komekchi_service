@@ -4,9 +4,14 @@ import 'package:komekchi_service/features/data/datasource/get_app_dt.dart';
 import 'package:komekchi_service/features/domain/entities/aksiya.dart';
 import 'package:komekchi_service/features/domain/entities/category.dart';
 import 'package:komekchi_service/features/domain/entities/common.dart';
+import 'package:komekchi_service/features/domain/entities/complaint.dart';
+import 'package:komekchi_service/features/domain/entities/order.dart';
+import 'package:komekchi_service/features/domain/entities/rating.dart';
+import 'package:komekchi_service/features/domain/entities/search_result.dart';
 import 'package:komekchi_service/features/domain/entities/subcategory.dart';
 import 'package:komekchi_service/features/domain/repositories/repository_app.dart';
 
+import '../../domain/entities/about.dart';
 import '../../domain/entities/banners.dart';
 
 class RepositoryImpl extends GetAppRepository {
@@ -120,6 +125,17 @@ class RepositoryImpl extends GetAppRepository {
   }
 
   @override
+  Future<Either<Failure, List<AboutItem>>> getAbout() async {
+    try {
+      final response = await getAppDt.getAbout();
+      return Right(response);
+    } catch (e) {
+      if (e is Failure) return Left(e);
+      return Left(UnknownFailure(message: e.toString()));
+    }
+  }
+
+  @override
   Future<Either<Failure, void>> sendContactUs({
     String? email,
     String? phone,
@@ -139,7 +155,7 @@ class RepositoryImpl extends GetAppRepository {
   }
 
   @override
-  Future<Either<Failure, PaginatedResult<SubcategoryItem>>> searchServices({
+  Future<Either<Failure, SearchResult>> searchServices({
     required String query,
     int page = 1,
     int limit = 20,
@@ -151,6 +167,126 @@ class RepositoryImpl extends GetAppRepository {
         limit: limit,
       );
       return Right(response);
+    } catch (e) {
+      if (e is Failure) return Left(e);
+      return Left(UnknownFailure(message: e.toString()));
+    }
+  }
+
+  @override
+  Future<Either<Failure, List<OrderItem>>> getOrders({String? status}) async {
+    try {
+      final response = await getAppDt.getOrders(status: status);
+      return Right(response);
+    } catch (e) {
+      if (e is Failure) return Left(e);
+      return Left(UnknownFailure(message: e.toString()));
+    }
+  }
+
+  @override
+  Future<Either<Failure, OrderItem>> getOrderById(String uuid) async {
+    try {
+      final response = await getAppDt.getOrderById(uuid);
+      return Right(response);
+    } catch (e) {
+      if (e is Failure) return Left(e);
+      return Left(UnknownFailure(message: e.toString()));
+    }
+  }
+
+  @override
+  Future<Either<Failure, OrderItem>> createOrder({
+    required String subcategoryUuid,
+    required String address,
+    String? note,
+    required String orderDate,
+    required String orderTime,
+    required int quantity,
+  }) async {
+    try {
+      final response = await getAppDt.createOrder(
+        subcategoryUuid: subcategoryUuid,
+        address: address,
+        note: note,
+        orderDate: orderDate,
+        orderTime: orderTime,
+        quantity: quantity,
+      );
+      return Right(response);
+    } catch (e) {
+      if (e is Failure) return Left(e);
+      return Left(UnknownFailure(message: e.toString()));
+    }
+  }
+
+  @override
+  Future<Either<Failure, OrderItem>> cancelOrder(String uuid) async {
+    try {
+      final response = await getAppDt.cancelOrder(uuid);
+      return Right(response);
+    } catch (e) {
+      if (e is Failure) return Left(e);
+      return Left(UnknownFailure(message: e.toString()));
+    }
+  }
+
+  @override
+  Future<Either<Failure, List<RatingItem>>> getRatings({
+    String? categoryUuid,
+    String? subcategoryUuid,
+  }) async {
+    try {
+      final response = await getAppDt.getRatings(
+        categoryUuid: categoryUuid,
+        subcategoryUuid: subcategoryUuid,
+      );
+      return Right(response);
+    } catch (e) {
+      if (e is Failure) return Left(e);
+      return Left(UnknownFailure(message: e.toString()));
+    }
+  }
+
+  @override
+  Future<Either<Failure, void>> submitRating({
+    String? categoryUuid,
+    String? subcategoryUuid,
+    required int stars,
+    String? comment,
+  }) async {
+    try {
+      await getAppDt.submitRating(
+        categoryUuid: categoryUuid,
+        subcategoryUuid: subcategoryUuid,
+        stars: stars,
+        comment: comment,
+      );
+      return const Right(null);
+    } catch (e) {
+      if (e is Failure) return Left(e);
+      return Left(UnknownFailure(message: e.toString()));
+    }
+  }
+
+  @override
+  Future<Either<Failure, List<ComplaintItem>>> getComplaints() async {
+    try {
+      final response = await getAppDt.getComplaints();
+      return Right(response);
+    } catch (e) {
+      if (e is Failure) return Left(e);
+      return Left(UnknownFailure(message: e.toString()));
+    }
+  }
+
+  @override
+  Future<Either<Failure, void>> submitComplaint({
+    required String message,
+  }) async {
+    try {
+      await getAppDt.submitComplaint(message: message);
+      return const Right(null);
     } catch (e) {
       if (e is Failure) return Left(e);
       return Left(UnknownFailure(message: e.toString()));

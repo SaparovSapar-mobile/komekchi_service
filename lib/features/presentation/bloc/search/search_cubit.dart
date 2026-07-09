@@ -1,8 +1,10 @@
 import 'dart:async';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:komekchi_service/features/domain/entities/subcategory.dart';
+import 'package:komekchi_service/features/domain/entities/search_result.dart';
 import 'package:komekchi_service/features/domain/usecases/search_usecase.dart';
+
+import '../../../../core/error/faiulre.dart';
 
 part 'search_state.dart';
 
@@ -37,8 +39,8 @@ class SearchCubit extends Cubit<SearchState> {
     final result = await searchUsecase(SearchParams(query: query.trim()));
 
     result.fold(
-      (failure) => emit(SearchError(failure.message)),
-      (paginated) => emit(SearchSuccess(paginated.items)),
+      (failure) => emit(SearchError(failure.message, failure)),
+      (searchResult) => emit(SearchSuccess(searchResult)),
     );
   }
 

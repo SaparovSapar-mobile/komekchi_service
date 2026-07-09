@@ -120,5 +120,147 @@ class ApiService {
     await prefs.setString('phone', phone);
   }
 
+  // POST /client/user/phone/register — заводит ещё не созданный аккаунт,
+  // генерирует 4-значный OTP и шлёт его на телефон через SMS-gateway APK.
+  // Завершается вызовом /client/user/phone/confirm.
+  Future<void> registerWithPhone({
+    required String name,
+    required String phone,
+    required String password,
+  }) async {
+    final response = await dio.post(
+      '/phone/register',
+      data: {'name': name, 'phone': phone, 'password': password},
+    );
+
+    if (response.statusCode != 200 && response.statusCode != 201) {
+      throw Exception('Failed to register');
+    }
+
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('phone', phone);
+    await prefs.setString('name', name);
+    await prefs.setString('password', password);
+    await prefs.setString('otp_channel', 'phone');
+  }
+
+  // То же самое, но для входа/регистрации через email
+  Future<void> sendEmailForOtp(String email) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('email', email);
+  }
+
+  // POST /client/user/register — регистрация по email, 6-значный код
+  // приходит на почту. Бэкенд требует ещё и phone — UI его не собирает,
+  // поэтому шлём фиксированную заглушку.
+  Future<void> registerWithEmail({
+    required String name,
+    required String email,
+    required String password,
+  }) async {
+    final response = await dio.post(
+      '/register',
+      data: {
+        'name': name,
+        'email': email,
+        'phone': '+15551234567',
+        'password': password,
+      },
+    );
+
+    if (response.statusCode != 200 && response.statusCode != 201) {
+      throw Exception('Failed to register');
+    }
+
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('email', email);
+    await prefs.setString('name', name);
+    await prefs.setString('password', password);
+    await prefs.setString('otp_channel', 'email');
+  }
+
+  // POST /client/user/phone/confirm — проверяет OTP, создаёт аккаунт
+  // и возвращает токены (тот же формат, что и /client/user/login).
+  Future<void> confirmPhoneOtp({
+    required String phone,
+    required String code,
+  }) async {
+    final response = await dio.post(
+      '/phone/confirm',
+      data: {'phone': phone, 'code': code},
+    );
+
+    if (response.statusCode != 200 && response.statusCode != 201) {
+      throw Exception('Failed to confirm OTP');
+    }
+
+    await _saveTokens(response.data);
+  }
+
+  // POST /client/user/verify-email — проверяет 6-значный код с почты,
+  // после этого аккаунт становится активным.
+  Future<void> verifyEmail({
+    required String email,
+    required String code,
+  }) async {
+    final response = await dio.post(
+      '/verify-email',
+      data: {'email': email, 'code': code},
+    );
+
+    if (response.statusCode != 200 && response.statusCode != 201) {
+      throw Exception('Failed to verify email');
+    }
+
+    await _saveTokens(response.data);
+  }
+
+  // POST /client/user/login — вход по email или телефону + пароль.
+  Future<void> login({required String login, required String password}) async {
+    final response = await dio.post(
+      '/login',
+      data: {'login': login, 'password': password},
+    );
+
+    if (response.statusCode != 200 && response.statusCode != 201) {
+      throw Exception('Failed to login');
+    }
+
+    await _saveTokens(response.data);
+  }
+
+  // Не у всех эндпоинтов есть токены в ответе (например, verify-email
+  // может просто активировать аккаунт без авто-логина) — поэтому мягко
+  // выходим, если структуры нет, вместо падения с ошибкой.
+  Future<void> _saveTokens(Map<String, dynamic> responseData) async {
+    final data = responseData['data'];
+    if (data == null) return;
+
+    final prefs = await SharedPreferences.getInstance();
+
+    final tokens = data['tokens'];
+    if (tokens != null) {
+      final accessToken = tokens['access_token'];
+      final refreshToken = tokens['refresh_token'];
+
+      if (accessToken != null) {
+        await prefs.setString('auth_token', accessToken);
+      }
+      if (refreshToken != null) {
+        await prefs.setString('refresh_token', refreshToken);
+      }
+    }
+
+    final user = data['user'];
+    if (user != null) {
+      if (user['name'] != null) {
+        await prefs.setString('name', user['name']);
+      }
+      if (user['uuid'] != null) {
+        await prefs.setString('user_uuid', user['uuid']);
+      }
+    }
+  }
+
   // Шаг 2: пользователь ввёл OTP из SMS → верифицируем
 }

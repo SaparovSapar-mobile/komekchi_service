@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import 'package:komekchi_service/core/api_service.dart';
 import 'package:komekchi_service/features/presentation/pages/home/settings/parts/logout_bottom_sheet.dart';
 
 // ─── Models ───────────────────────────────────────────────────────────────────
@@ -98,8 +100,8 @@ class _ThemeSheet extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final items = [
-      _ThemeItem(AppTheme.light, 'Light', Icons.wb_sunny_outlined),
-      _ThemeItem(AppTheme.dark, 'Dark', Icons.dark_mode_outlined),
+      _ThemeItem(AppTheme.light, 'Ýagty', Icons.wb_sunny_outlined),
+      _ThemeItem(AppTheme.dark, 'Garaňky', Icons.dark_mode_outlined),
       _ThemeItem(AppTheme.system, 'Systems', Icons.settings_outlined),
     ];
 
@@ -266,19 +268,17 @@ class _SheetTile extends StatelessWidget {
   }
 }
 
-
 void logOutShowBottomSheet(BuildContext context) {
-    showModalBottomSheet(
-      context: context,
-      backgroundColor: Colors.transparent,
-      builder: (_) => LogOutBottomSheet(
-        onSelected: (confirmed) {
-          if (confirmed) {
-            // пользователь нажал "Howa"
-          } else {
-            // пользователь нажал "Yok"
-          }
-        },
-      ),
-    );
-  }
+  showModalBottomSheet(
+    context: context,
+    backgroundColor: Colors.transparent,
+    builder: (_) => LogOutBottomSheet(
+      onSelected: (confirmed) async {
+        if (confirmed) {
+          await ApiService().logout();
+          if (context.mounted) context.go('/login');
+        }
+      },
+    ),
+  );
+}

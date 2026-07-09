@@ -1,9 +1,32 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:komekchi_service/core/utils/theme/app_text_style.dart';
+import 'package:komekchi_service/features/domain/entities/order.dart';
+import 'package:komekchi_service/features/domain/usecases/order_usecase.dart';
+import 'package:komekchi_service/features/presentation/bloc/order/order_cubit.dart';
 import 'package:komekchi_service/features/presentation/pages/home/home_screen.dart';
+import 'package:komekchi_service/injector.dart';
 
 import '../../../../../core/utils/theme/app_colors.dart';
 import 'bron_card.dart';
+
+/// Backend order.status values assumed as: pending, cancelled, completed.
+/// Adjust `_statusFilters` below if the API uses different values.
+enum BronStatus { pending, cancelled, completed, unknown }
+
+BronStatus bronStatusFromApi(String status) {
+  switch (status.toLowerCase()) {
+    case 'pending':
+      return BronStatus.pending;
+    case 'cancelled':
+    case 'canceled':
+      return BronStatus.cancelled;
+    case 'completed':
+      return BronStatus.completed;
+    default:
+      return BronStatus.unknown;
+  }
+}
 
 class BronlarScreen extends StatefulWidget {
   const BronlarScreen({super.key});
@@ -22,73 +45,58 @@ class _BronlarScreenState extends State<BronlarScreen> {
     'Tamamlanan',
   ];
 
-  final List<BronItem> brons = [
-    BronItem(
-      number: '65493',
-      date: '11.11.2026  19:00',
-      category: 'Arassaçylyk',
-      service: 'Ayna yuwmak',
-      address: 'Iş ýerim',
-      price: '546.00 man',
-      status: BronStatus.garasylyar,
-      rating: null,
-    ),
-    BronItem(
-      number: '65493',
-      date: '11.11.2026  19:00',
-      category: 'Arassaçylyk',
-      service: 'Ayna yuwmak',
-      address: 'Iş ýerim',
-      price: '546.00 man',
-      status: BronStatus.tamamlanan,
-      rating: 4.7,
-    ),
-    BronItem(
-      number: '65493',
-      date: '11.11.2026  19:00',
-      category: 'Arassaçylyk',
-      service: 'Ayna yuwmak',
-      address: 'Iş ýerim',
-      price: '546.00 man',
-      status: BronStatus.yatyryldy,
-      rating: null,
-    ),
+  static const List<String?> _statusFilters = [
+    null,
+    'pending',
+    'cancelled',
+    'completed',
   ];
 
-  List<BronItem> get _filtered {
-    if (_selectedTab == 0) return brons;
-
-    switch (_selectedTab) {
-      case 1:
-        return brons.where((b) => b.status == BronStatus.garasylyar).toList();
-      case 2:
-        return brons.where((b) => b.status == BronStatus.yatyryldy).toList();
-      case 3:
-        return brons.where((b) => b.status == BronStatus.tamamlanan).toList();
-      default:
-        return brons;
-    }
+  void _selectTab(int index) {
+    setState(() => _selectedTab = index);
+    context.read<OrderCubit>().fetchOrders(status: _statusFilters[index]);
   }
 
-  String getCurrentDate() {
-    final now = DateTime.now();
-    final day = now.day.toString().padLeft(2, '0');
-    final month = now.month.toString().padLeft(2, '0');
-    final year = now.year;
-    return '$day.$month.$year';
+  Future<void> _cancelOrder(OrderItem order) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Bron ýatyrylsynmy?'),
+        content: Text('N°${order.uuid.substring(0, 6)} bronyny ýatyrmak isleýärsiňizmi?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, false),
+            child: const Text('Ýok'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, true),
+            child: const Text('Howa'),
+          ),
+        ],
+      ),
+    );
+    if (confirmed != true || !mounted) return;
+
+    final result = await sl<CancelOrderUsecase>().call(order.uuid);
+    if (!mounted) return;
+    result.fold(
+      (failure) => ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(failure.message))),
+      (_) => context.read<OrderCubit>().fetchOrders(
+        status: _statusFilters[_selectedTab],
+      ),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final bg = isDark ? AppColor.bgPageDark : AppColor.bgPageLight;
-    // final cardBg = isDark ? AppColor.bgBlogDark : AppColor.bgBlogLight;
     final textColor = AppColor.titleText(context);
     final TextStyle textStyle = AppTextStyle.semiBold16;
-    // final borderColor = isDark ? const Color(0xFF333333) : AppColor.borderColor;
 
     return Container(
-      // padding: EdgeInsets.only(bottom: MediaQuery.of(context).padding.bottom),
       width: double.infinity,
       margin: const EdgeInsets.only(top: 10),
       decoration: BoxDecoration(
@@ -101,10 +109,8 @@ class _BronlarScreenState extends State<BronlarScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Header
           AppBarWidget(textColor, isDark),
-          // Title
-           Padding(
+          Padding(
             padding: EdgeInsets.symmetric(horizontal: 15, vertical: 12),
             child: Text(
               'Bronlarym',
@@ -113,53 +119,78 @@ class _BronlarScreenState extends State<BronlarScreen> {
           ),
 
           // Tabs
-          Container(
-            child: SizedBox(
-              height: 40,
-              child: ListView.builder(
-                scrollDirection: Axis.horizontal,
-                padding: const EdgeInsets.symmetric(horizontal: 15),
-                itemCount: tabs.length,
-                itemBuilder: (context, index) {
-                  final isSelected = _selectedTab == index;
-                  return GestureDetector(
-                    onTap: () => setState(() => _selectedTab = index),
-                    child: Container(
-                      margin: const EdgeInsets.only(right: 8),
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 16,
-                        vertical: 8,
-                      ),
-                      decoration: BoxDecoration(
-                        color: isSelected ? AppColor.primary : Colors.white,
-                        borderRadius: BorderRadius.circular(8),
-                        border: Border.all(
-                          color: isSelected
-                              ? AppColor.primary
-                              : Colors.grey.shade300,
-                          width: 1,
-                        ),
-                      ),
-                      child: Text(
-                        tabs[index],
-                        style: TextStyle(
-                          fontSize: 13,
-                          fontWeight: FontWeight.w500,
-                          color: isSelected ? Colors.white : Colors.black54,
-                        ),
+          SizedBox(
+            height: 40,
+            child: ListView.builder(
+              scrollDirection: Axis.horizontal,
+              padding: const EdgeInsets.symmetric(horizontal: 15),
+              itemCount: tabs.length,
+              itemBuilder: (context, index) {
+                final isSelected = _selectedTab == index;
+                return GestureDetector(
+                  onTap: () => _selectTab(index),
+                  child: Container(
+                    margin: const EdgeInsets.only(right: 8),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 8,
+                    ),
+                    decoration: BoxDecoration(
+                      color: isSelected ? AppColor.primary : Colors.white,
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(
+                        color: isSelected
+                            ? AppColor.primary
+                            : Colors.grey.shade300,
+                        width: 1,
                       ),
                     ),
-                  );
-                },
-              ),
+                    child: Text(
+                      tabs[index],
+                      style: TextStyle(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w500,
+                        color: isSelected ? Colors.white : Colors.black54,
+                      ),
+                    ),
+                  ),
+                );
+              },
             ),
           ),
           const SizedBox(height: 10),
 
-          // Bron cards
           Expanded(
-            child: _filtered.isEmpty
-                ? Center(
+            child: BlocBuilder<OrderCubit, OrderState>(
+              builder: (context, state) {
+                if (state is OrderLoading || state is OrderInitial) {
+                  return const Center(child: CircularProgressIndicator());
+                }
+
+                if (state is OrderError) {
+                  return Center(
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          state.message,
+                          style: const TextStyle(color: Colors.red),
+                          textAlign: TextAlign.center,
+                        ),
+                        const SizedBox(height: 8),
+                        TextButton(
+                          onPressed: () => _selectTab(_selectedTab),
+                          child: const Text('Gaýtadan synanyşmak'),
+                        ),
+                      ],
+                    ),
+                  );
+                }
+
+                final items = (state as OrderSuccess).items;
+
+                if (items.isEmpty) {
+                  return Center(
                     child: Text(
                       'Bron ýok',
                       style: TextStyle(
@@ -167,48 +198,34 @@ class _BronlarScreenState extends State<BronlarScreen> {
                         fontSize: 15,
                       ),
                     ),
-                  )
-                : ListView.separated(
-                    padding: EdgeInsets.only(
-                      left: 15,
-                      right: 15,
-                      top: 12,
-                      bottom: MediaQuery.of(context).padding.bottom,
-                    ),
+                  );
+                }
 
-                    itemCount: _filtered.length,
-                    separatorBuilder: (_, __) => const SizedBox(height: 12),
-                    itemBuilder: (context, index) {
-                      return BronCard(item: _filtered[index]);
-                    },
+                return ListView.separated(
+                  padding: EdgeInsets.only(
+                    left: 15,
+                    right: 15,
+                    top: 12,
+                    bottom: MediaQuery.of(context).padding.bottom,
                   ),
+                  itemCount: items.length,
+                  separatorBuilder: (_, __) => const SizedBox(height: 12),
+                  itemBuilder: (context, index) {
+                    final order = items[index];
+                    return BronCard(
+                      order: order,
+                      onCancel: bronStatusFromApi(order.status) ==
+                              BronStatus.pending
+                          ? () => _cancelOrder(order)
+                          : null,
+                    );
+                  },
+                );
+              },
+            ),
           ),
         ],
       ),
     );
   }
-}
-
-enum BronStatus { garasylyar, tamamlanan, yatyryldy }
-
-class BronItem {
-  final String number;
-  final String date;
-  final String category;
-  final String service;
-  final String address;
-  final String price;
-  final BronStatus status;
-  final double? rating;
-
-  BronItem({
-    required this.number,
-    required this.date,
-    required this.category,
-    required this.service,
-    required this.address,
-    required this.price,
-    required this.status,
-    this.rating,
-  });
 }

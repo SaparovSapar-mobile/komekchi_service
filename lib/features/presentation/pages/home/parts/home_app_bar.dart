@@ -32,13 +32,17 @@ Padding AppBarWidget(Color textColor, bool isDark) {
             final icon = state is WeatherLoaded
                 ? state.weather.iconData
                 : Icons.cloud;
+            final isDay = state is WeatherLoaded ? state.weather.isDay : true;
+            final iconColor = isDay
+                ? const Color(0xFFFBB725)
+                : const Color(0xFF262626);
             final tempText = state is WeatherLoaded
                 ? "${state.weather.temperature.round()}°"
                 : "--°";
 
             return Row(
               children: [
-                Icon(icon, size: 12, color: const Color(0xFF262626)),
+                Icon(icon, size: 12, color: iconColor),
                 Text(
                   " $tempText",
                   style: TextStyle(fontSize: 12, color: textColor),

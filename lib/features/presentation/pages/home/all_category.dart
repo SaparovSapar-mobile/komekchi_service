@@ -196,7 +196,7 @@ class _CategoryTile extends StatelessWidget {
         );
       },
       child: Container(
-        margin: const EdgeInsets.symmetric(vertical: 5),
+        margin: const  EdgeInsets.symmetric(vertical: 5),
         height: 46,
         child: Row(
           children: [
@@ -218,7 +218,7 @@ class _CategoryTile extends StatelessWidget {
                     color: iconBg,
                     borderRadius: BorderRadius.circular(8),
                   ),
-                  child: const Icon(
+                  child:  Icon(
                     Icons.category,
                     color: AppColor.primary,
                     size: 20,
@@ -228,7 +228,7 @@ class _CategoryTile extends StatelessWidget {
             ),
             const SizedBox(width: 14),
             Expanded(
-              child: Text(
+              child:  Text(
                 item.nameTm,
                 style: TextStyle(
                   fontSize: 15,

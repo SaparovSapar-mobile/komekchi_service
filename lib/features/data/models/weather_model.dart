@@ -5,6 +5,7 @@ class WeatherModel {
   final num temperature, windSpeed;
   final int humidity;
   final IconData iconData;
+  final bool isDay;
 
   WeatherModel({
     required this.temperature,
@@ -12,6 +13,7 @@ class WeatherModel {
     required this.iconData,
     required this.humidity,
     required this.windSpeed,
+    required this.isDay,
   });
 
   factory WeatherModel.defaultValue() {
@@ -21,6 +23,7 @@ class WeatherModel {
       iconData: Icons.cloud,
       windSpeed: 0,
       humidity: 0,
+      isDay: true,
     );
   }
 
@@ -36,6 +39,7 @@ class WeatherModel {
       iconData: weatherInfo.iconData,
       humidity: (current['relative_humidity_2m'] as num?)?.toInt() ?? 0,
       windSpeed: (current['wind_speed_10m'] as num).toDouble(),
+      isDay: isDay,
     );
   }
 

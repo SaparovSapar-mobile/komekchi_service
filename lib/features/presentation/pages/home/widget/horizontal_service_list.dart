@@ -8,6 +8,7 @@ import 'package:komekchi_service/features/presentation/pages/home/home_screen.da
 import 'package:komekchi_service/injector.dart';
 
 import '../../../../../core/utils/theme/app_colors.dart';
+import '../../../../../core/widgets/branded_shimmer.dart';
 
 class HorizontalServiceList extends StatefulWidget {
   final bool is24_7;
@@ -50,9 +51,7 @@ class _HorizontalServiceListState extends State<HorizontalServiceList> {
       children: [
         GestureDetector(
           onTap: () {
-            context.push(
-              "/allCategory",
-            );
+            context.push("/allCategory");
           },
           child: Subtitle(text: widget.text),
         ),
@@ -63,7 +62,36 @@ class _HorizontalServiceListState extends State<HorizontalServiceList> {
             bloc: _cubit,
             builder: (context, state) {
               if (state is SubcategoryLoading || state is SubcategoryInitial) {
-                return const Center(child: CircularProgressIndicator());
+                return BrandedShimmer(
+                  child: ListView.builder(
+                    scrollDirection: Axis.horizontal,
+                    padding: const EdgeInsets.only(left: 20),
+                    itemCount: 4,
+                    itemBuilder: (context, index) => Container(
+                      width: 160,
+                      margin: const EdgeInsets.only(right: 10),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          BrandedShimmerCard(
+                            width: 160,
+                            height: 110,
+                            borderRadius: 9.46,
+                          ),
+                          const SizedBox(height: 8),
+                          Container(
+                            width: 100,
+                            height: 12,
+                            decoration: BoxDecoration(
+                              color: const Color(0xFFEDF1FB),
+                              borderRadius: BorderRadius.circular(4),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                );
               }
 
               if (state is SubcategoryError) {

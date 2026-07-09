@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:komekchi_service/core/utils/app_constants.dart';
 import 'package:komekchi_service/features/domain/entities/banners.dart';
 import '../../../../../core/utils/theme/app_colors.dart';
+import '../../../../../core/widgets/branded_shimmer.dart';
 import '../../../bloc/banner/banner_cubit.dart';
 
 class BannerSlider extends StatefulWidget {
@@ -57,9 +58,15 @@ class _BannerSliderState extends State<BannerSlider> {
       },
       builder: (context, state) {
         if (state is BannerLoading) {
-          return const SizedBox(
-            height: 142,
-            child: Center(child: CircularProgressIndicator()),
+          return Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+            child: BrandedShimmer(
+              child: BrandedShimmerCard(
+                width: double.infinity,
+                height: 125,
+                borderRadius: 16,
+              ),
+            ),
           );
         }
 

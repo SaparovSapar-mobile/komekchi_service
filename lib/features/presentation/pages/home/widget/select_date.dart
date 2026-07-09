@@ -8,7 +8,10 @@ import 'package:komekchi_service/features/presentation/pages/home/home_screen.da
 import '../../../../../core/utils/theme/app_colors.dart';
 
 class SelectDate extends StatefulWidget {
-  const SelectDate({super.key});
+  final String? subcategoryUuid;
+  final int quantity;
+
+  const SelectDate({super.key, this.subcategoryUuid, this.quantity = 1});
 
   @override
   State<SelectDate> createState() => _SelectDateState();
@@ -348,9 +351,28 @@ class _SelectDateState extends State<SelectDate> {
                         width: double.infinity,
                         height: screenHeight * 0.066, // ~56px адаптивно
                         child: ElevatedButton(
-                          onPressed: () {
-                            context.push('/selectedDate');
-                          },
+                          onPressed: selectedTimeIndex == -1
+                              ? null
+                              : () {
+                                  final day = days[selectedDayIndex];
+                                  final orderDate =
+                                      '${day.year.toString().padLeft(4, '0')}-'
+                                      '${day.month.toString().padLeft(2, '0')}-'
+                                      '${day.day.toString().padLeft(2, '0')}';
+                                  final orderTime = _availableTimeSlots[
+                                          selectedTimeIndex]
+                                      .split('-')
+                                      .first;
+                                  context.push(
+                                    '/selectedDate',
+                                    extra: {
+                                      'subcategoryUuid': widget.subcategoryUuid,
+                                      'quantity': widget.quantity,
+                                      'orderDate': orderDate,
+                                      'orderTime': orderTime,
+                                    },
+                                  );
+                                },
                           style: ElevatedButton.styleFrom(
                             backgroundColor: AppColor.primary,
                             disabledBackgroundColor: Colors.grey.shade300,

@@ -1,5 +1,6 @@
 import 'package:komekchi_service/features/domain/entities/category.dart';
 
+import '../../../core/utils/text_utils.dart';
 import 'common_model.dart';
 
 class CategoryItemModel extends CategoryItem {
@@ -24,9 +25,9 @@ class CategoryItemModel extends CategoryItem {
       nameTm: json['name_tm'] ?? '',
       nameRu: json['name_ru'] ?? '',
       nameEn: json['name_en'] ?? '',
-      descTm: json['desc_tm'] ?? '',
-      descRu: json['desc_ru'] ?? '',
-      descEn: json['desc_en'] ?? '',
+      descTm: stripHtml(json['desc_tm']),
+      descRu: stripHtml(json['desc_ru']),
+      descEn: stripHtml(json['desc_en']),
       iconImg: json['icon_img'] ?? '',
       paymentMethod: PaymentMethodModel.fromJson(json['payment_method']),
       warningDesc: WarningDescModel.fromJson(json['warning_desc']),

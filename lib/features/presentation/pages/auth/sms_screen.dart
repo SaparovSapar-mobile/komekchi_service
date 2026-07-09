@@ -15,7 +15,10 @@ class SmsScreen extends StatefulWidget {
 }
 
 class _SmsScreenState extends State<SmsScreen> {
-  final int _codeLength = 4;
+  // Telefon arkaly bellige durulsa 4 sanly kod, email arkaly bolsa 6 sanly.
+  int _codeLength = 4;
+  String _otpChannel = 'phone';
+  bool _isReady = false;
   late List<TextEditingController> _controllers;
   late List<FocusNode> _focusNodes;
 
@@ -29,31 +32,33 @@ class _SmsScreenState extends State<SmsScreen> {
   @override
   void initState() {
     super.initState();
-    _controllers = List.generate(_codeLength, (_) => TextEditingController());
-    _focusNodes = List.generate(_codeLength, (_) => FocusNode());
+    _init();
+  }
+
+  Future<void> _init() async {
+    final prefs = await SharedPreferences.getInstance();
+    final channel = prefs.getString('otp_channel') ?? 'phone';
+
+    setState(() {
+      _otpChannel = channel;
+      _codeLength = channel == 'email' ? 6 : 4;
+      _controllers = List.generate(_codeLength, (_) => TextEditingController());
+      _focusNodes = List.generate(_codeLength, (_) => FocusNode());
+      _isReady = true;
+    });
+
     _startTimer();
-    // Auto-focus first field
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      _focusNodes[0].requestFocus();
+      if (_focusNodes.isNotEmpty) _focusNodes[0].requestFocus();
     });
   }
 
-
-  void _startTimer() async {
-    // Resend API call
-    try {
-      final prefs = await SharedPreferences.getInstance();
-      final phone = prefs.getString('phone');
-      final name = prefs.getString('name');
-      final password = prefs.getString('password');
-      if (phone != null && name != null && password != null) await ApiService().sendPhoneForOtp(phone);
-    } catch (_) {}
-
+  void _startTimer() {
+    _timer?.cancel();
     setState(() {
       _secondsLeft = 60;
       _canResend = false;
     });
-    _timer?.cancel();
     _timer = Timer.periodic(const Duration(seconds: 1), (t) {
       if (_secondsLeft == 0) {
         t.cancel();
@@ -67,11 +72,13 @@ class _SmsScreenState extends State<SmsScreen> {
   @override
   void dispose() {
     _timer?.cancel();
-    for (final c in _controllers) {
-      c.dispose();
-    }
-    for (final f in _focusNodes) {
-      f.dispose();
+    if (_isReady) {
+      for (final c in _controllers) {
+        c.dispose();
+      }
+      for (final f in _focusNodes) {
+        f.dispose();
+      }
     }
     super.dispose();
   }
@@ -108,6 +115,34 @@ class _SmsScreenState extends State<SmsScreen> {
 
   bool get _isComplete => _controllers.every((c) => c.text.isNotEmpty);
 
+  Future<void> _onConfirm() async {
+    setState(() {
+      _isLoading = true;
+      _error = null;
+    });
+
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final code = _controllers.map((c) => c.text).join();
+
+      if (_otpChannel == 'email') {
+        final email = prefs.getString('email');
+        if (email == null) throw Exception('Email tapylmady');
+        await ApiService().verifyEmail(email: email, code: code);
+      } else {
+        final phone = prefs.getString('phone');
+        if (phone == null) throw Exception('Telefon belgisi tapylmady');
+        await ApiService().confirmPhoneOtp(phone: phone, code: code);
+      }
+
+      if (mounted) context.go('/check');
+    } catch (e) {
+      setState(() => _error = 'Ýalňyşlyk: $e');
+    } finally {
+      if (mounted) setState(() => _isLoading = false);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
@@ -115,6 +150,13 @@ class _SmsScreenState extends State<SmsScreen> {
     final cardBg = isDark ? AppColor.bgPageDark : AppColor.bgPageLight;
     final textColor = AppColor.titleText(context);
     final borderColor = isDark ? const Color(0xFF333333) : AppColor.borderColor;
+
+    if (!_isReady) {
+      return Scaffold(
+        backgroundColor: bg,
+        body: const Center(child: CircularProgressIndicator()),
+      );
+    }
 
     return Scaffold(
       appBar: AppBar(
@@ -128,7 +170,7 @@ class _SmsScreenState extends State<SmsScreen> {
       ),
       backgroundColor: bg,
       body: SafeArea(
-        child: Padding(
+        child: SingleChildScrollView(
           padding: const EdgeInsets.symmetric(horizontal: 24),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
@@ -185,7 +227,9 @@ class _SmsScreenState extends State<SmsScreen> {
               const SizedBox(height: 28),
 
               Text(
-                'Telefon belgiňize gelen kody giriziň',
+                _otpChannel == 'email'
+                    ? 'E-poçtaňyza gelen kody giriziň'
+                    : 'Telefon belgiňize gelen kody giriziň',
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   color: textColor,
@@ -203,12 +247,12 @@ class _SmsScreenState extends State<SmsScreen> {
                   final hasValue = _controllers[index].text.isNotEmpty;
 
                   return Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 8),
+                    padding: const EdgeInsets.symmetric(horizontal: 6),
                     child: RawKeyboardListener(
                       focusNode: FocusNode(),
                       onKey: (event) => _onKeyEvent(event, index),
                       child: SizedBox(
-                        width: 56,
+                        width: 48,
                         height: 60,
                         child: TextField(
                           controller: _controllers[index],
@@ -303,8 +347,7 @@ class _SmsScreenState extends State<SmsScreen> {
                 width: double.infinity,
                 height: 54,
                 child: ElevatedButton(
-                  // в sms_screen.dart
-                  onPressed:(){},
+                  onPressed: _isComplete && !_isLoading ? _onConfirm : null,
                   child: _isLoading
                       ? const SizedBox(
                           width: 24,

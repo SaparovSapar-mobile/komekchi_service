@@ -5,6 +5,7 @@ import 'package:komekchi_service/core/utils/theme/app_theme.dart';
 import 'package:komekchi_service/features/presentation/bloc/banner/banner_cubit.dart';
 import 'package:komekchi_service/features/presentation/bloc/category/get_category_cubit.dart';
 import 'package:komekchi_service/features/presentation/bloc/weather/weather_cubit.dart';
+import 'core/utils/deep_link_service.dart';
 import 'core/utils/router.dart';
 import 'injector.dart';
 
@@ -14,6 +15,7 @@ void main() async {
   await dotenv.load(fileName: ".env");
   WidgetsFlutterBinding.ensureInitialized();
   await init();
+  await DeepLinkService.init();
   runApp(const MyApp());
 }
 
@@ -33,7 +35,7 @@ class MyApp extends StatelessWidget {
           ],
           child: MaterialApp.router(
             debugShowCheckedModeBanner: false,
-            themeMode: mode,
+            themeMode: mode, 
             theme: AppTheme.lightTheme.copyWith(
               pageTransitionsTheme: const PageTransitionsTheme(
                 builders: {

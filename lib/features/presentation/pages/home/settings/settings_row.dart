@@ -56,10 +56,13 @@ class SettingsRow extends StatelessWidget {
             style: textStyle.copyWith(color: AppColor.titleText(context)),
           ),
           subtitle: subtitle != null
-              ? Text(
-                  subtitle!,
-                  style: TextStyle(fontSize: 12, color: Colors.grey.shade500),
-                )
+              ? Padding(
+                padding: const EdgeInsets.only(bottom:  3.0),
+                child: Text(
+                    subtitle!,
+                    style: TextStyle(fontSize: 12, color: Colors.grey.shade500),
+                  ),
+              )
               : null,
           trailing: trailing,
         ),

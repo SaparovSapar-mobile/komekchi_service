@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 import 'package:komekchi_service/core/utils/theme/app_text_style.dart';
 import 'package:komekchi_service/features/presentation/pages/home/home_screen.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../../../core/utils/theme/app_colors.dart';
 import '../../../../../main.dart';
@@ -25,6 +26,24 @@ class _SettingsScreenState extends State<SettingsScreen> {
   AppLanguage _selectedLanguage = AppLanguage.turkmen;
   AppTheme _selectedTheme = AppTheme.dark;
 
+  String? _userName;
+  bool _isLoggedIn = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadUser();
+  }
+
+  Future<void> _loadUser() async {
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('auth_token');
+    setState(() {
+      _isLoggedIn = token != null;
+      _userName = prefs.getString('name');
+    });
+  }
+
   // Текст для отображения в строке настроек
   String get _languageLabel {
     switch (_selectedLanguage) {
@@ -42,9 +61,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
   String get _themeLabel {
     switch (_selectedTheme) {
       case AppTheme.light:
-        return 'Light';
+        return 'Ýagty';
       case AppTheme.dark:
-        return 'Dark';
+        return 'Garaňky';
       case AppTheme.system:
         return 'Systems';
     }
@@ -105,41 +124,43 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Meniň sahypam
-                    SectionCard(
-                      text: 'Meniň sahypam',
-                      children: [
-                        ListTile(
-                          leading: Container(
-                            width: 46,
-                            height: 46,
-                            decoration: BoxDecoration(
-                              color: cardBg,
-                              borderRadius: BorderRadius.circular(10),
+                    // Meniň sahypam (diňe agza bolan ulanyjylar üçin)
+                    if (_isLoggedIn) ...[
+                      SectionCard(
+                        text: 'Meniň sahypam',
+                        children: [
+                          ListTile(
+                            leading: Container(
+                              width: 46,
+                              height: 46,
+                              decoration: BoxDecoration(
+                                color: cardBg,
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                              child: const Icon(
+                                Icons.person,
+                                color: AppColor.primary,
+                              ),
                             ),
-                            child: const Icon(
-                              Icons.person,
-                              color: AppColor.primary,
+                            title: Text(
+                              _userName ?? 'Ulanyjy',
+                              style: textStyle.copyWith(
+                                color: AppColor.titleText(context),
+                              ),
+                            ),
+                            subtitle: Text(
+                              'Ulanyjy',
+                              style: TextStyle(
+                                fontSize: 13,
+                                color: AppColor.descriptionText(context),
+                              ),
                             ),
                           ),
-                          title: Text(
-                            'Mekan Çaryýew',
-                            style: textStyle.copyWith(
-                              color: AppColor.titleText(context),
-                            ),
-                          ),
-                          subtitle: Text(
-                            'Ulanyjy',
-                            style: TextStyle(
-                              fontSize: 13,
-                              color: AppColor.descriptionText(context),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
+                        ],
+                      ),
 
-                    const SizedBox(height: 16),
+                      const SizedBox(height: 16),
+                    ],
 
                     // Sazlamalar
                     SectionCard(
@@ -231,7 +252,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                             Icons.chevron_right,
                             color: Colors.grey.shade400,
                           ),
-                          onTap: () {},
+                          onTap: () => context.push('/kartlarym'),
                         ),
                         SettingsRow(
                           image: "assets/images/settings/bell.png",
@@ -279,11 +300,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           image: "assets/images/settings/lock.png",
                           iconColor: Colors.blue,
                           title: 'Pin kod',
-                          onTap: () {
-                            setState(() {
-                              pinKod = !pinKod;
-                            });
-                          },
+                          onTap: () => context.push('/pinCode'),
                           trailing: GestureDetector(
                             onTap: () {
                               setState(() {
@@ -334,7 +351,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                             Icons.chevron_right,
                             color: Colors.grey.shade400,
                           ),
-                          onTap: () {},
+                          onTap: () => context.push('/24goldaw'),
                         ),
                         SettingsRow(
                           image: "assets/images/settings/contactus.png",
@@ -379,28 +396,30 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     SectionCard(
                       text: 'Akkountdan çykmak',
                       children: [
-                        SettingsRow(
-                          image: "assets/images/settings/logout.png",
-                          iconColor: Colors.blue,
-                          title: 'Çykmak',
-                          trailing: Icon(
-                            Icons.chevron_right,
-                            color: Colors.grey.shade400,
+                        if (_isLoggedIn) ...[
+                          SettingsRow(
+                            image: "assets/images/settings/logout.png",
+                            iconColor: Colors.blue,
+                            title: 'Çykmak',
+                            trailing: Icon(
+                              Icons.chevron_right,
+                              color: Colors.grey.shade400,
+                            ),
+                            onTap: () {
+                              logOutShowBottomSheet(context);
+                            },
                           ),
-                          onTap: () {
-                            logOutShowBottomSheet(context);
-                          },
-                        ),
-                        SettingsRow(
-                          image: "assets/images/settings/trash.png",
-                          iconColor: Colors.red,
-                          title: 'Hasabym pozmak',
-                          trailing: Icon(
-                            Icons.chevron_right,
-                            color: Colors.grey.shade400,
+                          SettingsRow(
+                            image: "assets/images/settings/trash.png",
+                            iconColor: Colors.red,
+                            title: 'Hasabym pozmak',
+                            trailing: Icon(
+                              Icons.chevron_right,
+                              color: Colors.grey.shade400,
+                            ),
+                            onTap: () {},
                           ),
-                          onTap: () {},
-                        ),
+                        ],
                         SettingsRow(
                           isLast: true,
                           image: "assets/images/settings/version.png",
@@ -411,7 +430,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                             mainAxisSize: MainAxisSize.min,
                             children: [
                               Text(
-                                'New version',
+                                'Täze wersiýa',
                                 style: TextStyle(
                                   fontSize: 12,
                                   color: Colors.grey.shade500,
@@ -469,17 +488,5 @@ class SectionTitle extends StatelessWidget {
         ],
       ),
     );
-  }
-}
-
-// White card wrapper
-
-// Settings row
-
-// Thin divider
-class _Divider extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Divider(height: 1, indent: 56, color: Colors.grey.shade100);
   }
 }

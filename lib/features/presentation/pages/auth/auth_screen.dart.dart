@@ -8,6 +8,9 @@ import '../../../../core/api_service.dart';
 import '../../../../core/utils/theme/app_colors.dart';
 import 'parts/auth_helper.dart';
 
+part 'parts/login_form.dart';
+part 'parts/register_form.dart';
+
 class AuthScreen extends StatefulWidget {
   final bool showLogin;
   const AuthScreen({super.key, this.showLogin = true});
@@ -18,10 +21,12 @@ class AuthScreen extends StatefulWidget {
 
 class _AuthScreenState extends State<AuthScreen>
     with SingleTickerProviderStateMixin {
-  late TabController _tabController;
+  // Внутренний таб выбора способа входа/регистрации: Telefon belgi / Email
+  late TabController _methodTabController;
 
   bool _obscureLoginPassword = true;
   final TextEditingController _loginPhoneController = TextEditingController();
+  final TextEditingController _loginEmailController = TextEditingController();
   final TextEditingController _loginPasswordController =
       TextEditingController();
 
@@ -32,6 +37,7 @@ class _AuthScreenState extends State<AuthScreen>
   final List<String> _roles = ['Ulanyjy', 'Hyzmat Beriji'];
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _regPhoneController = TextEditingController();
+  final TextEditingController _regEmailController = TextEditingController();
   final TextEditingController _regPasswordController = TextEditingController();
   final TextEditingController _confirmController = TextEditingController();
   final TextStyle textStyle1 = AppTextStyle.semiBold16;
@@ -39,21 +45,23 @@ class _AuthScreenState extends State<AuthScreen>
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(
-      length: 2,
-      vsync: this,
-      initialIndex: widget.showLogin ? 0 : 1,
-    );
-    _tabController.addListener(() => setState(() {}));
+    _methodTabController = TabController(length: 2, vsync: this);
+    _methodTabController.addListener(() => setState(() {}));
   }
+
+  // setState — protected member, поэтому недоступен напрямую из extension
+  // методов в parts/login_form.dart и parts/register_form.dart.
+  void _refresh(VoidCallback fn) => setState(fn);
 
   @override
   void dispose() {
-    _tabController.dispose();
+    _methodTabController.dispose();
     _loginPhoneController.dispose();
+    _loginEmailController.dispose();
     _loginPasswordController.dispose();
     _nameController.dispose();
     _regPhoneController.dispose();
+    _regEmailController.dispose();
     _regPasswordController.dispose();
     _confirmController.dispose();
     super.dispose();
@@ -96,7 +104,7 @@ class _AuthScreenState extends State<AuthScreen>
                     onPressed: () => context.pop(),
                   ),
                   Text(
-                    _tabController.index == 0 ? 'Hasaba durmak' : 'Agza bolmak',
+                    widget.showLogin ? 'Hasaba durmak' : 'Agza bolmak',
                     style: textStyle.copyWith(
                       color: AppColor.titleText(context),
                     ),
@@ -125,7 +133,7 @@ class _AuthScreenState extends State<AuthScreen>
               width: double.infinity,
               margin: const EdgeInsets.only(bottom: 10),
             ),
-            // ─── TabBar ───
+            // ─── TabBar: Telefon belgi / Email ───
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16),
               child: Container(
@@ -135,7 +143,7 @@ class _AuthScreenState extends State<AuthScreen>
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: TabBar(
-                  controller: _tabController,
+                  controller: _methodTabController,
                   dividerColor: Colors.transparent,
                   indicator: BoxDecoration(
                     color: cardBg,
@@ -159,8 +167,8 @@ class _AuthScreenState extends State<AuthScreen>
                   splashFactory: NoSplash.splashFactory,
                   overlayColor: WidgetStateProperty.all(Colors.transparent),
                   tabs: const [
-                    Tab(text: 'Hasaba durmak'),
-                    Tab(text: 'Agza bolmak'),
+                    Tab(text: 'Telefon belgi'),
+                    Tab(text: 'Email'),
                   ],
                 ),
               ),
@@ -168,402 +176,26 @@ class _AuthScreenState extends State<AuthScreen>
 
             const SizedBox(height: 16),
 
-            // ─── TabBarView (плавное переключение) ───
             Expanded(
-              child: TabBarView(
-                controller: _tabController,
-                physics: const NeverScrollableScrollPhysics(),
-                children: [
-                  // ── Login tab ──
-                  SingleChildScrollView(
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
-                    child: _buildLoginForm(
-                      isDark,
-                      cardBg,
-                      AppColor.titleText(context),
-                      borderColor,
-                    ),
-                  ),
-                  // ── Register tab ──
-                  SingleChildScrollView(
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
-                    child: _buildRegisterForm(
-                      isDark,
-                      cardBg,
-                      AppColor.titleText(context),
-                      borderColor,
-                    ),
-                  ),
-                ],
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: widget.showLogin
+                    ? _buildLoginForm(
+                        isDark,
+                        cardBg,
+                        AppColor.titleText(context),
+                        borderColor,
+                      )
+                    : _buildRegisterForm(
+                        isDark,
+                        cardBg,
+                        AppColor.titleText(context),
+                        borderColor,
+                      ),
               ),
             ),
           ],
         ),
-      ),
-    );
-  }
-
-  // ─── LOGIN FORM ─────────────────────────────────────────────────────────────
-
-  Widget _buildLoginForm(
-    bool isDark,
-    Color cardBg,
-    Color textColor,
-    Color borderColor,
-  ) {
-    final inputBg = isDark ? AppColor.bgPageDark : AppColor.bgPageLight;
-    final hintColor = isDark ? Colors.white38 : Colors.black38;
-    const blue = AppColor.primary;
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const SizedBox(height: 8),
-
-        Center(
-          child: Image.asset(
-            "assets/images/logo/phone.png",
-            height: 30,
-            width: 30,
-          ),
-        ),
-        const SizedBox(height: 32),
-
-        // Phone
-        Text(
-          'Telefon belgiňiz',
-          style: TextStyle(
-            color: textColor,
-            fontSize: 14,
-            fontWeight: FontWeight.w500,
-          ),
-        ),
-        const SizedBox(height: 8),
-        Row(
-          children: [
-            codeBox('+993', textColor, inputBg, borderColor),
-            const SizedBox(width: 10),
-            Expanded(
-              child: inputField(
-                controller: _loginPhoneController,
-                inputBg: inputBg,
-                type: FieldType.phone,
-                borderColor: borderColor,
-                textColor: textColor,
-                hintColor: hintColor,
-                keyboardType: TextInputType.phone,
-              ),
-            ),
-          ],
-        ),
-
-        const SizedBox(height: 16),
-
-        // Password
-        Text(
-          'Açar sözi',
-          style: TextStyle(
-            color: textColor,
-            fontSize: 14,
-            fontWeight: FontWeight.w500,
-          ),
-        ),
-        const SizedBox(height: 8),
-        inputField(
-          controller: _loginPasswordController,
-          inputBg: inputBg,
-          borderColor: borderColor,
-          textColor: textColor,
-          type: FieldType.code,
-          hintColor: hintColor,
-          obscure: _obscureLoginPassword,
-          suffix: IconButton(
-            icon: Icon(
-              _obscureLoginPassword
-                  ? Icons.visibility_off_outlined
-                  : Icons.visibility_outlined,
-              color: hintColor,
-              size: 20,
-            ),
-            onPressed: () =>
-                setState(() => _obscureLoginPassword = !_obscureLoginPassword),
-          ),
-        ),
-
-        const SizedBox(height: 10),
-
-        TextButton(
-          onPressed: () => context.push('/forgot'),
-          child: Text(
-            "Açar sözi ýatdan çykardym",
-            style: TextStyle(
-              color: isDark ? AppColor.titleDark : AppColor.primary,
-              fontSize: 14,
-              fontStyle: FontStyle.italic,
-            ),
-          ),
-        ),
-
-        const SizedBox(height: 36),
-
-        SizedBox(
-          width: double.infinity,
-          height: 54,
-          child: ElevatedButton(
-            // Сначала сохраняем номер и отправляем на сервер
-            onPressed: () async {
-              final phone = '+993${_loginPhoneController.text.trim()}';
-              try {
-                await ApiService().sendPhoneForOtp(phone);
-                if (context.mounted) context.push("/smsscreen");
-              } catch (e) {
-                ScaffoldMessenger.of(
-                  context,
-                ).showSnackBar(SnackBar(content: Text('Ýalňyşlyk: $e')));
-              }
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: blue,
-              foregroundColor: Colors.white,
-              elevation: 0,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(14),
-              ),
-            ),
-            child: const Text(
-              'Geçmek',
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
-            ),
-          ),
-        ),
-
-        const SizedBox(height: 24),
-      ],
-    );
-  }
-
-  // ─── REGISTER FORM ──────────────────────────────────────────────────────────
-
-  Widget _buildRegisterForm(
-    bool isDark,
-    Color cardBg,
-    Color textColor,
-    Color borderColor,
-  ) {
-    final inputBg = isDark ? AppColor.bgPageDark : AppColor.bgPageLight;
-    final hintColor = AppColor.titleText(context);
-    const blue = AppColor.primary;
-
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const SizedBox(height: 8),
-          Text(
-            'Wezipeler',
-            style: TextStyle(
-              color: textColor,
-              fontSize: 14,
-              fontWeight: FontWeight.w500,
-            ),
-          ),
-          const SizedBox(height: 8),
-          Container(
-            height: 52,
-            decoration: BoxDecoration(
-              color: inputBg,
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: borderColor),
-            ),
-            padding: const EdgeInsets.symmetric(horizontal: 14),
-            child: DropdownButton<String>(
-              value: _selectedRole,
-              isExpanded: true,
-              underline: const SizedBox(),
-              dropdownColor: cardBg,
-              style: TextStyle(color: textColor, fontSize: 15),
-              icon: Icon(Icons.keyboard_arrow_down, color: hintColor),
-              items: _roles
-                  .map(
-                    (r) => DropdownMenuItem(
-                      value: r,
-                      child: Text(r, style: TextStyle(color: textColor)),
-                    ),
-                  )
-                  .toList(),
-              onChanged: (v) =>
-                  setState(() => _selectedRole = v ?? _selectedRole),
-            ),
-          ),
-
-          const SizedBox(height: 16),
-
-          // Ady Familýasy
-          Text(
-            'Ady Familýasy',
-            style: TextStyle(
-              color: textColor,
-              fontSize: 14,
-              fontWeight: FontWeight.w500,
-            ),
-          ),
-          const SizedBox(height: 8),
-          inputField(
-            controller: _nameController,
-            inputBg: inputBg,
-            text: "Adyňyzy giriziň",
-            borderColor: borderColor,
-            textColor: textColor,
-            hintColor: Colors.grey,
-          ),
-
-          const SizedBox(height: 16),
-
-          // Phone
-          Text(
-            'Telefon belgiňiz',
-            style: TextStyle(
-              color: textColor,
-              fontSize: 14,
-              fontWeight: FontWeight.w500,
-            ),
-          ),
-          const SizedBox(height: 8),
-          Row(
-            children: [
-              codeBox('+993', textColor, inputBg, borderColor),
-              const SizedBox(width: 10),
-              Expanded(
-                child: inputField(
-                  controller: _regPhoneController,
-                  inputBg: inputBg,
-                  type: FieldType.phone,
-                  borderColor: borderColor,
-                  textColor: textColor,
-                  hintColor: hintColor,
-                  keyboardType: TextInputType.phone,
-                ),
-              ),
-            ],
-          ),
-
-          const SizedBox(height: 16),
-
-          // Password
-          Text(
-            'Açar sözi',
-            style: TextStyle(
-              color: textColor,
-              fontSize: 14,
-              fontWeight: FontWeight.w500,
-            ),
-          ),
-          const SizedBox(height: 8),
-          inputField(
-            controller: _regPasswordController,
-            inputBg: inputBg,
-            borderColor: borderColor,
-            textColor: textColor,
-            hintColor: hintColor,
-            obscure: _obscureRegPassword,
-            suffix: IconButton(
-              icon: Icon(
-                _obscureRegPassword
-                    ? Icons.visibility_off_outlined
-                    : Icons.visibility_outlined,
-                color: hintColor,
-                size: 20,
-              ),
-              onPressed: () =>
-                  setState(() => _obscureRegPassword = !_obscureRegPassword),
-            ),
-          ),
-
-          const SizedBox(height: 16),
-
-          // Confirm password
-          Text(
-            'Açar sözüňizi tassyklaň',
-            style: TextStyle(
-              color: textColor,
-              fontSize: 14,
-              fontWeight: FontWeight.w500,
-            ),
-          ),
-          const SizedBox(height: 8),
-          inputField(
-            controller: _confirmController,
-            inputBg: inputBg,
-            borderColor: borderColor,
-            textColor: textColor,
-            hintColor: hintColor,
-            obscure: _obscureConfirm,
-            suffix: IconButton(
-              icon: Icon(
-                _obscureConfirm
-                    ? Icons.visibility_off_outlined
-                    : Icons.visibility_outlined,
-                color: hintColor,
-                size: 20,
-              ),
-              onPressed: () =>
-                  setState(() => _obscureConfirm = !_obscureConfirm),
-            ),
-          ),
-
-          const SizedBox(height: 12),
-
-          // Checkbox
-          Row(
-            children: [
-              Checkbox(
-                value: _agreed,
-                activeColor: blue,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(4),
-                ),
-                onChanged: (v) => setState(() => _agreed = v ?? false),
-              ),
-              Text(
-                'Düzgünler bilen tanyşdym?',
-                style: TextStyle(
-                  color: textColor,
-                  fontSize: 14,
-                  fontStyle: FontStyle.italic,
-                ),
-              ),
-            ],
-          ),
-
-          const SizedBox(height: 20),
-
-          SizedBox(
-            width: double.infinity,
-            height: 54,
-            child: ElevatedButton(
-              onPressed: _agreed
-                  ? () async {
-                      final phone = '+993${_regPhoneController.text.trim()}';
-                      try {
-                        await ApiService().sendPhoneForOtp(phone);
-                        if (context.mounted) context.push("/smsscreen");
-                      } catch (e) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text('Ýalňyşlyk: $e')),
-                        );
-                      }
-                    }
-                  : null,
-              child: Text(
-                'Agza bol',
-                style: textStyle1.copyWith(color: AppColor.titleDark),
-              ),
-            ),
-          ),
-
-          const SizedBox(height: 24),
-        ],
       ),
     );
   }

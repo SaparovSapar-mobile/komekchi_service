@@ -53,6 +53,7 @@ class _WalkthroughScreenState extends State<WalkthroughScreen> {
   Widget build(BuildContext context) {
     final bool isDark = Theme.of(context).brightness == Brightness.dark;
     final page = pages[_pageIndex];
+   
 
     // ✅ Адаптивные размеры
     final screenWidth = MediaQuery.of(context).size.width;
@@ -64,7 +65,7 @@ class _WalkthroughScreenState extends State<WalkthroughScreen> {
     final double fontSizeSkip = screenWidth * 0.045;
     final double buttonHeight = screenHeight * 0.066;
     final double bottomPadding = screenHeight * 0.036;
-    final TextStyle textStyle = AppTextStyle.semiBold18; 
+    final TextStyle textStyle = AppTextStyle.semiBold18;
 
     return Scaffold(
       appBar: AppBar(
@@ -72,7 +73,7 @@ class _WalkthroughScreenState extends State<WalkthroughScreen> {
         backgroundColor: isDark ? AppColor.bgPageDark : AppColor.bgPageLight,
         systemOverlayStyle: SystemUiOverlayStyle(
           statusBarColor: isDark ? AppColor.bgPageDark : AppColor.bgPageLight,
-          statusBarIconBrightness:isDark ? Brightness.light : Brightness.dark,
+          statusBarIconBrightness: isDark ? Brightness.light : Brightness.dark,
           statusBarBrightness: isDark ? Brightness.light : Brightness.dark,
         ),
       ),
@@ -204,9 +205,7 @@ class _WalkthroughScreenState extends State<WalkthroughScreen> {
                       topLeft: Radius.circular(20),
                       topRight: Radius.circular(20),
                     ),
-                    color: isDark
-                        ? AppColor.bgBlogDark
-                        : AppColor.titleDark,
+                    color: isDark ? AppColor.bgBlogDark : AppColor.titleDark,
                   ),
                   padding: EdgeInsets.only(
                     top: screenHeight * 0.008,

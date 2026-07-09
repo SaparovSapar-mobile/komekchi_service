@@ -7,11 +7,12 @@ class SearchInitial extends SearchState {}
 class SearchLoading extends SearchState {}
 
 class SearchSuccess extends SearchState {
-  final List<SubcategoryItem> items;
-  SearchSuccess(this.items);
+  final SearchResult result;
+  SearchSuccess(this.result);
 }
 
 class SearchError extends SearchState {
   final String message;
-  SearchError(this.message);
+  final Failure failure;
+  SearchError(this.message, this.failure);
 }

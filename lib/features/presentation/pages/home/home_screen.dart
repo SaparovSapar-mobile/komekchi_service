@@ -9,6 +9,7 @@ import 'package:komekchi_service/features/presentation/pages/home/widget/banner_
 import 'package:komekchi_service/features/presentation/pages/home/widget/horizontal_service_list.dart';
 import 'package:komekchi_service/injector.dart';
 
+import '../../../../core/widgets/network_error_view.dart';
 import '../../../../core/utils/theme/app_colors.dart';
 import '../../../../core/utils/theme/const.dart';
 import 'parts/home_aksiya_section.dart';
@@ -78,62 +79,67 @@ class _HomeScreenState extends State<HomeScreen> {
           SalgymBar(isDark: isDark, textColor: textColor),
           const SizedBox(height: 5),
           Expanded(
-            child: RefreshIndicator(
-              color: AppColor.primary,
-              onRefresh: _onRefresh,
-              child: SingleChildScrollView(
-                physics: const AlwaysScrollableScrollPhysics(),
-                padding: EdgeInsets.only(
-                  bottom: MediaQuery.of(context).padding.bottom,
-                ),
-                controller: widget.scrollController,
-                child: Column(
-                  children: [
-                    const DividerWidget(),
-                    GestureDetector(
-                      onTap: () => context.push("/allCategory"),
-                      child: const Subtitle(text: "Hyzmatlar"),
-                    ),
-                    HomeCategoryGrid(textColor: textColor),
-                    const DividerWidget(),
-                    BannerSlider(),
-                    const DividerWidget(),
-                    HorizontalServiceList(is24_7: true, text: "7/24 hyzmatlar"),
-                    const DividerWidget(),
-                    HorizontalServiceList(
-                      isFeatured: true,
-                      text: "Öňde baryjylar",
-                    ),
-                    const DividerWidget(),
-                    GestureDetector(
-                      onTap: () => context.push("/aksiya"),
-                      child: const Subtitle(text: "Aksiýalar"),
-                    ),
-                    HomeAksiyaSection(aksiyaCubit: _aksiyaCubit),
-                    const DividerWidget(),
-                    const Padding(
-                      padding: EdgeInsets.symmetric(
-                        vertical: 5.0,
-                        horizontal: 15.0,
-                      ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        children: [
-                          Text(
-                            "Näme üçin biz?",
-                            style: TextStyle(fontSize: 14),
-                          ),
-                        ],
-                      ),
-                    ),
-                    HomeBizGrid(biz: defaultBizItems),
-                    const SizedBox(height: 30),
-                  ],
-                ),
-              ),
+            child: BlocBuilder<GetCategoryCubit, GetCategoryState>(
+              builder: (context, categoryState) {
+                if (categoryState is GetCategoryError) {
+                  return NetworkErrorView.fromFailure(
+                    categoryState.failure,
+                    onRetry: _onRefresh,
+                  );
+                }
+                return _buildContent(context);
+              },
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildContent(BuildContext context) {
+    final textColor = AppColor.titleText(context);
+
+    return RefreshIndicator(
+      color: AppColor.primary,
+      onRefresh: _onRefresh,
+      child: SingleChildScrollView(
+        physics: const AlwaysScrollableScrollPhysics(),
+        padding: EdgeInsets.only(bottom: MediaQuery.of(context).padding.bottom),
+        controller: widget.scrollController,
+        child: Column(
+          children: [
+            const DividerWidget(),
+            GestureDetector(
+              onTap: () => context.push("/allCategory"),
+              child: const Subtitle(text: "Hyzmatlar"),
+            ),
+            HomeCategoryGrid(textColor: textColor),
+            const DividerWidget(),
+            BannerSlider(),
+            const DividerWidget(),
+            HorizontalServiceList(is24_7: true, text: "7/24 hyzmatlar"),
+            const DividerWidget(),
+            HorizontalServiceList(isFeatured: true, text: "Öňde baryjylar"),
+            const DividerWidget(),
+            GestureDetector(
+              onTap: () => context.push("/aksiya"),
+              child: const Subtitle(text: "Aksiýalar"),
+            ),
+            HomeAksiyaSection(aksiyaCubit: _aksiyaCubit),
+            const DividerWidget(),
+            const Padding(
+              padding: EdgeInsets.symmetric(vertical: 5.0, horizontal: 15.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  Text("Näme üçin biz?", style: TextStyle(fontSize: 14)),
+                ],
+              ),
+            ),
+            HomeBizGrid(biz: defaultBizItems),
+            const SizedBox(height: 30),
+          ],
+        ),
       ),
     );
   }

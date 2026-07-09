@@ -13,20 +13,25 @@ class StatusBadge extends StatelessWidget {
     String label;
 
     switch (status) {
-      case BronStatus.garasylyar:
+      case BronStatus.pending:
         bgColor = Colors.orange.shade50;
         textColor = Colors.orange;
         label = 'Garaşylýar';
         break;
-      case BronStatus.tamamlanan:
+      case BronStatus.completed:
         bgColor = Colors.green.shade50;
         textColor = Colors.green;
         label = 'Tamamlanan';
         break;
-      case BronStatus.yatyryldy:
+      case BronStatus.cancelled:
         bgColor = Colors.red.shade50;
         textColor = Colors.red;
         label = 'Ýatyryldy';
+        break;
+      case BronStatus.unknown:
+        bgColor = Colors.grey.shade200;
+        textColor = Colors.grey;
+        label = 'Näbelli';
         break;
     }
 

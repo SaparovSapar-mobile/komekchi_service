@@ -4,11 +4,13 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:komekchi_service/core/utils/app_constants.dart';
 import 'package:komekchi_service/core/utils/theme/app_text_style.dart';
+import 'package:komekchi_service/features/presentation/bloc/category/get_category_cubit.dart';
 import 'package:komekchi_service/features/presentation/bloc/search/search_cubit.dart';
 import 'package:komekchi_service/features/presentation/pages/home/home_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../../../core/utils/theme/app_colors.dart';
+import '../../../../../core/widgets/network_error_view.dart';
 
 class SearchScreen extends StatefulWidget {
   const SearchScreen({super.key});
@@ -23,54 +25,11 @@ class _SearchScreenState extends State<SearchScreen> {
   List<String> _searchHistory = [];
   String _query = '';
 
-  final List<CategoryItem> categories = [
-    CategoryItem(
-      title: 'Elektrikçi',
-      image: 'assets/images/category/image1.png',
-    ),
-    CategoryItem(
-      title: 'Arassaçylyk',
-      image: 'assets/images/category/image2.png',
-    ),
-    CategoryItem(
-      title: 'Ýük daşaýjy',
-      image: 'assets/images/category/image3.png',
-    ),
-    CategoryItem(
-      title: 'Agaç ussasy',
-      image: 'assets/images/category/image4.png',
-    ),
-    CategoryItem(
-      title: 'Reňkleýji',
-      image: 'assets/images/category/image5.png',
-    ),
-    CategoryItem(title: 'Salon', image: 'assets/images/category/image6.png'),
-    CategoryItem(
-      title: 'Toý bezegleri',
-      image: 'assets/images/category/image7.png',
-    ),
-    CategoryItem(
-      title: 'Tehnika bejerijiler',
-      image: 'assets/images/category/image8.png',
-    ),
-    CategoryItem(
-      title: 'Öý abatlaýyş',
-      image: 'assets/images/category/image9.png',
-    ),
-    CategoryItem(
-      title: 'Okuw gollanmalar',
-      image: 'assets/images/category/image12.png',
-    ),
-    CategoryItem(
-      title: 'Maşyn yuwmak',
-      image: 'assets/images/category/image11.png',
-    ),
-  ];
-
   @override
   void initState() {
     super.initState();
     _loadHistory();
+    context.read<GetCategoryCubit>().fetchCategory();
     _searchController.addListener(() {
       setState(() => _query = _searchController.text);
       context.read<SearchCubit>().searchDebounced(_searchController.text);
@@ -282,75 +241,97 @@ class _SearchScreenState extends State<SearchScreen> {
     final bg = isDark ? AppColor.bgPageDark : AppColor.bgPageLight;
     final cardBg = isDark ? AppColor.bgBlogDark : AppColor.bgBlogLight;
 
-    return ListView(
-      padding: const EdgeInsets.symmetric(horizontal: 15),
-      children: [
-        const SizedBox(height: 8),
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-          margin: EdgeInsets.only(
-            bottom: MediaQuery.of(
-              context,
-            ).padding.bottom.clamp(0.0, double.infinity),
-          ),
-          decoration: BoxDecoration(
-            color: cardBg,
-            borderRadius: BorderRadius.circular(10),
-          ),
-          child: Column(
-            children: [
-              const Row(
-                mainAxisAlignment: MainAxisAlignment.start,
+    return BlocBuilder<GetCategoryCubit, GetCategoryState>(
+      builder: (context, state) {
+        if (state is GetCategoryLoading) {
+          return const Center(child: CircularProgressIndicator());
+        }
+
+        if (state is GetCategoryError) {
+          return NetworkErrorView.fromFailure(
+            state.failure,
+            onRetry: () => context.read<GetCategoryCubit>().fetchCategory(),
+          );
+        }
+
+        final items = state is GetCategorySucces
+            ? state.dataCategory
+            : const [];
+
+        return ListView(
+          padding: const EdgeInsets.symmetric(horizontal: 15),
+          children: [
+            const SizedBox(height: 8),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+              margin: EdgeInsets.only(
+                bottom: MediaQuery.of(
+                  context,
+                ).padding.bottom.clamp(0.0, double.infinity),
+              ),
+              decoration: BoxDecoration(
+                color: cardBg,
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: Column(
                 children: [
-                  Text(
-                    'Ähli kategoriýalar',
-                    style: TextStyle(fontSize: 17, fontWeight: FontWeight.w700),
+                  const Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Ähli kategoriýalar',
+                        style: TextStyle(
+                          fontSize: 17,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                    ],
                   ),
+                  ...List.generate(items.length, (index) {
+                    final item = items[index];
+                    return ListTile(
+                      contentPadding: EdgeInsets.zero,
+                      leading: Container(
+                        decoration: BoxDecoration(
+                          color: bg,
+                          borderRadius: BorderRadius.circular(4),
+                        ),
+                        child: Image.network(
+                          ApiConstants.imageUrl(item.iconImg),
+                          width: 28,
+                          height: 28,
+                          errorBuilder: (_, __, ___) => Icon(
+                            Icons.category,
+                            color: AppColor.primary,
+                            size: 28,
+                          ),
+                        ),
+                      ),
+                      title: Text(
+                        item.nameTm,
+                        style: textStyle.copyWith(
+                          color: AppColor.titleText(context),
+                        ),
+                      ),
+                      trailing: Icon(
+                        Icons.chevron_right,
+                        color: Colors.grey.shade400,
+                      ),
+                      onTap: () {
+                        context.push(
+                          "/categoryId",
+                          extra: {'uuid': item.uuid, 'title': item.nameTm},
+                        );
+                      },
+                    );
+                  }),
                 ],
               ),
-              ...List.generate(categories.length, (index) {
-                final item = categories[index];
-                return ListTile(
-                  contentPadding: EdgeInsets.zero,
-                  leading: Container(
-                    decoration: BoxDecoration(
-                      color: bg,
-                      borderRadius: BorderRadius.circular(4),
-                    ),
-                    child: Image.asset(
-                      item.image,
-                      width: 28,
-                      height: 28,
-                      errorBuilder: (_, __, ___) => Icon(
-                        Icons.category,
-                        color: AppColor.primary,
-                        size: 28,
-                      ),
-                    ),
-                  ),
-                  title: Text(
-                    item.title,
-                    style: textStyle.copyWith(
-                      color: AppColor.titleText(context),
-                    ),
-                  ),
-                  trailing: Icon(
-                    Icons.chevron_right,
-                    color: Colors.grey.shade400,
-                  ),
-                  onTap: () {
-                    // This screen's category tiles are local placeholders
-                    // (not backed by a real category uuid from the API),
-                    // so route to the real, API-driven category list.
-                    context.push("/allCategory");
-                  },
-                );
-              }),
-            ],
-          ),
-        ),
-        const SizedBox(height: 8),
-      ],
+            ),
+            const SizedBox(height: 8),
+          ],
+        );
+      },
     );
   }
 
@@ -363,18 +344,16 @@ class _SearchScreenState extends State<SearchScreen> {
         }
 
         if (state is SearchError) {
-          return Center(
-            child: Text(
-              state.message,
-              style: const TextStyle(color: Colors.red),
-            ),
+          return NetworkErrorView.fromFailure(
+            state.failure,
+            onRetry: () => context.read<SearchCubit>().search(_query),
           );
         }
 
         if (state is SearchSuccess) {
-          final items = state.items;
+          final result = state.result;
 
-          if (items.isEmpty) {
+          if (result.isEmpty) {
             return Center(
               child: Column(
                 mainAxisSize: MainAxisSize.min,
@@ -390,49 +369,100 @@ class _SearchScreenState extends State<SearchScreen> {
             );
           }
 
-          return ListView.builder(
+          return ListView(
             padding: const EdgeInsets.symmetric(horizontal: 15),
-            itemCount: items.length,
-            itemBuilder: (context, index) {
-              final item = items[index];
-              return Column(
-                children: [
-                  ListTile(
-                    contentPadding: EdgeInsets.zero,
-                    leading: ClipRRect(
-                      borderRadius: BorderRadius.circular(6),
-                      child: Image.network(
-                        ApiConstants.imageUrl(item.img),
-                        width: 40,
-                        height: 40,
-                        fit: BoxFit.cover,
-                        errorBuilder: (_, __, ___) => Icon(
-                          Icons.category,
-                          color: AppColor.primary,
-                          size: 28,
+            children: [
+              if (result.categories.isNotEmpty) ...[
+                _buildSearchSectionTitle('Kategoriýalar'),
+                ...result.categories.map(
+                  (category) => Column(
+                    children: [
+                      ListTile(
+                        contentPadding: EdgeInsets.zero,
+                        leading: ClipRRect(
+                          borderRadius: BorderRadius.circular(6),
+                          child: Image.network(
+                            ApiConstants.imageUrl(category.iconImg),
+                            width: 40,
+                            height: 40,
+                            fit: BoxFit.cover,
+                            errorBuilder: (_, __, ___) => Icon(
+                              Icons.category,
+                              color: AppColor.primary,
+                              size: 28,
+                            ),
+                          ),
                         ),
+                        title: Text(
+                          category.nameTm,
+                          style: TextStyle(
+                            fontSize: 15,
+                            color: AppColor.titleText(context),
+                          ),
+                        ),
+                        trailing: Icon(
+                          Icons.chevron_right,
+                          color: Colors.grey.shade400,
+                        ),
+                        onTap: () {
+                          _addToHistory(_query);
+                          context.push(
+                            "/categoryId",
+                            extra: {
+                              'uuid': category.uuid,
+                              'title': category.nameTm,
+                            },
+                          );
+                        },
                       ),
-                    ),
-                    title: Text(
-                      item.nameTm,
-                      style: TextStyle(
-                        fontSize: 15,
-                        color: AppColor.titleText(context),
-                      ),
-                    ),
-                    trailing: Icon(
-                      Icons.chevron_right,
-                      color: Colors.grey.shade400,
-                    ),
-                    onTap: () {
-                      _addToHistory(_query);
-                      context.push("/detail", extra: {"uuid": item.uuid});
-                    },
+                      Divider(height: 1, color: Colors.grey.shade100),
+                    ],
                   ),
-                  Divider(height: 1, color: Colors.grey.shade100),
-                ],
-              );
-            },
+                ),
+              ],
+              if (result.subcategories.isNotEmpty) ...[
+                _buildSearchSectionTitle('Hyzmatlar'),
+                ...result.subcategories.map(
+                  (item) => Column(
+                    children: [
+                      ListTile(
+                        contentPadding: EdgeInsets.zero,
+                        leading: ClipRRect(
+                          borderRadius: BorderRadius.circular(6),
+                          child: Image.network(
+                            ApiConstants.imageUrl(item.img),
+                            width: 40,
+                            height: 40,
+                            fit: BoxFit.cover,
+                            errorBuilder: (_, __, ___) => Icon(
+                              Icons.category,
+                              color: AppColor.primary,
+                              size: 28,
+                            ),
+                          ),
+                        ),
+                        title: Text(
+                          item.nameTm,
+                          style: TextStyle(
+                            fontSize: 15,
+                            color: AppColor.titleText(context),
+                          ),
+                        ),
+                        trailing: Icon(
+                          Icons.chevron_right,
+                          color: Colors.grey.shade400,
+                        ),
+                        onTap: () {
+                          _addToHistory(_query);
+                          context.push("/detail", extra: {"uuid": item.uuid});
+                        },
+                      ),
+                      Divider(height: 1, color: Colors.grey.shade100),
+                    ],
+                  ),
+                ),
+              ],
+            ],
           );
         }
 
@@ -440,10 +470,18 @@ class _SearchScreenState extends State<SearchScreen> {
       },
     );
   }
-}
 
-class CategoryItem {
-  final String title;
-  final String image;
-  const CategoryItem({required this.title, required this.image});
+  Widget _buildSearchSectionTitle(String title) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8),
+      child: Text(
+        title,
+        style: TextStyle(
+          fontSize: 14,
+          fontWeight: FontWeight.w600,
+          color: AppColor.descriptionText(context),
+        ),
+      ),
+    );
+  }
 }

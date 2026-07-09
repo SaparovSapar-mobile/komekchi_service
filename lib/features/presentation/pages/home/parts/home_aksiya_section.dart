@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../../core/utils/app_constants.dart';
+import '../../../../../core/widgets/branded_shimmer.dart';
 import '../../../../domain/entities/aksiya.dart';
 import '../../../bloc/aksiya/aksiya_cubit.dart';
 
@@ -18,7 +19,19 @@ class HomeAksiyaSection extends StatelessWidget {
         bloc: aksiyaCubit,
         builder: (context, state) {
           if (state is AksiyaLoading || state is AksiyaInitial) {
-            return const Center(child: CircularProgressIndicator());
+            return BrandedShimmer(
+              child: ListView.builder(
+                scrollDirection: Axis.horizontal,
+                padding: const EdgeInsets.only(left: 20),
+                itemCount: 3,
+                itemBuilder: (context, index) => BrandedShimmerCard(
+                  width: 174,
+                  height: 106,
+                  borderRadius: 9.46,
+                  margin: const EdgeInsets.only(right: 10),
+                ),
+              ),
+            );
           }
           if (state is AksiyaError) {
             return Center(

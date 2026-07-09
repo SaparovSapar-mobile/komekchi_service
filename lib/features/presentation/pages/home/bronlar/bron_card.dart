@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:komekchi_service/core/utils/theme/app_text_style.dart';
+import 'package:komekchi_service/features/domain/entities/order.dart';
 
 import '../../../../../core/utils/theme/app_colors.dart';
 import 'bottom_sheet_shikayat.dart';
@@ -7,8 +8,10 @@ import 'bronlar_screen.dart';
 import 'status_badge.dart';
 
 class BronCard extends StatelessWidget {
-  final BronItem item;
-  const BronCard({required this.item});
+  final OrderItem order;
+  final VoidCallback? onCancel;
+
+  const BronCard({super.key, required this.order, this.onCancel});
 
   void _showBottomSheetShikayat(BuildContext context) {
     showModalBottomSheet(
@@ -31,13 +34,15 @@ class BronCard extends StatelessWidget {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final bg = isDark ? AppColor.bgPageDark : AppColor.bgPageLight;
     final cardBg = isDark ? AppColor.bgBlogDark : AppColor.bgBlogLight;
-    final textColor = AppColor.titleText(context);
-    final borderColor = isDark ? const Color(0xFF333333) : AppColor.borderColor;
     final TextStyle textStyle = AppTextStyle.medium14;
     final TextStyle textStyle1 = AppTextStyle.medium12;
-    final TextStyle textStyle3 = AppTextStyle.medium16;
     final TextStyle textStyle2 = AppTextStyle.regular12;
     final TextStyle textStyle4 = AppTextStyle.bold14;
+    final status = bronStatusFromApi(order.status);
+    final shortNumber = order.uuid.length >= 6
+        ? order.uuid.substring(0, 6).toUpperCase()
+        : order.uuid.toUpperCase();
+
     return Container(
       decoration: BoxDecoration(
         color: cardBg,
@@ -65,7 +70,7 @@ class BronCard extends StatelessWidget {
                       ),
                       child: Center(
                         child: Text(
-                          'N°${item.number}',
+                          'N°$shortNumber',
                           style: textStyle1.copyWith(
                             color: AppColor.titleText(context),
                           ),
@@ -74,7 +79,7 @@ class BronCard extends StatelessWidget {
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      item.date,
+                      '${order.orderDate} ${order.orderTime}',
                       style: textStyle2.copyWith(
                         color: AppColor.titleText(context),
                       ),
@@ -83,39 +88,12 @@ class BronCard extends StatelessWidget {
                 ),
 
                 const Spacer(),
-                if (item.rating != null) ...[
-                  const SizedBox(width: 6),
-                  Container(
-                    width: 50,
-                    height: 22,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(7),
-                      color: bg,
-                    ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Flexible(
-                          child: Text(
-                            item.rating.toString(),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            style: textStyle3,
-                          ),
-                        ),
-                        const SizedBox(width: 2),
-                        const Icon(Icons.star, size: 15, color: Colors.amber),
-                      ],
-                    ),
-                  ),
-                ],
-                const SizedBox(width: 9),
-                StatusBadge(status: item.status),
+                StatusBadge(status: status),
               ],
             ),
           ),
 
-          // Category + service
+          // Service
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
             child: Row(
@@ -137,24 +115,24 @@ class BronCard extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(width: 10),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      item.category,
-                      style: const TextStyle(
-                        fontSize: 12,
-                        fontWeight: FontWeight.w600,
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        order.subcategoryName,
+                        style: const TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w600,
+                        ),
                       ),
-                    ),
-                    Text(
-                      item.service,
-                      style: TextStyle(fontSize: 10, color: Color(0xFF90979F)),
-                    ),
-                  ],
+                      Text(
+                        'Sany: ${order.quantity}',
+                        style: TextStyle(fontSize: 10, color: Color(0xFF90979F)),
+                      ),
+                    ],
+                  ),
                 ),
-                const Spacer(),
-                Icon(Icons.chevron_right, color: Colors.black),
               ],
             ),
           ),
@@ -184,9 +162,8 @@ class BronCard extends StatelessWidget {
                         ),
                         const SizedBox(width: 6),
                         Expanded(
-                          // 👈 перенеси сюда для длинного адреса
                           child: Text(
-                            item.address,
+                            order.address,
                             style: const TextStyle(fontSize: 13),
                             overflow: TextOverflow.ellipsis,
                           ),
@@ -218,7 +195,7 @@ class BronCard extends StatelessWidget {
                         ),
                         Flexible(
                           child: Text(
-                            item.price,
+                            '${order.totalPrice} tmt',
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
                             style: const TextStyle(
@@ -240,23 +217,10 @@ class BronCard extends StatelessWidget {
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
             child: Row(
               children: [
-                // Refresh icon
-                Container(
-                  height: 30,
-                  width: 30,
-                  decoration: BoxDecoration(
-                    color: Color(0xFFF6F8FD),
-                    borderRadius: BorderRadius.circular(5),
-                  ),
-                  child: Icon(Icons.refresh, size: 20, color: Colors.black),
-                ),
-                const SizedBox(width: 12),
-
                 // Sikayat etmek
                 Expanded(
                   child: OutlinedButton(
                     onPressed: () => _showBottomSheetShikayat(context),
-
                     style: OutlinedButton.styleFrom(
                       side: BorderSide(color: Colors.red.shade200),
                       backgroundColor: Colors.red.shade50,
@@ -276,8 +240,29 @@ class BronCard extends StatelessWidget {
                   ),
                 ),
 
+                // Ýatyrmak (only pending orders)
+                if (status == BronStatus.pending && onCancel != null) ...[
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: OutlinedButton(
+                      onPressed: onCancel,
+                      style: OutlinedButton.styleFrom(
+                        side: BorderSide(color: AppColor.primary),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        padding: const EdgeInsets.symmetric(vertical: 8),
+                      ),
+                      child: Text(
+                        'Ýatyrmak',
+                        style: textStyle.copyWith(color: AppColor.primary),
+                      ),
+                    ),
+                  ),
+                ],
+
                 // Baha bermek (only tamamlanan)
-                if (item.status == BronStatus.tamamlanan) ...[
+                if (status == BronStatus.completed) ...[
                   const SizedBox(width: 8),
                   Expanded(
                     child: ElevatedButton(

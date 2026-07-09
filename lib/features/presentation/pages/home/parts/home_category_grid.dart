@@ -80,19 +80,24 @@ class HomeCategoryGrid extends StatelessWidget {
                         color: catgBg,
                         border: Border.all(color: const Color(0xFFC6D2FF)),
                       ),
-                      child: isLast
-                          ? Image.asset(
-                              'assets/images/newcategory/image10.png',
-                              fit: BoxFit.contain,
-                            )
-                          : Image.network(
-                              ApiConstants.imageUrl(categories[index].iconImg),
-                              fit: BoxFit.contain,
-                              errorBuilder: (_, __, ___) => const Icon(
-                                Icons.category,
-                                color: AppColor.primary,
+                      child: Padding(
+                        padding: const EdgeInsets.all(12),
+                        child: isLast
+                            ? Image.asset(
+                                'assets/images/newcategory/image10.png',
+                                fit: BoxFit.contain,
+                              )
+                            : Image.network(
+                                ApiConstants.imageUrl(
+                                  categories[index].iconImg,
+                                ),
+                                fit: BoxFit.contain,
+                                errorBuilder: (_, __, ___) => const Icon(
+                                  Icons.category,
+                                  color: AppColor.primary,
+                                ),
                               ),
-                            ),
+                      ),
                     ),
                   ),
                   const SizedBox(height: 6),

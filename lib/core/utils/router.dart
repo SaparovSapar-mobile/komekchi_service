@@ -1,8 +1,10 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:komekchi_service/features/presentation/bloc/about/about_cubit.dart';
 import 'package:komekchi_service/features/presentation/bloc/aksiya/aksiya_cubit.dart';
 import 'package:komekchi_service/features/presentation/bloc/aksiya/aksiya_detail_cubit.dart';
+import 'package:komekchi_service/features/presentation/bloc/order/create_order_cubit.dart';
 import 'package:komekchi_service/features/presentation/bloc/search/search_cubit.dart';
 import 'package:komekchi_service/features/presentation/bloc/subcategory/subcategory_cubit.dart';
 import 'package:komekchi_service/features/presentation/bloc/subcategory/subcategory_detail_cubit.dart';
@@ -15,8 +17,13 @@ import 'package:komekchi_service/features/presentation/pages/home/detail_screen/
 import 'package:komekchi_service/features/presentation/pages/home/detail_screen/issue/nagilelik.dart';
 import 'package:komekchi_service/features/presentation/pages/home/detail_screen/sms.dart';
 import 'package:komekchi_service/features/presentation/pages/home/search/serach_screen.dart';
+import 'package:komekchi_service/features/presentation/pages/home/settings/cards/card_model.dart';
+import 'package:komekchi_service/features/presentation/pages/home/settings/cards/kart_goshmak_screen.dart';
+import 'package:komekchi_service/features/presentation/pages/home/settings/cards/kart_pozmak_screen.dart';
+import 'package:komekchi_service/features/presentation/pages/home/settings/cards/kartlarym_screen.dart';
 import 'package:komekchi_service/features/presentation/pages/home/settings/contact_us/contact_us_page.dart';
 import 'package:komekchi_service/features/presentation/pages/home/settings/contact_us/hat_yazmak_page.dart';
+import 'package:komekchi_service/features/presentation/pages/home/settings/pin/pin_code_screen.dart';
 import 'package:komekchi_service/features/presentation/pages/home/widget/bell.dart';
 import 'package:komekchi_service/features/presentation/pages/home/widget/name_uchin_biz/about_screen.dart';
 import 'package:komekchi_service/features/presentation/pages/home/widget/name_uchin_biz/hyzmat.dart';
@@ -74,8 +81,23 @@ final appRouter = GoRouter(
         );
       },
     ),
-    GoRoute(path: '/date', builder: (_, __) => const SelectDate()),
-    GoRoute(path: '/24goldaw', builder: (_, __) => const AboutScreen()),
+    GoRoute(
+      path: '/date',
+      builder: (context, state) {
+        final data = state.extra as Map<String, dynamic>?;
+        return SelectDate(
+          subcategoryUuid: data?['subcategoryUuid'] as String?,
+          quantity: data?['quantity'] as int? ?? 1,
+        );
+      },
+    ),
+    GoRoute(
+      path: '/24goldaw',
+      builder: (_, __) => BlocProvider(
+        create: (_) => sl<AboutCubit>(),
+        child: const AboutScreen(),
+      ),
+    ),
     GoRoute(path: '/kepilligi', builder: (_, __) => const IshKepilligi()),
     GoRoute(path: '/istertibi', builder: (_, __) => const IshTertibi()),
     GoRoute(path: '/toleg', builder: (_, __) => const Toleg()),
@@ -93,8 +115,35 @@ final appRouter = GoRouter(
     GoRoute(path: '/bells', builder: (_, __) => const BildirislerScreen()),
     GoRoute(path: '/contactUs', builder: (_, __) => const ContactUsPage()),
     GoRoute(path: '/hatYazmak', builder: (_, __) => const HatYazmakPage()),
+    GoRoute(path: '/kartlarym', builder: (_, __) => const KartlarymScreen()),
+    GoRoute(
+      path: '/kartGoshmak',
+      builder: (_, __) => const KartGoshmakScreen(),
+    ),
+    GoRoute(
+      path: '/kartPozmak',
+      builder: (context, state) {
+        final card = state.extra as SavedCard;
+        return KartPozmakScreen(card: card);
+      },
+    ),
+    GoRoute(path: '/pinCode', builder: (_, __) => const PinCodeScreen()),
 
-    GoRoute(path: '/selectedDate', builder: (_, __) => const SelectedDate()),
+    GoRoute(
+      path: '/selectedDate',
+      builder: (context, state) {
+        final data = state.extra as Map<String, dynamic>?;
+        return BlocProvider(
+          create: (_) => sl<CreateOrderCubit>(),
+          child: SelectedDate(
+            subcategoryUuid: data?['subcategoryUuid'] as String?,
+            quantity: data?['quantity'] as int? ?? 1,
+            orderDate: data?['orderDate'] as String?,
+            orderTime: data?['orderTime'] as String?,
+          ),
+        );
+      },
+    ),
     GoRoute(
       path: '/allCategory',
       builder: (_, __) => const AllCategoryScreen(),

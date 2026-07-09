@@ -3,8 +3,13 @@ import 'package:komekchi_service/core/error/faiulre.dart';
 import 'package:komekchi_service/features/domain/entities/aksiya.dart';
 import 'package:komekchi_service/features/domain/entities/category.dart';
 import 'package:komekchi_service/features/domain/entities/common.dart';
+import 'package:komekchi_service/features/domain/entities/complaint.dart';
+import 'package:komekchi_service/features/domain/entities/order.dart';
+import 'package:komekchi_service/features/domain/entities/rating.dart';
+import 'package:komekchi_service/features/domain/entities/search_result.dart';
 import 'package:komekchi_service/features/domain/entities/subcategory.dart';
 
+import '../entities/about.dart';
 import '../entities/banners.dart';
 
 abstract class GetAppRepository {
@@ -29,15 +34,44 @@ abstract class GetAppRepository {
   Future<Either<Failure, List<BannerItem>>> getBanners();
   Future<Either<Failure, BannerItem>> getBannerById(String uuid);
 
+  Future<Either<Failure, List<AboutItem>>> getAbout();
+
   Future<Either<Failure, void>> sendContactUs({
     String? email,
     String? phone,
     required String message,
   });
 
-  Future<Either<Failure, PaginatedResult<SubcategoryItem>>> searchServices({
+  Future<Either<Failure, SearchResult>> searchServices({
     required String query,
     int page,
     int limit,
   });
+
+  Future<Either<Failure, List<OrderItem>>> getOrders({String? status});
+  Future<Either<Failure, OrderItem>> getOrderById(String uuid);
+  Future<Either<Failure, OrderItem>> createOrder({
+    required String subcategoryUuid,
+    required String address,
+    String? note,
+    required String orderDate,
+    required String orderTime,
+    required int quantity,
+  });
+  Future<Either<Failure, OrderItem>> cancelOrder(String uuid);
+
+  Future<Either<Failure, List<RatingItem>>> getRatings({
+    String? categoryUuid,
+    String? subcategoryUuid,
+  });
+
+  Future<Either<Failure, void>> submitRating({
+    String? categoryUuid,
+    String? subcategoryUuid,
+    required int stars,
+    String? comment,
+  });
+
+  Future<Either<Failure, List<ComplaintItem>>> getComplaints();
+  Future<Either<Failure, void>> submitComplaint({required String message});
 }

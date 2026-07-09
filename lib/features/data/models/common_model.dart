@@ -1,3 +1,4 @@
+import '../../../core/utils/text_utils.dart';
 import '../../domain/entities/common.dart';
 
 class PaymentMethodModel extends PaymentMethod {
@@ -38,9 +39,9 @@ class WarningDescModel extends WarningDesc {
       return const WarningDescModel(descTm: '', descRu: '', descEn: '');
     }
     return WarningDescModel(
-      descTm: json['desc_tm'] ?? '',
-      descRu: json['desc_ru'] ?? '',
-      descEn: json['desc_en'] ?? '',
+      descTm: stripHtml(json['desc_tm']),
+      descRu: stripHtml(json['desc_ru']),
+      descEn: stripHtml(json['desc_en']),
     );
   }
 }

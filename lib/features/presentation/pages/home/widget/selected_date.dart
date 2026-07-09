@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:komekchi_service/core/utils/theme/const.dart';
+import 'package:komekchi_service/features/presentation/bloc/order/create_order_cubit.dart';
 import 'package:komekchi_service/features/presentation/pages/home/home_screen.dart';
 import 'package:komekchi_service/features/presentation/pages/home/widget/bank_bottomsheet.dart';
 
@@ -11,7 +13,18 @@ import '../../auth/parts/auth_helper.dart';
 import 'tolegbottomsheet.dart';
 
 class SelectedDate extends StatefulWidget {
-  const SelectedDate({super.key});
+  final String? subcategoryUuid;
+  final int quantity;
+  final String? orderDate;
+  final String? orderTime;
+
+  const SelectedDate({
+    super.key,
+    this.subcategoryUuid,
+    this.quantity = 1,
+    this.orderDate,
+    this.orderTime,
+  });
 
   @override
   State<SelectedDate> createState() => _SelectedDateState();
@@ -20,6 +33,8 @@ class SelectedDate extends StatefulWidget {
 class _SelectedDateState extends State<SelectedDate> {
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _phoneController = TextEditingController();
+  final TextEditingController _addressController = TextEditingController();
+  final TextEditingController _noteController = TextEditingController();
   String? _selectedToleg;
   String? _selectedBank;
 
@@ -44,7 +59,40 @@ class _SelectedDateState extends State<SelectedDate> {
   void dispose() {
     _nameController.dispose();
     _phoneController.dispose();
+    _addressController.dispose();
+    _noteController.dispose();
     super.dispose();
+  }
+
+  void _submit(BuildContext context) {
+    final subcategoryUuid = widget.subcategoryUuid;
+    final orderDate = widget.orderDate;
+    final orderTime = widget.orderTime;
+
+    if (subcategoryUuid == null || orderDate == null || orderTime == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Hyzmat we wagt saýlanmady')),
+      );
+      return;
+    }
+
+    if (_addressController.text.trim().isEmpty) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Salgyňyzy giriziň')));
+      return;
+    }
+
+    context.read<CreateOrderCubit>().createOrder(
+      subcategoryUuid: subcategoryUuid,
+      address: _addressController.text.trim(),
+      note: _noteController.text.trim().isEmpty
+          ? null
+          : _noteController.text.trim(),
+      orderDate: orderDate,
+      orderTime: orderTime,
+      quantity: widget.quantity,
+    );
   }
 
   void _showTolegBottomSheet(BuildContext context) {
@@ -270,6 +318,48 @@ class _SelectedDateState extends State<SelectedDate> {
 
                           const SizedBox(height: 16),
 
+                          Text(
+                            'Salgy',
+                            style: TextStyle(
+                              color: textColor,
+                              fontSize: 14,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                          const SizedBox(height: 8),
+                          inputField(
+                            controller: _addressController,
+                            inputBg: cardBg,
+                            borderColor: borderColor,
+                            textColor: textColor,
+                            hintColor: AppColor.descriptionText(context),
+                            text: "Salgyňyzy giriziň",
+                            keyboardType: TextInputType.streetAddress,
+                          ),
+
+                          const SizedBox(height: 16),
+
+                          Text(
+                            'Bellik',
+                            style: TextStyle(
+                              color: textColor,
+                              fontSize: 14,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                          const SizedBox(height: 8),
+                          inputField(
+                            controller: _noteController,
+                            inputBg: cardBg,
+                            borderColor: borderColor,
+                            textColor: textColor,
+                            hintColor: AppColor.descriptionText(context),
+                            text: "Bellik (hökmany däl)",
+                            keyboardType: TextInputType.text,
+                          ),
+
+                          const SizedBox(height: 16),
+
                           // Töleg şekili
                            Text(
                             'Töleg şekili',
@@ -363,26 +453,58 @@ class _SelectedDateState extends State<SelectedDate> {
                           const SizedBox(height: 24),
 
                           // Çagyryş button
-                          Container(
-                            width: 360,
-                            height: 56,
-                            child: ElevatedButton(
-                              onPressed: () {},
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: AppColor.primary,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(10),
+                          BlocConsumer<CreateOrderCubit, CreateOrderState>(
+                            listener: (context, state) {
+                              if (state is CreateOrderSuccess) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(
+                                    content: Text('Bron üstünlikli döredildi'),
+                                  ),
+                                );
+                                context.go('/main');
+                              } else if (state is CreateOrderError) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(content: Text(state.message)),
+                                );
+                              }
+                            },
+                            builder: (context, state) {
+                              final isLoading = state is CreateOrderLoading;
+                              return SizedBox(
+                                width: double.infinity,
+                                height: 56,
+                                child: ElevatedButton(
+                                  onPressed: isLoading
+                                      ? null
+                                      : () => _submit(context),
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: AppColor.primary,
+                                    disabledBackgroundColor: AppColor.primary
+                                        .withOpacity(0.6),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(10),
+                                    ),
+                                  ),
+                                  child: isLoading
+                                      ? const SizedBox(
+                                          width: 22,
+                                          height: 22,
+                                          child: CircularProgressIndicator(
+                                            strokeWidth: 2,
+                                            color: Colors.white,
+                                          ),
+                                        )
+                                      : const Text(
+                                          'Çagyryş',
+                                          style: TextStyle(
+                                            fontSize: 16,
+                                            fontWeight: FontWeight.w500,
+                                            color: Colors.white,
+                                          ),
+                                        ),
                                 ),
-                              ),
-                              child: const Text(
-                                'Çagyryş',
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w500,
-                                  color: Colors.white,
-                                ),
-                              ),
-                            ),
+                              );
+                            },
                           ),
                         ],
                       ),

@@ -30,7 +30,6 @@ class ContactUsPage extends StatelessWidget {
       body: Container(
         width: double.infinity,
         margin: const EdgeInsets.only(top: 10),
-        // padding: const EdgeInsets.only(bottom: 75.0),
         decoration: BoxDecoration(
           color: bg,
           borderRadius: BorderRadius.only(
@@ -41,93 +40,6 @@ class ContactUsPage extends StatelessWidget {
         child: Column(
           children: [
             AppBarWidget(textColor, isDark),
-            // Header
-            SizedBox(height: 23),
-
-            Container(
-              decoration: BoxDecoration(
-                color: cardBg,
-                borderRadius: BorderRadius.circular(10),
-              ),
-              margin: const EdgeInsets.symmetric(horizontal: 14),
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      IconButton(
-                        onPressed: () => Navigator.pop(context),
-                        icon: Icon(
-                          Icons.arrow_back_ios_new,
-                          size: 18,
-                          color: textColor,
-                        ),
-                      ),
-                      Text(
-                        'Yza',
-                        style: TextStyle(fontSize: 16, color: textColor),
-                      ),
-                    ],
-                  ),
-
-                  GestureDetector(
-                    onTap: () => context.push('/hatYazmak'),
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 7),
-                      child: Row(
-                        children: [
-                          Container(
-                            width: 36,
-                            height: 36,
-                            decoration: BoxDecoration(
-                              color: cardBg,
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            child: const Icon(
-                              Icons.support_agent,
-                              size: 20,
-                              color: AppColor.primary,
-                            ),
-                          ),
-                          const SizedBox(width: 10),
-                          Expanded(
-                            child: Text(
-                              'Biz bilen habarlaşmak',
-                              style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w500,
-                                color: textColor,
-                              ),
-                            ),
-                          ),
-                          Icon(Icons.chevron_right, size: 20, color: textColor),
-                        ],
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 20),
-
-                  _SectionTitle(title: 'Kontaktlar', textColor: textColor),
-
-                  _ContactCard(
-                    cardBg: cardBg,
-                    items: const [
-                      _ContactItem(
-                        icon: Icons.phone_outlined,
-                        text: '+993 63509004',
-                        color: AppColor.primary,
-                      ),
-                      _ContactItem(
-                        icon: Icons.phone_outlined,
-                        text: '+993 63509004',
-                        color: AppColor.primary,
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
 
             Expanded(
               child: SingleChildScrollView(
@@ -136,7 +48,97 @@ class ContactUsPage extends StatelessWidget {
                   children: [
                     const SizedBox(height: 16),
 
+                    // Yza (back)
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 8),
+                      child: Row(
+                        children: [
+                          IconButton(
+                            onPressed: () => Navigator.pop(context),
+                            icon: Icon(
+                              Icons.arrow_back_ios_new,
+                              size: 18,
+                              color: textColor,
+                            ),
+                          ),
+                          Text(
+                            'Yza',
+                            style: TextStyle(fontSize: 16, color: textColor),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+
+                    // Biz bilen habarlaşmak
+                    GestureDetector(
+                      onTap: () => context.push('/hatYazmak'),
+                      child: Container(
+                        margin: const EdgeInsets.symmetric(horizontal: 16),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 10,
+                          vertical: 12,
+                        ),
+                        decoration: BoxDecoration(
+                          color: cardBg,
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Row(
+                          children: [
+                            Container(
+                              width: 36,
+                              height: 36,
+                              decoration: BoxDecoration(
+                                color: AppColor.primary.withOpacity(0.12),
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              child: const Icon(
+                                Icons.support_agent,
+                                size: 20,
+                                color: AppColor.primary,
+                              ),
+                            ),
+                            const SizedBox(width: 10),
+                            Expanded(
+                              child: Text(
+                                'Biz bilen habarlaşmak',
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w500,
+                                  color: textColor,
+                                ),
+                              ),
+                            ),
+                            Icon(
+                              Icons.chevron_right,
+                              size: 20,
+                              color: textColor,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+
+                    const SizedBox(height: 24),
+
                     // Kontaktlar section
+                    _SectionTitle(title: 'Kontaktlar', textColor: textColor),
+                    _ContactCard(
+                      cardBg: cardBg,
+                      items: const [
+                        _ContactItem(
+                          icon: Icons.phone_outlined,
+                          text: '+993 63509004',
+                          color: AppColor.primary,
+                        ),
+                        _ContactItem(
+                          icon: Icons.phone_outlined,
+                          text: '+993 63509004',
+                          color: AppColor.primary,
+                        ),
+                      ],
+                    ),
+
                     const SizedBox(height: 24),
 
                     // Social media section
@@ -148,32 +150,32 @@ class ContactUsPage extends StatelessWidget {
                       cardBg: cardBg,
                       items: const [
                         _ContactItem(
-                          iconAsset: 'assets/images/social/tiktok.png',
+                          icon: Icons.music_note_rounded,
                           text: 'komekchieller@',
                           color: Colors.black,
                         ),
                         _ContactItem(
-                          iconAsset: 'assets/images/social/telegram.png',
+                          icon: Icons.send_rounded,
                           text: 'komekchieller@',
                           color: Color(0xFF0088CC),
                         ),
                         _ContactItem(
-                          iconAsset: 'assets/images/social/instagram.png',
+                          icon: Icons.camera_alt_rounded,
                           text: 'komekchieller@',
                           color: Color(0xFFE1306C),
                         ),
                         _ContactItem(
-                          iconAsset: 'assets/images/social/gmail.png',
+                          icon: Icons.email_rounded,
                           text: 'komekchieller@',
                           color: Color(0xFFEA4335),
                         ),
                         _ContactItem(
-                          iconAsset: 'assets/images/social/linkedin.png',
+                          icon: Icons.work_rounded,
                           text: 'komekchieller@',
                           color: Color(0xFF0077B5),
                         ),
                         _ContactItem(
-                          iconAsset: 'assets/images/social/whatsapp.png',
+                          icon: Icons.chat_rounded,
                           text: 'komekchieller@',
                           color: Color(0xFF25D366),
                         ),
@@ -204,12 +206,8 @@ class ContactUsPage extends StatelessWidget {
                             child: Container(
                               height: 160,
                               color: const Color(0xFFE5E5E5),
-                              child: const Center(
-                                child: Icon(
-                                  Icons.map_outlined,
-                                  size: 48,
-                                  color: Colors.grey,
-                                ),
+                              child:  Center(
+                                child: Image.asset('assets/images/service/map.png')
                               ),
                             ),
                           ),
@@ -217,7 +215,7 @@ class ContactUsPage extends StatelessWidget {
                           Padding(
                             padding: const EdgeInsets.all(14),
                             child: Row(
-                              children: [
+                              children: [ 
                                 const Icon(
                                   Icons.location_on_outlined,
                                   color: Color(0xFF007AFF),
@@ -238,7 +236,7 @@ class ContactUsPage extends StatelessWidget {
                                   size: 18,
                                   color: Color(0xFF007AFF),
                                 ),
-                              ],
+                              ], 
                             ),
                           ),
                         ],
@@ -267,7 +265,7 @@ class _SectionTitle extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.only(left: 13, bottom: 8),
+      padding: const EdgeInsets.only(left: 21, bottom: 8),
       child: Text(
         title,
         style: TextStyle(
@@ -282,14 +280,12 @@ class _SectionTitle extends StatelessWidget {
 
 // ─── Contact Item Model ───────────────────────────────────────────
 class _ContactItem {
-  final IconData? icon;
-  final String? iconAsset;
+  final IconData icon;
   final String text;
   final Color color;
 
   const _ContactItem({
-    this.icon,
-    this.iconAsset,
+    required this.icon,
     required this.text,
     required this.color,
   });
@@ -311,7 +307,7 @@ class _ContactCard extends StatelessWidget {
         : Colors.black.withOpacity(0.08);
 
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 3),
+      margin: const EdgeInsets.symmetric(horizontal: 16),
       decoration: BoxDecoration(
         color: cardBg,
         borderRadius: BorderRadius.circular(12),
@@ -327,7 +323,7 @@ class _ContactCard extends StatelessWidget {
                 borderRadius: BorderRadius.circular(12),
                 child: Padding(
                   padding: const EdgeInsets.symmetric(
-                    horizontal: 6,
+                    horizontal: 12,
                     vertical: 13,
                   ),
                   child: Row(
@@ -340,15 +336,7 @@ class _ContactCard extends StatelessWidget {
                           color: item.color.withOpacity(0.12),
                           borderRadius: BorderRadius.circular(8),
                         ),
-                        child: item.iconAsset != null
-                            ? Padding(
-                                padding: const EdgeInsets.all(6),
-                                child: Image.asset(
-                                  item.iconAsset!,
-                                  fit: BoxFit.contain,
-                                ),
-                              )
-                            : Icon(item.icon, color: item.color, size: 18),
+                        child: Icon(item.icon, color: item.color, size: 18),
                       ),
                       const SizedBox(width: 12),
                       // Text
