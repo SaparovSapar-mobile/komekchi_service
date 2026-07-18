@@ -5,7 +5,7 @@ import 'package:go_router/go_router.dart';
 import 'package:komekchi_service/core/utils/app_constants.dart';
 import 'package:komekchi_service/features/presentation/bloc/aksiya/aksiya_detail_cubit.dart';
 
-import '../../../../core/utils/theme/app_colors.dart';
+import '../../../../../core/utils/theme/app_colors.dart';
 
 class AksiyaDetailScreen extends StatelessWidget {
   const AksiyaDetailScreen({super.key});

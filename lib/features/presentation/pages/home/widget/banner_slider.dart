@@ -8,7 +8,12 @@ import '../../../../../core/widgets/branded_shimmer.dart';
 import '../../../bloc/banner/banner_cubit.dart';
 
 class BannerSlider extends StatefulWidget {
-  const BannerSlider({super.key});
+  /// When true (default), only "type 1" banners are shown — used for the
+  /// slider placed at the top of the home screen. When false, all other
+  /// types (type-2, type-3, ...) are shown — used for the slider below.
+  final bool showTypeOneOnly;
+
+  const BannerSlider({super.key, this.showTypeOneOnly = true});
 
   @override
   State<BannerSlider> createState() => _BannerSliderState();
@@ -24,6 +29,13 @@ class _BannerSliderState extends State<BannerSlider> {
   void initState() {
     super.initState();
     context.read<BannerCubit>().fetchBanners();
+  }
+
+  List<BannerItem> _filterBanners(List<BannerItem> banners) {
+    return banners.where((b) {
+      final isTypeOne = b.typeNumber == 1;
+      return widget.showTypeOneOnly ? isTypeOne : !isTypeOne;
+    }).toList();
   }
 
   void _startAutoScroll(int length) {
@@ -52,7 +64,7 @@ class _BannerSliderState extends State<BannerSlider> {
     return BlocConsumer<BannerCubit, BannerState>(
       listener: (context, state) {
         if (state is BannerSuccess) {
-          _banners = state.banner;
+          _banners = _filterBanners(state.banner);
           _startAutoScroll(_banners.length);
         }
       },
@@ -78,7 +90,8 @@ class _BannerSliderState extends State<BannerSlider> {
         }
 
         if (state is BannerSuccess) {
-          final banners = state.banner;
+          final banners = _filterBanners(state.banner);
+          if (banners.isEmpty) return const SizedBox.shrink();
 
           return Padding(
             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),

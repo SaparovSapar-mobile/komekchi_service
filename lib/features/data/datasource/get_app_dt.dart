@@ -1,6 +1,8 @@
 import 'package:komekchi_service/core/api_service.dart';
 import 'package:komekchi_service/core/error/faiulre.dart';
 import 'package:komekchi_service/features/data/models/about_model.dart';
+import 'package:komekchi_service/features/data/models/address_model.dart';
+import 'package:komekchi_service/features/data/models/address_type_model.dart';
 import 'package:komekchi_service/features/data/models/aksiya_model.dart';
 import 'package:komekchi_service/features/data/models/banners_model.dart';
 import 'package:komekchi_service/features/data/models/category_model.dart';
@@ -10,6 +12,8 @@ import 'package:komekchi_service/features/data/models/order_model.dart';
 import 'package:komekchi_service/features/data/models/rating_model.dart';
 import 'package:komekchi_service/features/data/models/subcategory_model.dart';
 import 'package:komekchi_service/features/domain/entities/about.dart';
+import 'package:komekchi_service/features/domain/entities/address.dart';
+import 'package:komekchi_service/features/domain/entities/address_type.dart';
 import 'package:komekchi_service/features/domain/entities/aksiya.dart';
 import 'package:komekchi_service/features/domain/entities/banners.dart';
 import 'package:komekchi_service/features/domain/entities/category.dart';
@@ -79,6 +83,23 @@ abstract class GetAppDt {
 
   Future<List<ComplaintItem>> getComplaints();
   Future<void> submitComplaint({required String message});
+
+  Future<List<AddressTypeItem>> getAddressTypes();
+
+  Future<List<AddressItem>> getAddresses();
+  Future<AddressItem> getAddressById(String uuid);
+  Future<AddressItem> createAddress({
+    required String address,
+    required String addressTypeUuid,
+  });
+  Future<AddressItem> updateAddress({
+    required String uuid,
+    required String address,
+    required String addressTypeUuid,
+  });
+  Future<void> deleteAddress(String uuid);
+
+  Future<void> updateNotificationPreference({required bool isNotification});
 }
 
 class GetAppDtImpl extends GetAppDt {
@@ -376,7 +397,7 @@ class GetAppDtImpl extends GetAppDt {
   Future<OrderItem> getOrderById(String uuid) async {
     try {
       final response = await api.dio.get('/orders/$uuid');
-
+      print(response.data);
       if (response.statusCode == 200) {
         return OrderItemModel.fromJson(response.data['data']);
       } else {
@@ -530,6 +551,148 @@ class GetAppDtImpl extends GetAppDt {
       if (response.statusCode != 200 && response.statusCode != 201) {
         throw ServerFailure(
           message: 'Failed to submit complaint',
+          code: response.statusCode,
+        );
+      }
+    } catch (e) {
+      throw Failure.fromException(e);
+    }
+  }
+
+  @override
+  Future<List<AddressTypeItem>> getAddressTypes() async {
+    try {
+      final response = await api.dio.get('/address-types');
+
+      if (response.statusCode == 200) {
+        final list = response.data['data'] as List? ?? [];
+        return list.map((e) => AddressTypeItemModel.fromJson(e)).toList();
+      } else {
+        throw ServerFailure(
+          message: 'Failed to load address types',
+          code: response.statusCode,
+        );
+      }
+    } catch (e) {
+      throw Failure.fromException(e);
+    }
+  }
+
+  @override
+  Future<List<AddressItem>> getAddresses() async {
+    try {
+      final response = await api.dio.get('/addresses');
+
+      if (response.statusCode == 200) {
+        final list = response.data['data'] as List? ?? [];
+        return list.map((e) => AddressItemModel.fromJson(e)).toList();
+      } else {
+        throw ServerFailure(
+          message: 'Failed to load addresses',
+          code: response.statusCode,
+        );
+      }
+    } catch (e) {
+      throw Failure.fromException(e);
+    }
+  }
+
+  @override
+  Future<AddressItem> getAddressById(String uuid) async {
+    try {
+      final response = await api.dio.get('/addresses/$uuid');
+
+      if (response.statusCode == 200) {
+        return AddressItemModel.fromJson(response.data['data']);
+      } else {
+        throw ServerFailure(
+          message: 'Failed to load address',
+          code: response.statusCode,
+        );
+      }
+    } catch (e) {
+      throw Failure.fromException(e);
+    }
+  }
+
+  @override
+  Future<AddressItem> createAddress({
+    required String address,
+    required String addressTypeUuid,
+  }) async {
+    try {
+      final response = await api.dio.post(
+        '/addresses',
+        data: {'address': address, 'address_type_uuid': addressTypeUuid},
+      );
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        return AddressItemModel.fromJson(response.data['data']);
+      } else {
+        throw ServerFailure(
+          message: 'Failed to create address',
+          code: response.statusCode,
+        );
+      }
+    } catch (e) {
+      throw Failure.fromException(e);
+    }
+  }
+
+  @override
+  Future<AddressItem> updateAddress({
+    required String uuid,
+    required String address,
+    required String addressTypeUuid,
+  }) async {
+    try {
+      final response = await api.dio.put(
+        '/addresses/$uuid',
+        data: {'address': address, 'address_type_uuid': addressTypeUuid},
+      );
+
+      if (response.statusCode == 200) {
+        return AddressItemModel.fromJson(response.data['data']);
+      } else {
+        throw ServerFailure(
+          message: 'Failed to update address',
+          code: response.statusCode,
+        );
+      }
+    } catch (e) {
+      throw Failure.fromException(e);
+    }
+  }
+
+  @override
+  Future<void> deleteAddress(String uuid) async {
+    try {
+      final response = await api.dio.delete('/addresses/$uuid');
+
+      if (response.statusCode != 204 && response.statusCode != 200) {
+        throw ServerFailure(
+          message: 'Failed to delete address',
+          code: response.statusCode,
+        );
+      }
+    } catch (e) {
+      throw Failure.fromException(e);
+    }
+  }
+
+  @override
+  Future<void> updateNotificationPreference({
+    required bool isNotification,
+  }) async {
+    try {
+      final response = await api.dio.put(
+        '/notification',
+        data: {'is_notification': isNotification},
+      );
+
+      if (response.statusCode != 200) {
+        throw ServerFailure(
+          message: 'Failed to update notification preference',
           code: response.statusCode,
         );
       }

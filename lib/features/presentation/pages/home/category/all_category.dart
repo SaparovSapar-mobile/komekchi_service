@@ -7,7 +7,7 @@ import 'package:komekchi_service/features/domain/entities/category.dart';
 import 'package:komekchi_service/features/presentation/bloc/category/get_category_cubit.dart';
 import 'package:komekchi_service/features/presentation/pages/home/home_screen.dart';
 
-import '../../../../core/utils/theme/app_colors.dart';
+import '../../../../../core/utils/theme/app_colors.dart';
 
 class AllCategoryScreen extends StatefulWidget {
   const AllCategoryScreen({super.key});

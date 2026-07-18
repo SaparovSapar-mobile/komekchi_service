@@ -240,61 +240,69 @@ class _SmsScreenState extends State<SmsScreen> {
 
               const SizedBox(height: 32),
 
-              // OTP boxes
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: List.generate(_codeLength, (index) {
-                  final hasValue = _controllers[index].text.isNotEmpty;
+              // OTP boxes — box width adapts to _codeLength (4 for phone,
+              // 6 for email) so it never overflows on narrower screens.
+              LayoutBuilder(
+                builder: (context, constraints) {
+                  final perItem = (constraints.maxWidth + 14) / _codeLength;
+                  final boxWidth = (perItem - 10).clamp(28.0, 48.0);
 
-                  return Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 6),
-                    child: RawKeyboardListener(
-                      focusNode: FocusNode(),
-                      onKey: (event) => _onKeyEvent(event, index),
-                      child: SizedBox(
-                        width: 48,
-                        height: 60,
-                        child: TextField(
-                          controller: _controllers[index],
-                          focusNode: _focusNodes[index],
-                          textAlign: TextAlign.center,
-                          keyboardType: TextInputType.number,
-                          maxLength: 1,
-                          inputFormatters: [
-                            FilteringTextInputFormatter.digitsOnly,
-                          ],
-                          style: TextStyle(
-                            color: textColor,
-                            fontSize: 22,
-                            fontWeight: FontWeight.w600,
-                          ),
-                          decoration: InputDecoration(
-                            counterText: '',
-                            filled: true,
-                            fillColor: cardBg,
-                            enabledBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(12),
-                              borderSide: BorderSide(
-                                color: hasValue
-                                    ? AppColor.primary
-                                    : borderColor,
-                                width: hasValue ? 1.5 : 1,
+                  return Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: List.generate(_codeLength, (index) {
+                      final hasValue = _controllers[index].text.isNotEmpty;
+
+                      return Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 3),
+                        child: RawKeyboardListener(
+                          focusNode: FocusNode(),
+                          onKey: (event) => _onKeyEvent(event, index),
+                          child: SizedBox(
+                            width: boxWidth,
+                            height: 60,
+                            child: TextField(
+                              controller: _controllers[index],
+                              focusNode: _focusNodes[index],
+                              textAlign: TextAlign.center,
+                              keyboardType: TextInputType.number,
+                              maxLength: 1,
+                              inputFormatters: [
+                                FilteringTextInputFormatter.digitsOnly,
+                              ],
+                              style: TextStyle(
+                                color: textColor,
+                                fontSize: 22,
+                                fontWeight: FontWeight.w600,
                               ),
-                            ),
-                            focusedBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(12),
-                              borderSide: BorderSide(
-                                color: AppColor.primary,
-                                width: 1.5,
+                              decoration: InputDecoration(
+                                counterText: '',
+                                filled: true,
+                                fillColor: cardBg,
+                                enabledBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                  borderSide: BorderSide(
+                                    color: hasValue
+                                        ? AppColor.primary
+                                        : borderColor,
+                                    width: hasValue ? 1.5 : 1,
+                                  ),
+                                ),
+                                focusedBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                  borderSide: BorderSide(
+                                    color: AppColor.primary,
+                                    width: 1.5,
+                                  ),
+                                ),
                               ),
+                              onChanged: (value) => _onChanged(value, index),
                             ),
                           ),
-                          onChanged: (value) => _onChanged(value, index),
                         ),
-                      ),
-                    ),
+                      );
+                    }),
                   );
-                }),
+                },
               ),
 
               if (_error != null) ...[

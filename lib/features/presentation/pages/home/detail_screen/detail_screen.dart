@@ -11,7 +11,7 @@ import 'package:komekchi_service/features/domain/entities/rating.dart';
 import 'package:komekchi_service/features/domain/entities/subcategory.dart';
 import 'package:komekchi_service/features/presentation/bloc/rating/rating_cubit.dart';
 import 'package:komekchi_service/features/presentation/bloc/subcategory/subcategory_detail_cubit.dart';
-import 'package:komekchi_service/features/presentation/pages/home/detail_screen/issue/nagilelik_bottomsheet.dart';
+import 'package:komekchi_service/features/presentation/pages/home/detail_screen/complaint/complaint_bottomsheet.dart';
 import 'package:komekchi_service/features/presentation/pages/home/home_screen.dart';
 import 'package:komekchi_service/features/presentation/pages/home/widget/rate_service_sheet.dart';
 import 'package:komekchi_service/injector.dart';
@@ -157,8 +157,8 @@ class _DetailScreenState extends State<DetailScreen> {
                     const SizedBox(height: 24),
                     _buildDescriptionSection(context, item),
                     const SizedBox(height: 24),
-                    _buildRatingsSection(context),
-                    const SizedBox(height: 24),
+                    // _buildRatingsSection(context),
+                    // const SizedBox(height: 24),
                     _buildActionButtonsSection(context, item),
                     _buildPriceBreakdownSection(context, item, screenWidth, bg),
                     const SizedBox(height: 35),

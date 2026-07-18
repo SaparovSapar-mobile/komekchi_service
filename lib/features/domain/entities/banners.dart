@@ -49,4 +49,7 @@ class BannerItem {
     required this.uuid,
   });
 
+  int? get typeNumber => int.tryParse(
+    RegExp(r'\d+').firstMatch(typeName)?.group(0) ?? '',
+  );
   }

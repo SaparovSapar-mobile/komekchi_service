@@ -18,8 +18,8 @@ class _TolegBottomSheetState extends State<TolegBottomSheet> {
 
   final List<TolegItem> items = const [
     TolegItem(title: 'Nagt töleg', subtitle: 'Sargyt gelende nagt töleg.'),
-    TolegItem(title: 'Terminal töleg', subtitle: 'Sargydy bank kart arkaly töleg.'),
-    TolegItem(title: 'Onlaýn töleg', subtitle: 'Sargydy bank kart arkaly töleg.'),
+    // TolegItem(title: 'Terminal töleg', subtitle: 'Sargydy bank kart arkaly töleg.'),
+    // TolegItem(title: 'Onlaýn töleg', subtitle: 'Sargydy bank kart arkaly töleg.'),
   ];
 
   @override

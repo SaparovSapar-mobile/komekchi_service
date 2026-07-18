@@ -3,16 +3,20 @@ import 'package:komekchi_service/core/api_service.dart';
 import 'package:komekchi_service/features/data/repository/repository_impl.dart';
 import 'package:komekchi_service/features/domain/repositories/repository_app.dart';
 import 'package:komekchi_service/features/domain/usecases/about_usecase.dart';
+import 'package:komekchi_service/features/domain/usecases/address_usecase.dart';
 import 'package:komekchi_service/features/domain/usecases/aksiya_usecase.dart';
 import 'package:komekchi_service/features/domain/usecases/banner_usecase.dart';
 import 'package:komekchi_service/features/domain/usecases/category_usecase.dart';
 import 'package:komekchi_service/features/domain/usecases/complaint_usecase.dart';
 import 'package:komekchi_service/features/domain/usecases/contact_us_usecase.dart';
+import 'package:komekchi_service/features/domain/usecases/notification_usecase.dart';
 import 'package:komekchi_service/features/domain/usecases/order_usecase.dart';
 import 'package:komekchi_service/features/domain/usecases/rating_usecase.dart';
 import 'package:komekchi_service/features/domain/usecases/search_usecase.dart';
 import 'package:komekchi_service/features/domain/usecases/subcategory_usecase.dart';
 import 'package:komekchi_service/features/presentation/bloc/about/about_cubit.dart';
+import 'package:komekchi_service/features/presentation/bloc/address/address_cubit.dart';
+import 'package:komekchi_service/features/presentation/bloc/address/address_type_cubit.dart';
 import 'package:komekchi_service/features/presentation/bloc/aksiya/aksiya_cubit.dart';
 import 'package:komekchi_service/features/presentation/bloc/aksiya/aksiya_detail_cubit.dart';
 import 'package:komekchi_service/features/presentation/bloc/banner/banner_cubit.dart';
@@ -117,6 +121,32 @@ Future<void> init() async {
     () => SubmitComplaintUsecase(getAppsRepository: sl<GetAppRepository>()),
   );
 
+  sl.registerLazySingleton<GetAddressTypesUsecase>(
+    () => GetAddressTypesUsecase(getAppsRepository: sl<GetAppRepository>()),
+  );
+
+  sl.registerLazySingleton<GetAddressesUsecase>(
+    () => GetAddressesUsecase(getAppsRepository: sl<GetAppRepository>()),
+  );
+  sl.registerLazySingleton<GetAddressByIdUsecase>(
+    () => GetAddressByIdUsecase(getAppsRepository: sl<GetAppRepository>()),
+  );
+  sl.registerLazySingleton<CreateAddressUsecase>(
+    () => CreateAddressUsecase(getAppsRepository: sl<GetAppRepository>()),
+  );
+  sl.registerLazySingleton<UpdateAddressUsecase>(
+    () => UpdateAddressUsecase(getAppsRepository: sl<GetAppRepository>()),
+  );
+  sl.registerLazySingleton<DeleteAddressUsecase>(
+    () => DeleteAddressUsecase(getAppsRepository: sl<GetAppRepository>()),
+  );
+
+  sl.registerLazySingleton<UpdateNotificationPreferenceUsecase>(
+    () => UpdateNotificationPreferenceUsecase(
+      getAppsRepository: sl<GetAppRepository>(),
+    ),
+  );
+
   // Cubits
   sl.registerFactory(
     () => GetCategoryCubit(getCategoriesUsecase: sl<GetCategoriesUsecase>()),
@@ -187,5 +217,15 @@ Future<void> init() async {
     () => SubmitComplaintCubit(
       submitComplaintUsecase: sl<SubmitComplaintUsecase>(),
     ),
+  );
+
+  sl.registerFactory(
+    () => AddressTypeCubit(
+      getAddressTypesUsecase: sl<GetAddressTypesUsecase>(),
+    ),
+  );
+
+  sl.registerFactory(
+    () => AddressCubit(getAddressesUsecase: sl<GetAddressesUsecase>()),
   );
 }

@@ -60,7 +60,8 @@ class KartlarymScreen extends StatelessWidget {
                   ),
                   const Spacer(),
                   IconButton(
-                    onPressed: () => context.push('/kartGoshmak'),
+                    // onPressed: () => context.push('/kartGoshmak'),
+                    onPressed: () {},
                     icon: Icon(Icons.add, color: textColor),
                   ),
                 ],

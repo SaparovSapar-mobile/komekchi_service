@@ -7,7 +7,7 @@ import 'package:komekchi_service/features/domain/entities/aksiya.dart';
 import 'package:komekchi_service/features/presentation/bloc/aksiya/aksiya_cubit.dart';
 import 'package:komekchi_service/features/presentation/pages/home/home_screen.dart';
 
-import '../../../../core/utils/theme/app_colors.dart';
+import '../../../../../core/utils/theme/app_colors.dart';
 
 class AksiyalarScreen extends StatefulWidget {
   const AksiyalarScreen({super.key});

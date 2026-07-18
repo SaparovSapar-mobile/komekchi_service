@@ -25,9 +25,8 @@ class SalgymBar extends StatelessWidget {
                   height: 38,
                   width: 38,
                   decoration: BoxDecoration(
-                    color: isDark ? AppColor.bgBlogDark : AppColor.bgPageLight,
+                    color: isDark ? AppColor.bgPageDark : AppColor.bgPageLight,
                     borderRadius: BorderRadius.circular(8),
-                    border: Border.all(color: const Color(0xFFF4F2F2)),
                   ),
                   child: Icon(Icons.add_circle, color: AppColor.primary, size: 18,),
                 ),
@@ -70,9 +69,8 @@ class SalgymBar extends StatelessWidget {
                   height: 38,
                   width: 38,
                   decoration: BoxDecoration(
-                    color: isDark ? AppColor.bgBlogDark : AppColor.bgPageLight,
+                    color: isDark ? AppColor.bgPageDark : AppColor.bgPageLight,
                     borderRadius: BorderRadius.circular(8),
-                    border: Border.all(color: const Color(0xFFF4F2F2)),
                   ),
                   child: Icon(Icons.notifications, color: AppColor.primary, size: 18,),
                 ),

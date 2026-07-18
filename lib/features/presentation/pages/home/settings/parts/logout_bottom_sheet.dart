@@ -19,7 +19,7 @@ class _LogOutBottomSheetState extends State<LogOutBottomSheet> {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final textColor = AppColor.titleText(context);
     final bg = isDark ? AppColor.bgPageDark : AppColor.bgPageLight;
-    final cardBg = isDark ? AppColor.bgBlogDark : AppColor.bgPageLight;
+    final cardBg = isDark ? AppColor.bgBlogDark : AppColor.bgBlogLight;
     return Column(
       mainAxisAlignment: MainAxisAlignment.end,
       children: [

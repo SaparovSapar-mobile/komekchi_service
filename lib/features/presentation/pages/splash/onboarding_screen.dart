@@ -399,20 +399,20 @@ class _WalkthroughScreenState extends State<WalkthroughScreen> {
             ),
 
             // ─── Skip ───
-            Positioned(
-              left: screenWidth * 0.05,
-              top: screenHeight * 0.059,
-              child: GestureDetector(
-                onTap: () => context.push('/login'),
-                child: Text(
-                  "Skip",
-                  style: TextStyle(
-                    color: isDark ? AppColor.titleDark : AppColor.primary,
-                    fontSize: fontSizeSkip,
-                  ),
-                ),
-              ),
-            ),
+            // Positioned(
+            //   left: screenWidth * 0.05,
+            //   top: screenHeight * 0.059,
+            //   child: GestureDetector(
+            //     onTap: () => context.push('/login'),
+            //     child: Text(
+            //       "Skip",
+            //       style: TextStyle(
+            //         color: isDark ? AppColor.titleDark : AppColor.primary,
+            //         fontSize: fontSizeSkip,
+            //       ),
+            //     ),
+            //   ),
+            // ),
 
             // ─── Dark mode toggle ───
             Positioned(

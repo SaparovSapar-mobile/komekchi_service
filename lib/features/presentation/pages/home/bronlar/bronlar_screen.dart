@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 import 'package:komekchi_service/core/utils/theme/app_text_style.dart';
+import 'package:komekchi_service/core/widgets/empty_state_view.dart';
 import 'package:komekchi_service/features/domain/entities/order.dart';
 import 'package:komekchi_service/features/domain/usecases/order_usecase.dart';
 import 'package:komekchi_service/features/presentation/bloc/order/order_cubit.dart';
 import 'package:komekchi_service/features/presentation/pages/home/home_screen.dart';
 import 'package:komekchi_service/injector.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../../../core/utils/theme/app_colors.dart';
 import 'bron_card.dart';
@@ -29,7 +32,9 @@ BronStatus bronStatusFromApi(String status) {
 }
 
 class BronlarScreen extends StatefulWidget {
-  const BronlarScreen({super.key});
+  final VoidCallback? onBook;
+
+  const BronlarScreen({super.key, this.onBook});
 
   @override
   State<BronlarScreen> createState() => _BronlarScreenState();
@@ -37,6 +42,9 @@ class BronlarScreen extends StatefulWidget {
 
 class _BronlarScreenState extends State<BronlarScreen> {
   int _selectedTab = 0;
+
+  /// null while checking, then true/false once resolved.
+  bool? _isLoggedIn;
 
   final List<String> tabs = [
     'Hemmesi',
@@ -51,6 +59,23 @@ class _BronlarScreenState extends State<BronlarScreen> {
     'cancelled',
     'completed',
   ];
+
+  @override
+  void initState() {
+    super.initState();
+    _checkAuth();
+  }
+
+  Future<void> _checkAuth() async {
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('auth_token');
+    final loggedIn = token != null && token.isNotEmpty;
+    if (!mounted) return;
+    setState(() => _isLoggedIn = loggedIn);
+    if (loggedIn) {
+      context.read<OrderCubit>().fetchOrders();
+    }
+  }
 
   void _selectTab(int index) {
     setState(() => _selectedTab = index);
@@ -92,7 +117,7 @@ class _BronlarScreenState extends State<BronlarScreen> {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final bg = isDark ? AppColor.bgPageDark : AppColor.bgPageLight;
+    final bg = isDark ? AppColor.bgBlogDark : AppColor.bgBlogLight;
     final textColor = AppColor.titleText(context);
     final TextStyle textStyle = AppTextStyle.semiBold16;
 
@@ -118,111 +143,113 @@ class _BronlarScreenState extends State<BronlarScreen> {
             ),
           ),
 
-          // Tabs
-          SizedBox(
-            height: 40,
-            child: ListView.builder(
-              scrollDirection: Axis.horizontal,
-              padding: const EdgeInsets.symmetric(horizontal: 15),
-              itemCount: tabs.length,
-              itemBuilder: (context, index) {
-                final isSelected = _selectedTab == index;
-                return GestureDetector(
-                  onTap: () => _selectTab(index),
-                  child: Container(
-                    margin: const EdgeInsets.only(right: 8),
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 16,
-                      vertical: 8,
-                    ),
-                    decoration: BoxDecoration(
-                      color: isSelected ? AppColor.primary : Colors.white,
-                      borderRadius: BorderRadius.circular(8),
-                      border: Border.all(
-                        color: isSelected
-                            ? AppColor.primary
-                            : Colors.grey.shade300,
-                        width: 1,
+          // Tabs (only relevant once we know the user is logged in)
+          if (_isLoggedIn == true) ...[
+            SizedBox(
+              height: 40,
+              child: ListView.builder(
+                scrollDirection: Axis.horizontal,
+                padding: const EdgeInsets.symmetric(horizontal: 15),
+                itemCount: tabs.length,
+                itemBuilder: (context, index) {
+                  final isSelected = _selectedTab == index;
+                  return GestureDetector(
+                    onTap: () => _selectTab(index),
+                    child: Container(
+                      margin: const EdgeInsets.only(right: 8),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 8,
+                      ),
+                      decoration: BoxDecoration(
+                        color: isSelected ? AppColor.primary : isDark ? AppColor.bgPageDark : Colors.white,
+                        borderRadius: BorderRadius.circular(8),
+                        // border: Border.all(
+                        //   color: isSelected
+                        //       ? AppColor.primary
+                        //       : Colors.grey.shade300,
+                        //   width: 1,
+                        // ),
+                      ),
+                      child: Text(
+                        tabs[index],
+                        style: TextStyle(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w500,
+                          color: isSelected ? Colors.white : isDark ? Colors.white : Colors.black54,
+                        ),
                       ),
                     ),
-                    child: Text(
-                      tabs[index],
-                      style: TextStyle(
-                        fontSize: 13,
-                        fontWeight: FontWeight.w500,
-                        color: isSelected ? Colors.white : Colors.black54,
-                      ),
-                    ),
-                  ),
-                );
-              },
+                  );
+                },
+              ),
             ),
-          ),
-          const SizedBox(height: 10),
+            const SizedBox(height: 10),
+          ],
 
           Expanded(
-            child: BlocBuilder<OrderCubit, OrderState>(
-              builder: (context, state) {
-                if (state is OrderLoading || state is OrderInitial) {
-                  return const Center(child: CircularProgressIndicator());
-                }
+            child: _isLoggedIn != true
+                ? EmptyStateView.noBookings(
+                    onBook: _isLoggedIn == null
+                        ? () {}
+                        : () => context.push('/login'),
+                  )
+                : BlocBuilder<OrderCubit, OrderState>(
+                    builder: (context, state) {
+                      if (state is OrderLoading || state is OrderInitial) {
+                        return const Center(child: CircularProgressIndicator());
+                      }
 
-                if (state is OrderError) {
-                  return Center(
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Text(
-                          state.message,
-                          style: const TextStyle(color: Colors.red),
-                          textAlign: TextAlign.center,
+                      if (state is OrderError) {
+                        return Center(
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Text(
+                                state.message,
+                                style: const TextStyle(color: Colors.red),
+                                textAlign: TextAlign.center,
+                              ),
+                              const SizedBox(height: 8),
+                              TextButton(
+                                onPressed: () => _selectTab(_selectedTab),
+                                child: const Text('Gaýtadan synanyşmak'),
+                              ),
+                            ],
+                          ),
+                        );
+                      }
+
+                      final items = (state as OrderSuccess).items;
+
+                      if (items.isEmpty) {
+                        return EmptyStateView.noBookings(
+                          onBook: widget.onBook ?? () {},
+                        );
+                      }
+
+                      return ListView.separated(
+                        padding: EdgeInsets.only(
+                          left: 15,
+                          right: 15,
+                          top: 12,
+                          bottom: MediaQuery.of(context).padding.bottom,
                         ),
-                        const SizedBox(height: 8),
-                        TextButton(
-                          onPressed: () => _selectTab(_selectedTab),
-                          child: const Text('Gaýtadan synanyşmak'),
-                        ),
-                      ],
-                    ),
-                  );
-                }
-
-                final items = (state as OrderSuccess).items;
-
-                if (items.isEmpty) {
-                  return Center(
-                    child: Text(
-                      'Bron ýok',
-                      style: TextStyle(
-                        color: Colors.grey.shade400,
-                        fontSize: 15,
-                      ),
-                    ),
-                  );
-                }
-
-                return ListView.separated(
-                  padding: EdgeInsets.only(
-                    left: 15,
-                    right: 15,
-                    top: 12,
-                    bottom: MediaQuery.of(context).padding.bottom,
+                        itemCount: items.length,
+                        separatorBuilder: (_, __) => const SizedBox(height: 12),
+                        itemBuilder: (context, index) {
+                          final order = items[index];
+                          return BronCard(
+                            order: order,
+                            onCancel: bronStatusFromApi(order.status) ==
+                                    BronStatus.pending
+                                ? () => _cancelOrder(order)
+                                : null,
+                          );
+                        },
+                      );
+                    },
                   ),
-                  itemCount: items.length,
-                  separatorBuilder: (_, __) => const SizedBox(height: 12),
-                  itemBuilder: (context, index) {
-                    final order = items[index];
-                    return BronCard(
-                      order: order,
-                      onCancel: bronStatusFromApi(order.status) ==
-                              BronStatus.pending
-                          ? () => _cancelOrder(order)
-                          : null,
-                    );
-                  },
-                );
-              },
-            ),
           ),
         ],
       ),

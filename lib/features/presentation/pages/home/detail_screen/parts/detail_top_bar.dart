@@ -22,7 +22,7 @@ extension DetailTopBar on _DetailScreenState {
             ),
           ),
           IconButton(
-            onPressed: () => showNagilelikBottomSheet(context),
+            onPressed: () => showComplaintBottomSheet(context),
             icon: Icon(Icons.more_vert, color: AppColor.titleText(context)),
           ),
         ],

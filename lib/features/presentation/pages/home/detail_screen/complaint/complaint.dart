@@ -201,15 +201,15 @@ class _NagilelikScreenState extends State<NagilelikScreen> {
                         ),
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(10),
-                          borderSide: const BorderSide(
-                            color: AppColor.borderColor,
-                            width: 1,
-                          ),
+                          // borderSide: const BorderSide(
+                          //   color: AppColor.borderColor,
+                          //   width: 1,
+                          // ),
                         ),
                         enabledBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(10),
                           borderSide: const BorderSide(
-                            color: AppColor.borderColor,
+                            color: AppColor.bgPageDark,
                             width: 1,
                           ),
                         ),

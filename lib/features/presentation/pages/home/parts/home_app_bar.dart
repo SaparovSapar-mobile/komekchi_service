@@ -35,7 +35,7 @@ Padding AppBarWidget(Color textColor, bool isDark) {
             final isDay = state is WeatherLoaded ? state.weather.isDay : true;
             final iconColor = isDay
                 ? const Color(0xFFFBB725)
-                : const Color(0xFF262626);
+                : const Color.fromARGB(255, 138, 138, 138);
             final tempText = state is WeatherLoaded
                 ? "${state.weather.temperature.round()}°"
                 : "--°";

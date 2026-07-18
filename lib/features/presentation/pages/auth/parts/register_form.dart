@@ -19,43 +19,43 @@ extension AuthRegisterForm on _AuthScreenState {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const SizedBox(height: 8),
-          Text(
-            'Wezipeler',
-            style: TextStyle(
-              color: textColor,
-              fontSize: 14,
-              fontWeight: FontWeight.w500,
-            ),
-          ),
-          const SizedBox(height: 8),
-          Container(
-            height: 52,
-            decoration: BoxDecoration(
-              color: inputBg,
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: borderColor),
-            ),
-            padding: const EdgeInsets.symmetric(horizontal: 14),
-            child: DropdownButton<String>(
-              value: _selectedRole,
-              isExpanded: true,
-              underline: const SizedBox(),
-              dropdownColor: cardBg,
-              style: TextStyle(color: textColor, fontSize: 15),
-              icon: Icon(Icons.keyboard_arrow_down, color: hintColor),
-              items: _roles
-                  .map(
-                    (r) => DropdownMenuItem(
-                      value: r,
-                      child: Text(r, style: TextStyle(color: textColor)),
-                    ),
-                  )
-                  .toList(),
-              onChanged: (v) =>
-                  _refresh(() => _selectedRole = v ?? _selectedRole),
-            ),
-          ),
+          // const SizedBox(height: 8),
+          // Text(
+          //   'Wezipeler',
+          //   style: TextStyle(
+          //     color: textColor,
+          //     fontSize: 14,
+          //     fontWeight: FontWeight.w500,
+          //   ),
+          // ),
+          // const SizedBox(height: 8),
+          // Container(
+          //   height: 52,
+          //   decoration: BoxDecoration(
+          //     color: inputBg,
+          //     borderRadius: BorderRadius.circular(12),
+          //     border: Border.all(color: borderColor),
+          //   ),
+          //   padding: const EdgeInsets.symmetric(horizontal: 14),
+          //   child: DropdownButton<String>(
+          //     value: _selectedRole,
+          //     isExpanded: true,
+          //     underline: const SizedBox(),
+          //     dropdownColor: cardBg,
+          //     style: TextStyle(color: textColor, fontSize: 15),
+          //     icon: Icon(Icons.keyboard_arrow_down, color: hintColor),
+          //     items: _roles
+          //         .map(
+          //           (r) => DropdownMenuItem(
+          //             value: r,
+          //             child: Text(r, style: TextStyle(color: textColor)),
+          //           ),
+          //         )
+          //         .toList(),
+          //     onChanged: (v) =>
+          //         _refresh(() => _selectedRole = v ?? _selectedRole),
+          //   ),
+          // ),
 
           const SizedBox(height: 16),
 

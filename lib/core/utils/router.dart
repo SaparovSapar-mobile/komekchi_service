@@ -10,13 +10,13 @@ import 'package:komekchi_service/features/presentation/bloc/subcategory/subcateg
 import 'package:komekchi_service/features/presentation/bloc/subcategory/subcategory_detail_cubit.dart';
 import 'package:komekchi_service/features/presentation/pages/auth/auth_screen.dart.dart';
 import 'package:komekchi_service/features/presentation/pages/auth/forgot_pass.dart';
-import 'package:komekchi_service/features/presentation/pages/home/aksiya_detail_screen.dart';
-import 'package:komekchi_service/features/presentation/pages/home/all_category.dart';
-import 'package:komekchi_service/features/presentation/pages/home/category_id.dart';
+import 'package:komekchi_service/features/presentation/pages/home/aksiya/aksiya_detail_screen.dart';
+import 'package:komekchi_service/features/presentation/pages/home/category/all_category.dart';
+import 'package:komekchi_service/features/presentation/pages/home/category/category_id.dart';
 import 'package:komekchi_service/features/presentation/pages/home/detail_screen/detail_screen.dart';
-import 'package:komekchi_service/features/presentation/pages/home/detail_screen/issue/nagilelik.dart';
+import 'package:komekchi_service/features/presentation/pages/home/detail_screen/complaint/complaint.dart';
 import 'package:komekchi_service/features/presentation/pages/home/detail_screen/sms.dart';
-import 'package:komekchi_service/features/presentation/pages/home/search/serach_screen.dart';
+import 'package:komekchi_service/features/presentation/pages/home/search/search_screen.dart';
 import 'package:komekchi_service/features/presentation/pages/home/settings/cards/card_model.dart';
 import 'package:komekchi_service/features/presentation/pages/home/settings/cards/kart_goshmak_screen.dart';
 import 'package:komekchi_service/features/presentation/pages/home/settings/cards/kart_pozmak_screen.dart';
@@ -32,18 +32,21 @@ import 'package:komekchi_service/features/presentation/pages/home/widget/name_uc
 import 'package:komekchi_service/features/presentation/pages/home/widget/name_uchin_biz/toleg.dart';
 import 'package:komekchi_service/features/presentation/pages/home/widget/name_uchin_biz/ynamdar.dart';
 import 'package:komekchi_service/features/presentation/pages/home/widget/select_date.dart';
-import 'package:komekchi_service/features/presentation/pages/main_screen.dart/main_screen.dart';
+import 'package:komekchi_service/features/presentation/pages/map/main_screen.dart';
 import 'package:komekchi_service/injector.dart';
 
 import '../../features/presentation/pages/auth/check_screen.dart';
 import '../../features/presentation/pages/auth/sms_screen.dart';
-import '../../features/presentation/pages/home/aksiyalar_screen.dart';
+import '../../features/presentation/pages/home/aksiya/aksiyalar_screen.dart';
 import '../../features/presentation/pages/home/widget/selected_date.dart';
+// import '../../features/presentation/pages/splash/lock_screen.dart'; // TODO: gaýtadan işe girizmeli bolanda aç
 import '../../features/presentation/pages/splash/onboarding_screen.dart';
 
 final appRouter = GoRouter(
   initialLocation: '/onboarding',
   routes: [
+    // Telefon gulpy arkaly girişi wagtlaýyn öçürildi — heniz gerek däl.
+    // GoRoute(path: '/lock', builder: (_, __) => const LockScreen()),
     GoRoute(
       path: '/onboarding',
       builder: (context, state) => const WalkthroughScreen(),
@@ -116,10 +119,10 @@ final appRouter = GoRouter(
     GoRoute(path: '/contactUs', builder: (_, __) => const ContactUsPage()),
     GoRoute(path: '/hatYazmak', builder: (_, __) => const HatYazmakPage()),
     GoRoute(path: '/kartlarym', builder: (_, __) => const KartlarymScreen()),
-    GoRoute(
-      path: '/kartGoshmak',
-      builder: (_, __) => const KartGoshmakScreen(),
-    ),
+    // GoRoute(
+    //   path: '/kartGoshmak',
+    //   builder: (_, __) => const KartGoshmakScreen(),
+    // ),
     GoRoute(
       path: '/kartPozmak',
       builder: (context, state) {

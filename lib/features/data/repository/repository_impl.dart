@@ -1,6 +1,8 @@
 import 'package:dartz/dartz.dart';
 import 'package:komekchi_service/core/error/faiulre.dart';
 import 'package:komekchi_service/features/data/datasource/get_app_dt.dart';
+import 'package:komekchi_service/features/domain/entities/address.dart';
+import 'package:komekchi_service/features/domain/entities/address_type.dart';
 import 'package:komekchi_service/features/domain/entities/aksiya.dart';
 import 'package:komekchi_service/features/domain/entities/category.dart';
 import 'package:komekchi_service/features/domain/entities/common.dart';
@@ -286,6 +288,101 @@ class RepositoryImpl extends GetAppRepository {
   }) async {
     try {
       await getAppDt.submitComplaint(message: message);
+      return const Right(null);
+    } catch (e) {
+      if (e is Failure) return Left(e);
+      return Left(UnknownFailure(message: e.toString()));
+    }
+  }
+
+  @override
+  Future<Either<Failure, List<AddressTypeItem>>> getAddressTypes() async {
+    try {
+      final response = await getAppDt.getAddressTypes();
+      return Right(response);
+    } catch (e) {
+      if (e is Failure) return Left(e);
+      return Left(UnknownFailure(message: e.toString()));
+    }
+  }
+
+  @override
+  Future<Either<Failure, List<AddressItem>>> getAddresses() async {
+    try {
+      final response = await getAppDt.getAddresses();
+      return Right(response);
+    } catch (e) {
+      if (e is Failure) return Left(e);
+      return Left(UnknownFailure(message: e.toString()));
+    }
+  }
+
+  @override
+  Future<Either<Failure, AddressItem>> getAddressById(String uuid) async {
+    try {
+      final response = await getAppDt.getAddressById(uuid);
+      return Right(response);
+    } catch (e) {
+      if (e is Failure) return Left(e);
+      return Left(UnknownFailure(message: e.toString()));
+    }
+  }
+
+  @override
+  Future<Either<Failure, AddressItem>> createAddress({
+    required String address,
+    required String addressTypeUuid,
+  }) async {
+    try {
+      final response = await getAppDt.createAddress(
+        address: address,
+        addressTypeUuid: addressTypeUuid,
+      );
+      return Right(response);
+    } catch (e) {
+      if (e is Failure) return Left(e);
+      return Left(UnknownFailure(message: e.toString()));
+    }
+  }
+
+  @override
+  Future<Either<Failure, AddressItem>> updateAddress({
+    required String uuid,
+    required String address,
+    required String addressTypeUuid,
+  }) async {
+    try {
+      final response = await getAppDt.updateAddress(
+        uuid: uuid,
+        address: address,
+        addressTypeUuid: addressTypeUuid,
+      );
+      return Right(response);
+    } catch (e) {
+      if (e is Failure) return Left(e);
+      return Left(UnknownFailure(message: e.toString()));
+    }
+  }
+
+  @override
+  Future<Either<Failure, void>> deleteAddress(String uuid) async {
+    try {
+      await getAppDt.deleteAddress(uuid);
+      return const Right(null);
+    } catch (e) {
+      if (e is Failure) return Left(e);
+      return Left(UnknownFailure(message: e.toString()));
+    }
+  }
+
+  @override
+  Future<Either<Failure, void>> updateNotificationPreference({
+    required bool isNotification,
+  }) async {
+    try {
+      await getAppDt.updateNotificationPreference(
+        isNotification: isNotification,
+      );
       return const Right(null);
     } catch (e) {
       if (e is Failure) return Left(e);

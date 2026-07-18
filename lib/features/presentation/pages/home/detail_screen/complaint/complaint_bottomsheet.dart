@@ -3,7 +3,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../../../../../core/utils/theme/app_colors.dart';
 
-void showNagilelikBottomSheet(BuildContext context) {
+void showComplaintBottomSheet(BuildContext context) {
   showModalBottomSheet(
     context: context,
     // shape: const RoundedRectangleBorder(
@@ -21,7 +21,7 @@ class _NagilelikBottomSheet extends StatelessWidget {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final bg = isDark ? AppColor.bgPageDark : AppColor.bgPageLight;
     final cardBg = isDark ? AppColor.bgBlogDark : AppColor.bgBlogLight;
-    final textColor =  AppColor.titleText(context);
+    final textColor = AppColor.titleText(context);
     return Container(
       decoration: BoxDecoration(
         color: bg,
@@ -44,7 +44,7 @@ class _NagilelikBottomSheet extends StatelessWidget {
           ),
           const SizedBox(height: 16),
 
-           Text(
+          Text(
             'Sazlamalar',
             style: TextStyle(
               fontSize: 18,
@@ -65,12 +65,15 @@ class _NagilelikBottomSheet extends StatelessWidget {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 6,
+                    ),
                     width: 35,
                     height: 37,
                     decoration: BoxDecoration(
-                    color: cardBg,
-                      borderRadius: BorderRadius.circular(8)
+                      color: cardBg,
+                      borderRadius: BorderRadius.circular(8),
                     ),
                     child: Image.asset(
                       "assets/images/logo/flag.png",
@@ -78,7 +81,7 @@ class _NagilelikBottomSheet extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(width: 10),
-                   Text(
+                  Text(
                     'Nagilelik bildirmek',
                     style: TextStyle(
                       fontSize: 15,

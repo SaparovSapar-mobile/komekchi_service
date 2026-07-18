@@ -1,5 +1,7 @@
 import 'package:dartz/dartz.dart';
 import 'package:komekchi_service/core/error/faiulre.dart';
+import 'package:komekchi_service/features/domain/entities/address.dart';
+import 'package:komekchi_service/features/domain/entities/address_type.dart';
 import 'package:komekchi_service/features/domain/entities/aksiya.dart';
 import 'package:komekchi_service/features/domain/entities/category.dart';
 import 'package:komekchi_service/features/domain/entities/common.dart';
@@ -74,4 +76,23 @@ abstract class GetAppRepository {
 
   Future<Either<Failure, List<ComplaintItem>>> getComplaints();
   Future<Either<Failure, void>> submitComplaint({required String message});
+
+  Future<Either<Failure, List<AddressTypeItem>>> getAddressTypes();
+
+  Future<Either<Failure, List<AddressItem>>> getAddresses();
+  Future<Either<Failure, AddressItem>> getAddressById(String uuid);
+  Future<Either<Failure, AddressItem>> createAddress({
+    required String address,
+    required String addressTypeUuid,
+  });
+  Future<Either<Failure, AddressItem>> updateAddress({
+    required String uuid,
+    required String address,
+    required String addressTypeUuid,
+  });
+  Future<Either<Failure, void>> deleteAddress(String uuid);
+
+  Future<Either<Failure, void>> updateNotificationPreference({
+    required bool isNotification,
+  });
 }

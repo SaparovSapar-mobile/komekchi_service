@@ -28,6 +28,8 @@
 		<true/>
 		<key>NSLocationWhenInUseUsageDescription</key>
 		<string>Need location access</string>
+		<key>NSFaceIDUsageDescription</key>
+		<string>Ulgama girmek üçin Face ID ulanylýar</string>
 		<key>CFBundleURLTypes</key>
 		<array>
 			<dict>

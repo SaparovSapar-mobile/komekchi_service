@@ -1,0 +1,34 @@
+{
+  "@@locale": "en",
+
+  "settingsTitle": "Settings",
+
+  "language": "Language",
+  "theme": "Theme",
+  "myAddresses": "My addresses",
+  "voiceNotifications": "Sound notifications",
+  "pinCode": "PIN code",
+
+  "languageTurkmen": "Turkmen",
+  "languageRussian": "Russian",
+  "languageEnglish": "English",
+  "systemOption": "System",
+
+  "themeLight": "Light",
+  "themeDark": "Dark",
+
+  "aboutUs": "About us",
+  "aboutCompany": "About the company",
+  "contactUs": "Contact us",
+  "writeLetter": "Write a letter",
+  "privacyPolicy": "Privacy policy",
+
+  "logoutSection": "Log out",
+  "logout": "Log out",
+  "deleteAccount": "Delete account",
+  "appUpdate": "Update app",
+  "newVersion": "New version",
+
+  "myPage": "My page",
+  "user": "User"
+}

@@ -127,6 +127,8 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
             HomeAksiyaSection(aksiyaCubit: _aksiyaCubit),
             const DividerWidget(),
+            BannerSlider(showTypeOneOnly: false),
+            const DividerWidget(),
             const Padding(
               padding: EdgeInsets.symmetric(vertical: 5.0, horizontal: 15.0),
               child: Row(

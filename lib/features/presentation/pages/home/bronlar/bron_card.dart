@@ -1,28 +1,64 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
+import 'package:komekchi_service/core/utils/app_constants.dart';
 import 'package:komekchi_service/core/utils/theme/app_text_style.dart';
 import 'package:komekchi_service/features/domain/entities/order.dart';
+import 'package:komekchi_service/features/presentation/bloc/subcategory/subcategory_detail_cubit.dart';
+import 'package:komekchi_service/injector.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../../../core/utils/theme/app_colors.dart';
+import '../widget/rate_service_sheet.dart';
 import 'bottom_sheet_shikayat.dart';
 import 'bronlar_screen.dart';
 import 'status_badge.dart';
 
-class BronCard extends StatelessWidget {
+class BronCard extends StatefulWidget {
   final OrderItem order;
   final VoidCallback? onCancel;
 
   const BronCard({super.key, required this.order, this.onCancel});
+
+  @override
+  State<BronCard> createState() => _BronCardState();
+}
+
+class _BronCardState extends State<BronCard> {
+  late final SubcategoryDetailCubit _subcategoryDetailCubit =
+      sl<SubcategoryDetailCubit>();
+
+  OrderItem get order => widget.order;
+  VoidCallback? get onCancel => widget.onCancel;
+
+  @override
+  void initState() {
+    super.initState();
+    _subcategoryDetailCubit.fetchSubcategoryById(order.subcategoryUuid);
+  }
+
+  @override
+  void dispose() {
+    _subcategoryDetailCubit.close();
+    super.dispose();
+  }
 
   void _showBottomSheetShikayat(BuildContext context) {
     showModalBottomSheet(
       context: context,
       backgroundColor: Colors.transparent,
       builder: (_) => BottomSheetShikayat(
-        onSelected: (confirmed) {
-          if (confirmed) {
-            // пользователь нажал "Howa"
+        onSelected: (confirmed) async {
+          if (!confirmed) return;
+
+          final prefs = await SharedPreferences.getInstance();
+          final token = prefs.getString('auth_token');
+          if (!context.mounted) return;
+
+          if (token == null || token.isEmpty) {
+            context.push('/login');
           } else {
-            // пользователь нажал "Yok"
+            context.push('/nagilelik');
           }
         },
       ),
@@ -32,8 +68,8 @@ class BronCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final bg = isDark ? AppColor.bgPageDark : AppColor.bgPageLight;
-    final cardBg = isDark ? AppColor.bgBlogDark : AppColor.bgBlogLight;
+    final bg = isDark ? AppColor.bgBlogDark : AppColor.bgBlogLight;
+    final cardBg = isDark ? AppColor.bgPageDark : AppColor.bgPageLight;
     final TextStyle textStyle = AppTextStyle.medium14;
     final TextStyle textStyle1 = AppTextStyle.medium12;
     final TextStyle textStyle2 = AppTextStyle.regular12;
@@ -47,7 +83,6 @@ class BronCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: cardBg,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: AppColor.borderColor, width: 1),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -66,7 +101,6 @@ class BronCard extends StatelessWidget {
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(7),
                         color: bg,
-                        border: Border.all(color: Color(0xFFC6D2FF)),
                       ),
                       child: Center(
                         child: Text(
@@ -104,14 +138,35 @@ class BronCard extends StatelessWidget {
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(7),
                     color: Color(0xFFF6F8FD),
-                    border: Border.all(color: Color(0xFFC6D2FF)),
+                    // border: Border.all(color: Color(0xFFC6D2FF)),
                   ),
-                  child: Image.asset(
-                    'assets/images/category/image2.png',
-                    width: 32,
-                    height: 32,
-                    errorBuilder: (_, __, ___) =>
-                        Icon(Icons.category, color: AppColor.primary, size: 28),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(7),
+                    child: BlocBuilder<SubcategoryDetailCubit,
+                        SubcategoryDetailState>(
+                      bloc: _subcategoryDetailCubit,
+                      builder: (context, state) {
+                        if (state is SubcategoryDetailSuccess &&
+                            state.item.img.isNotEmpty) {
+                          return Image.network(
+                            ApiConstants.imageUrl(state.item.img),
+                            width: 32,
+                            height: 32,
+                            fit: BoxFit.cover,
+                            errorBuilder: (_, __, ___) => Icon(
+                              Icons.category,
+                              color: AppColor.primary,
+                              size: 28,
+                            ),
+                          );
+                        }
+                        return Icon(
+                          Icons.category,
+                          color: AppColor.primary,
+                          size: 28,
+                        );
+                      },
+                    ),
                   ),
                 ),
                 const SizedBox(width: 10),
@@ -128,7 +183,10 @@ class BronCard extends StatelessWidget {
                       ),
                       Text(
                         'Sany: ${order.quantity}',
-                        style: TextStyle(fontSize: 10, color: Color(0xFF90979F)),
+                        style: TextStyle(
+                          fontSize: 10,
+                          color: Color(0xFF90979F),
+                        ),
                       ),
                     ],
                   ),
@@ -149,9 +207,9 @@ class BronCard extends StatelessWidget {
                     decoration: BoxDecoration(
                       color: bg,
                       borderRadius: BorderRadius.circular(5),
-                      border: Border.all(
-                        color: Color(0xFFC6D2FF).withOpacity(0.2),
-                      ),
+                      // border: Border.all(
+                      //   color: Color(0xFFC6D2FF).withOpacity(0.2),
+                      // ),
                     ),
                     child: Row(
                       children: [
@@ -181,9 +239,9 @@ class BronCard extends StatelessWidget {
                     decoration: BoxDecoration(
                       color: bg,
                       borderRadius: BorderRadius.circular(5),
-                      border: Border.all(
-                        color: Color(0xFFC6D2FF).withOpacity(0.2),
-                      ),
+                      // border: Border.all(
+                      //   color: Color(0xFFC6D2FF).withOpacity(0.2),
+                      // ),
                     ),
                     child: Row(
                       children: [
@@ -266,7 +324,10 @@ class BronCard extends StatelessWidget {
                   const SizedBox(width: 8),
                   Expanded(
                     child: ElevatedButton(
-                      onPressed: () {},
+                      onPressed: () => showRateServiceSheet(
+                        context,
+                        subcategoryUuid: order.subcategoryUuid,
+                      ),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: AppColor.primary,
                         shape: RoundedRectangleBorder(
@@ -279,12 +340,10 @@ class BronCard extends StatelessWidget {
                         children: [
                           Text(
                             'Baha bermek',
-                            style: textStyle.copyWith(
-                              color: AppColor.titleDark,
-                            ),
+                            style: textStyle.copyWith(color: Colors.white),
                           ),
-                          SizedBox(width: 4),
-                          Icon(
+                          const SizedBox(width: 4),
+                          const Icon(
                             Icons.arrow_forward,
                             size: 14,
                             color: Colors.white,

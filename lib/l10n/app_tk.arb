@@ -1,0 +1,35 @@
+{
+  "@@locale": "tk",
+
+  "settingsTitle": "Sazlamalar",
+  "@settingsTitle": {"description": "Settings section header"},
+
+  "language": "Diller",
+  "theme": "Tema",
+  "myAddresses": "Salgylarym",
+  "voiceNotifications": "Sesli bildirişler",
+  "pinCode": "Pin kod",
+
+  "languageTurkmen": "Türkmen",
+  "languageRussian": "Rus dili",
+  "languageEnglish": "English",
+  "systemOption": "Ulgam",
+
+  "themeLight": "Ýagty",
+  "themeDark": "Garaňky",
+
+  "aboutUs": "Biz barada",
+  "aboutCompany": "Karhana barada",
+  "contactUs": "Biz bilen habarlaşmak",
+  "writeLetter": "Hat yazmak",
+  "privacyPolicy": "Gizlinlik syýasaty",
+
+  "logoutSection": "Akkountdan çykmak",
+  "logout": "Çykmak",
+  "deleteAccount": "Hasabym pozmak",
+  "appUpdate": "Programmany täzelemek",
+  "newVersion": "Täze wersiýa",
+
+  "myPage": "Meniň sahypam",
+  "user": "Ulanyjy"
+}

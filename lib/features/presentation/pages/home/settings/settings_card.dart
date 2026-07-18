@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 
 import '../../../../../core/utils/theme/app_colors.dart';
-import 'settings.dart';
 
 class SectionCard extends StatelessWidget {
   final List<Widget> children;
@@ -30,6 +29,34 @@ class SectionCard extends StatelessWidget {
           ),
 
           Column(children: children),
+        ],
+      ),
+    );
+  }
+}
+
+class SectionTitle extends StatelessWidget {
+  final String title;
+  final Widget? trailing;
+  const SectionTitle({required this.title, this.trailing});
+
+  @override
+  Widget build(BuildContext context) {
+    final textColor = AppColor.titleText(context);
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 8),
+      child: Row(
+        children: [
+          Text(
+            title,
+            style: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.w700,
+              color: textColor,
+            ),
+          ),
+          const Spacer(),
+          if (trailing != null) trailing!,
         ],
       ),
     );

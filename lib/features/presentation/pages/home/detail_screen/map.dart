@@ -1,9 +1,39 @@
 // Vyzyvay pervый bottomsheet:
 import 'package:flutter/material.dart';
-import 'package:komekchi_service/core/utils/theme/const.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:komekchi_service/features/domain/entities/address.dart';
+import 'package:komekchi_service/features/domain/entities/address_type.dart';
+import 'package:komekchi_service/features/domain/usecases/address_usecase.dart';
+import 'package:komekchi_service/features/presentation/bloc/address/address_cubit.dart';
+import 'package:komekchi_service/features/presentation/bloc/address/address_type_cubit.dart';
+import 'package:komekchi_service/injector.dart';
 
 import '../../../../../core/utils/theme/app_colors.dart';
 import '../map_screen.dart';
+
+String _addressTypeLabel(String name) {
+  switch (name) {
+    case 'home_address':
+      return 'Öý';
+    case 'work_address':
+      return 'Iş';
+    case 'other':
+      return 'Başga';
+    default:
+      return name;
+  }
+}
+
+IconData _addressTypeIcon(String name) {
+  switch (name) {
+    case 'home_address':
+      return Icons.home_outlined;
+    case 'work_address':
+      return Icons.work_outline;
+    default:
+      return Icons.location_on_outlined;
+  }
+}
 
 void showSalgyBottomSheet(BuildContext context) {
   showModalBottomSheet(
@@ -25,29 +55,77 @@ class _SalgyBottomSheet extends StatefulWidget {
 }
 
 class _SalgyBottomSheetState extends State<_SalgyBottomSheet> {
-  int _selectedIndex = -1;
+  late final AddressCubit _addressCubit = sl<AddressCubit>();
 
-  final List<_SalgyItem> _items = [
-    _SalgyItem(
-      image: "assets/images/onboarding/image1.png",
-      title: 'Öý salgym',
-      subtitle: '14-nji ýabyr',
-      color: Colors.blue,
-    ),
-    _SalgyItem(
-      image: "assets/images/onboarding/image2.png",
-      title: 'Iş salgym',
-      subtitle: 'G. Kulyýew köç.',
-      color: Colors.blue,
-    ),
-  ];
+  @override
+  void initState() {
+    super.initState();
+    _addressCubit.fetchAddresses();
+  }
+
+  @override
+  void dispose() {
+    _addressCubit.close();
+    super.dispose();
+  }
+
+  void _openAddEdit(BuildContext rootContext, {AddressItem? existing}) {
+    Navigator.pop(context);
+    Future.delayed(const Duration(milliseconds: 300), () {
+      showSalgyAtiandyrBottomSheet(
+        rootContext,
+        initialText: existing?.address ?? '',
+        editUuid: existing?.uuid,
+        initialType: existing == null
+            ? null
+            : AddressTypeItem(
+                uuid: existing.addressTypeUuid,
+                name: existing.addressTypeName,
+              ),
+        onLocationAdded: (_) {
+          Future.delayed(const Duration(milliseconds: 300), () {
+            showSalgyBottomSheet(rootContext);
+          });
+        },
+      );
+    });
+  }
+
+  Future<void> _delete(AddressItem item) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Salgyny pozmalymy?'),
+        content: Text(item.address),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, false),
+            child: const Text('Ýok'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, true),
+            child: const Text('Howa'),
+          ),
+        ],
+      ),
+    );
+    if (confirmed != true || !mounted) return;
+
+    final result = await sl<DeleteAddressUsecase>().call(item.uuid);
+    if (!mounted) return;
+    result.fold(
+      (failure) => ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(failure.message))),
+      (_) => _addressCubit.fetchAddresses(),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final bg = isDark ? AppColor.bgPageDark : AppColor.bgPageLight;
     final cardBg = isDark ? AppColor.bgBlogDark : AppColor.bgBlogLight;
-    // final borderColor = isDark ? const Color(0xFF333333) : AppColor.borderColor;
+    final rootContext = Navigator.of(context, rootNavigator: true).context;
 
     return Container(
       decoration: BoxDecoration(
@@ -81,96 +159,144 @@ class _SalgyBottomSheetState extends State<_SalgyBottomSheet> {
           ),
           const SizedBox(height: 12),
 
-          // Dynamic items
-          ...List.generate(_items.length, (index) {
-            final item = _items[index];
-            final isSelected = _selectedIndex == index;
-            return GestureDetector(
-              onTap: () {
-                setState(() => _selectedIndex = index);
-                Navigator.pop(context, _items[index]);
-              },
+          // Saved addresses
+          BlocBuilder<AddressCubit, AddressState>(
+            bloc: _addressCubit,
+            builder: (context, state) {
+              if (state is AddressLoading || state is AddressInitial) {
+                return const Padding(
+                  padding: EdgeInsets.symmetric(vertical: 16),
+                  child: Center(child: CircularProgressIndicator()),
+                );
+              }
 
-              child: Padding(
-                padding: const EdgeInsets.symmetric(vertical: 10),
-                child: Row(
-                  children: [
-                    Image.asset(item.image, width: 38, height: 38),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            item.title,
-                            style: const TextStyle(
-                              fontSize: 15,
-                              fontWeight: FontWeight.w500,
+              if (state is AddressError) {
+                return Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 12),
+                  child: Text(
+                    state.message,
+                    style: const TextStyle(color: Colors.red),
+                  ),
+                );
+              }
+
+              final items = (state as AddressSuccess).items;
+
+              if (items.isEmpty) {
+                return Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 12),
+                  child: Text(
+                    'Salgy ýok',
+                    style: TextStyle(color: Colors.grey.shade400),
+                  ),
+                );
+              }
+
+              return Column(
+                children: items.map((item) {
+                  return Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 6),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: GestureDetector(
+                            onTap: () => Navigator.pop(context, item),
+                            child: Row(
+                              children: [
+                                Container(
+                                  width: 38,
+                                  height: 38,
+                                  decoration: BoxDecoration(
+                                    color: isDark
+                                        ? AppColor.bgPageDark
+                                        : const Color(0xFFF6F8FD),
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                  child: Icon(
+                                    _addressTypeIcon(item.addressTypeName),
+                                    color: AppColor.primary,
+                                    size: 20,
+                                  ),
+                                ),
+                                const SizedBox(width: 12),
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        _addressTypeLabel(
+                                          item.addressTypeName,
+                                        ),
+                                        style: const TextStyle(
+                                          fontSize: 15,
+                                          fontWeight: FontWeight.w500,
+                                        ),
+                                      ),
+                                      Text(
+                                        item.address,
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
+                                        style: TextStyle(
+                                          fontSize: 12,
+                                          color: Colors.grey.shade500,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ],
                             ),
                           ),
-                          Text(
-                            item.subtitle,
-                            style: TextStyle(
-                              fontSize: 12,
-                              color: Colors.grey.shade500,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    Container(
-                      width: 22,
-                      height: 22,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        border: Border.all(
-                          color: isSelected
-                              ? AppColor.primary
-                              : Colors.grey.shade300,
-                          width: isSelected ? 6 : 1.5,
                         ),
-                        color: isDark ? AppColor.bgPageDark : Colors.white,
-                      ),
+                        IconButton(
+                          onPressed: () =>
+                              _openAddEdit(rootContext, existing: item),
+                          icon: Icon(
+                            Icons.edit_outlined,
+                            size: 18,
+                            color: Colors.grey.shade500,
+                          ),
+                        ),
+                        IconButton(
+                          onPressed: () => _delete(item),
+                          icon: const Icon(
+                            Icons.delete_outline,
+                            size: 18,
+                            color: Colors.red,
+                          ),
+                        ),
+                      ],
                     ),
-                  ],
-                ),
-              ),
-            );
-          }),
-
-          // Divider
-
-          // Başga
-          GestureDetector(
-            onTap: () {
-              // final rootContext = Navigator.of(
-              //   context,
-              //   rootNavigator: true,
-              // ).context;
-              // Navigator.pop(context);
-              // Future.delayed(const Duration(milliseconds: 300), () {
-              //   showSalgyAtiandyrBottomSheet(
-              //     rootContext,
-              //     onLocationAdded: (name) {
-              //       Future.delayed(const Duration(milliseconds: 300), () {
-              //         showSalgyBottomSheet(rootContext);
-              //       });
-              //     },
-              //   );
-              // });
+                  );
+                }).toList(),
+              );
             },
+          ),
+
+          // Täze salgy goşmak
+          GestureDetector(
+            onTap: () => _openAddEdit(rootContext),
             child: Padding(
               padding: const EdgeInsets.symmetric(vertical: 10),
               child: Row(
                 children: [
-                  Image.asset(
-                    "assets/images/onboarding/image3.png",
+                  Container(
                     width: 38,
                     height: 38,
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFE8F0FF),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: const Icon(
+                      Icons.add,
+                      color: AppColor.primary,
+                      size: 20,
+                    ),
                   ),
                   const SizedBox(width: 12),
                   const Text(
-                    'Başga',
+                    'Täze salgy goşmak',
                     style: TextStyle(fontSize: 15, fontWeight: FontWeight.w500),
                   ),
                 ],
@@ -184,25 +310,13 @@ class _SalgyBottomSheetState extends State<_SalgyBottomSheet> {
   }
 }
 
-class _SalgyItem {
-  final String image;
-  final String title;
-  final String subtitle;
-  final Color color;
-
-  _SalgyItem({
-    required this.image,
-    required this.title,
-    required this.subtitle,
-    required this.color,
-  });
-}
-
 // ============ VTOROY BOTTOMSHEET ============
 void showSalgyAtiandyrBottomSheet(
   BuildContext context, {
   required ValueChanged<String> onLocationAdded,
   String initialText = '', // ← добавь
+  String? editUuid,
+  AddressTypeItem? initialType,
 }) {
   showModalBottomSheet(
     context: context,
@@ -213,6 +327,8 @@ void showSalgyAtiandyrBottomSheet(
     builder: (context) => _SalgyAtiandyrBottomSheet(
       onLocationAdded: onLocationAdded,
       initialText: initialText, // ← передай
+      editUuid: editUuid,
+      initialType: initialType,
     ),
   );
 }
@@ -220,9 +336,13 @@ void showSalgyAtiandyrBottomSheet(
 class _SalgyAtiandyrBottomSheet extends StatefulWidget {
   final ValueChanged<String> onLocationAdded;
   final String initialText;
+  final String? editUuid;
+  final AddressTypeItem? initialType;
   const _SalgyAtiandyrBottomSheet({
     required this.onLocationAdded,
     required this.initialText,
+    this.editUuid,
+    this.initialType,
   });
 
   @override
@@ -234,6 +354,10 @@ class _SalgyAtiandyrBottomSheetState extends State<_SalgyAtiandyrBottomSheet> {
   late final TextEditingController _controller;
   String _selectedLocation = '';
 
+  late final AddressTypeCubit _typeCubit = sl<AddressTypeCubit>();
+  AddressTypeItem? _selectedType;
+  bool _isSubmitting = false;
+
   @override
   void initState() {
     super.initState();
@@ -241,16 +365,56 @@ class _SalgyAtiandyrBottomSheetState extends State<_SalgyAtiandyrBottomSheet> {
       text: widget.initialText,
     ); // ← инициализируй тут
     _selectedLocation = widget.initialText;
+    _selectedType = widget.initialType;
+    _typeCubit.fetchAddressTypes();
   }
 
   @override
   void dispose() {
     _controller.dispose();
+    _typeCubit.close();
     super.dispose();
+  }
+
+  Future<void> _submit() async {
+    final type = _selectedType;
+    if (_selectedLocation.isEmpty || type == null || _isSubmitting) return;
+
+    setState(() => _isSubmitting = true);
+
+    final result = widget.editUuid == null
+        ? await sl<CreateAddressUsecase>().call(
+            CreateAddressParams(
+              address: _selectedLocation,
+              addressTypeUuid: type.uuid,
+            ),
+          )
+        : await sl<UpdateAddressUsecase>().call(
+            UpdateAddressParams(
+              uuid: widget.editUuid!,
+              address: _selectedLocation,
+              addressTypeUuid: type.uuid,
+            ),
+          );
+
+    if (!mounted) return;
+    setState(() => _isSubmitting = false);
+
+    result.fold(
+      (failure) => ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(failure.message))),
+      (_) {
+        widget.onLocationAdded(_selectedLocation);
+        Navigator.pop(context);
+      },
+    );
   }
 
   @override
   Widget build(BuildContext context) {
+    final isEdit = widget.editUuid != null;
+
     return Padding(
       padding: EdgeInsets.only(
         bottom: MediaQuery.of(context).viewInsets.bottom,
@@ -273,9 +437,9 @@ class _SalgyAtiandyrBottomSheetState extends State<_SalgyAtiandyrBottomSheet> {
               ),
             ),
             const SizedBox(height: 16),
-            const Text(
-              'Salgy atiandyr',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700),
+            Text(
+              isEdit ? 'Salgyny üýtgetmek' : 'Salgy atiandyr',
+              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w700),
             ),
             const SizedBox(height: 12),
 
@@ -332,6 +496,8 @@ class _SalgyAtiandyrBottomSheetState extends State<_SalgyAtiandyrBottomSheet> {
                             context,
                             onLocationAdded: widget.onLocationAdded,
                             initialText: locationName, // ← передаём текст сюда
+                            editUuid: widget.editUuid,
+                            initialType: _selectedType,
                           );
                         });
                       },
@@ -385,27 +551,103 @@ class _SalgyAtiandyrBottomSheetState extends State<_SalgyAtiandyrBottomSheet> {
               ),
             ),
 
-            // Tassyklamak button (esli vveden tekst)
-            if (_selectedLocation.isNotEmpty) ...[
+            // Salgy görnüşi (address type)
+            const SizedBox(height: 16),
+            const Text(
+              'Salgy görnüşi',
+              style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
+            ),
+            const SizedBox(height: 8),
+            BlocBuilder<AddressTypeCubit, AddressTypeState>(
+              bloc: _typeCubit,
+              builder: (context, state) {
+                if (state is AddressTypeLoading ||
+                    state is AddressTypeInitial) {
+                  return const Padding(
+                    padding: EdgeInsets.symmetric(vertical: 8),
+                    child: SizedBox(
+                      height: 20,
+                      width: 20,
+                      child: CircularProgressIndicator(strokeWidth: 2),
+                    ),
+                  );
+                }
+
+                if (state is AddressTypeError) {
+                  return Text(
+                    state.message,
+                    style: const TextStyle(color: Colors.red, fontSize: 13),
+                  );
+                }
+
+                final types = (state as AddressTypeSuccess).items;
+
+                return Wrap(
+                  spacing: 8,
+                  runSpacing: 8,
+                  children: types.map((type) {
+                    final isSelected = _selectedType?.uuid == type.uuid;
+                    return GestureDetector(
+                      onTap: () => setState(() => _selectedType = type),
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 8,
+                        ),
+                        decoration: BoxDecoration(
+                          color: isSelected ? AppColor.primary : Colors.white,
+                          borderRadius: BorderRadius.circular(8),
+                          border: Border.all(
+                            color: isSelected
+                                ? AppColor.primary
+                                : Colors.grey.shade300,
+                          ),
+                        ),
+                        child: Text(
+                          _addressTypeLabel(type.name),
+                          style: TextStyle(
+                            fontSize: 13,
+                            fontWeight: FontWeight.w500,
+                            color: isSelected ? Colors.white : Colors.black54,
+                          ),
+                        ),
+                      ),
+                    );
+                  }).toList(),
+                );
+              },
+            ),
+
+            // Tassyklamak button (esli vveden tekst i vybran tip)
+            if (_selectedLocation.isNotEmpty && _selectedType != null) ...[
               const SizedBox(height: 16),
               SizedBox(
                 width: double.infinity,
                 height: 48,
                 child: ElevatedButton(
-                  onPressed: () {
-                    widget.onLocationAdded(_selectedLocation);
-                    Navigator.pop(context);
-                  },
+                  onPressed: _isSubmitting ? null : _submit,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColor.primary,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(10),
                     ),
                   ),
-                  child: const Text(
-                    'Goşmak',
-                    style: TextStyle(color: Colors.white, fontSize: 15),
-                  ),
+                  child: _isSubmitting
+                      ? const SizedBox(
+                          width: 22,
+                          height: 22,
+                          child: CircularProgressIndicator(
+                            color: Colors.white,
+                            strokeWidth: 2,
+                          ),
+                        )
+                      : Text(
+                          isEdit ? 'Üýtgetmek' : 'Goşmak',
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 15,
+                          ),
+                        ),
                 ),
               ),
             ],

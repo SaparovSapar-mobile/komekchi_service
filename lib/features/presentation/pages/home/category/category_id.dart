@@ -6,7 +6,7 @@ import 'package:komekchi_service/core/utils/app_constants.dart';
 import 'package:komekchi_service/features/presentation/bloc/subcategory/subcategory_cubit.dart';
 import 'package:komekchi_service/features/presentation/pages/home/home_screen.dart';
 
-import '../../../../core/utils/theme/app_colors.dart';
+import '../../../../../core/utils/theme/app_colors.dart';
 
 class CategoryId extends StatefulWidget {
   final String categoryUuid;

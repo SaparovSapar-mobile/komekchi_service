@@ -13,6 +13,10 @@ class BottomSheetShikayat extends StatefulWidget {
 class _BottomSheetShikayatState extends State<BottomSheetShikayat> {
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final cardBg = isDark ? AppColor.bgBlogDark : AppColor.bgBlogLight;
+    final textColor = AppColor.titleText(context);
+
     return Column(
       mainAxisAlignment: MainAxisAlignment.end,
       children: [
@@ -21,7 +25,7 @@ class _BottomSheetShikayatState extends State<BottomSheetShikayat> {
             width: 56,
             height: 6,
             decoration: BoxDecoration(
-              color: Color(0xFFD1D1D1),
+              color: const Color(0xFFD1D1D1),
               borderRadius: BorderRadius.circular(10),
             ),
           ),
@@ -29,9 +33,9 @@ class _BottomSheetShikayatState extends State<BottomSheetShikayat> {
         SizedBox(height: 8),
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-          decoration: const BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+          decoration: BoxDecoration(
+            color: cardBg,
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
           ),
           child: Column(
             mainAxisSize: MainAxisSize.min,
@@ -52,12 +56,12 @@ class _BottomSheetShikayatState extends State<BottomSheetShikayat> {
               const SizedBox(height: 16),
 
               // Title
-              const Text(
+              Text(
                 'Şikaýat etmek!',
                 style: TextStyle(
                   fontSize: 17,
                   fontWeight: FontWeight.w600,
-                  color: Colors.black,
+                  color: textColor,
                 ),
               ),
               const SizedBox(height: 32),
@@ -73,18 +77,19 @@ class _BottomSheetShikayatState extends State<BottomSheetShikayat> {
                         widget.onSelected(false);
                       },
                       style: OutlinedButton.styleFrom(
+                        backgroundColor: AppColor.bgPageDark,
                         padding: const EdgeInsets.symmetric(vertical: 14),
                         side: const BorderSide(color: Color(0xFFE0E0E0)),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12),
                         ),
                       ),
-                      child: const Text(
+                      child: Text(
                         'Ýok',
                         style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w600,
-                          color: Colors.black,
+                          color: textColor,
                         ),
                       ),
                     ),
@@ -112,6 +117,7 @@ class _BottomSheetShikayatState extends State<BottomSheetShikayat> {
                         style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w600,
+                          color: Colors.white,
                         ),
                       ),
                     ),

@@ -1,0 +1,34 @@
+{
+  "@@locale": "ru",
+
+  "settingsTitle": "Настройки",
+
+  "language": "Язык",
+  "theme": "Тема",
+  "myAddresses": "Мои адреса",
+  "voiceNotifications": "Звуковые уведомления",
+  "pinCode": "Пин-код",
+
+  "languageTurkmen": "Туркменский",
+  "languageRussian": "Русский",
+  "languageEnglish": "Английский",
+  "systemOption": "Системный",
+
+  "themeLight": "Светлая",
+  "themeDark": "Тёмная",
+
+  "aboutUs": "О нас",
+  "aboutCompany": "О компании",
+  "contactUs": "Связаться с нами",
+  "writeLetter": "Написать письмо",
+  "privacyPolicy": "Политика конфиденциальности",
+
+  "logoutSection": "Выход из аккаунта",
+  "logout": "Выйти",
+  "deleteAccount": "Удалить аккаунт",
+  "appUpdate": "Обновить приложение",
+  "newVersion": "Новая версия",
+
+  "myPage": "Моя страница",
+  "user": "Пользователь"
+}

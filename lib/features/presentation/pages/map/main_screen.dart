@@ -9,7 +9,7 @@ import 'package:komekchi_service/injector.dart';
 
 import '../../../../core/utils/theme/app_colors.dart';
 import '../home/home_screen.dart';
-import '../home/search/serach_screen.dart';
+import '../home/search/search_screen.dart';
 import 'dart:ui';
 
 class MainScreen extends StatefulWidget {
@@ -92,8 +92,10 @@ class _MainScreenState extends State<MainScreen> {
             child: const SearchScreen(),
           ),
           BlocProvider(
-            create: (_) => sl<OrderCubit>()..fetchOrders(),
-            child: const BronlarScreen(),
+            create: (_) => sl<OrderCubit>(),
+            child: BronlarScreen(
+              onBook: () => setState(() => _currentIndex = 0),
+            ),
           ),
           SettingsScreen(),
         ],
@@ -179,18 +181,18 @@ class _MainScreenState extends State<MainScreen> {
           vertical: 5,
         ),
         decoration: BoxDecoration(
-          color: isSelected
-              ? (isDark
-                    ? AppColor.bgPageDark.withOpacity(0.85)
-                    : AppColor.primary.withOpacity(0.15))
-              : Colors.transparent,
+          // color: isSelected
+          //     ? (isDark
+          //           ? AppColor.bgPageDark.withOpacity(0.85)
+          //           : AppColor.primary.withOpacity(0.15))
+          //     : Colors.transparent,
           borderRadius: BorderRadius.circular(18),
         ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             Container(
-              padding: const EdgeInsets.all(5),
+              padding: const EdgeInsets.all(10),
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(8),
                 color: isDark
@@ -199,7 +201,7 @@ class _MainScreenState extends State<MainScreen> {
               ),
               child: Icon(
                 icon,
-                size: 24,
+                size: 20,
                 color: isSelected
                     ? AppColor.primary
                     : isDark
