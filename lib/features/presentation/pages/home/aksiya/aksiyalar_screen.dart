@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:komekchi_service/core/utils/app_constants.dart';
+import 'package:komekchi_service/core/utils/localized_field.dart';
 import 'package:komekchi_service/features/domain/entities/aksiya.dart';
 import 'package:komekchi_service/features/presentation/bloc/aksiya/aksiya_cubit.dart';
 import 'package:komekchi_service/features/presentation/pages/home/home_screen.dart';
@@ -149,7 +150,7 @@ class _AksiyaCard extends StatelessWidget {
       child: ClipRRect(
         borderRadius: BorderRadius.circular(14),
         child: Image.network(
-          ApiConstants.imageUrl(item.imgTm),
+          ApiConstants.imageUrl(item.img(context)),
           width: 171.55,
           height: 104.51,
           fit: BoxFit.cover,

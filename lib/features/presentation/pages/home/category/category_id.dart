@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:komekchi_service/core/utils/app_constants.dart';
+import 'package:komekchi_service/core/utils/localized_field.dart';
 import 'package:komekchi_service/features/presentation/bloc/subcategory/subcategory_cubit.dart';
 import 'package:komekchi_service/features/presentation/pages/home/home_screen.dart';
 
@@ -11,7 +12,13 @@ import '../../../../../core/utils/theme/app_colors.dart';
 class CategoryId extends StatefulWidget {
   final String categoryUuid;
   final String title;
-  const CategoryId({super.key, required this.categoryUuid, required this.title});
+  final String categoryIcon;
+  const CategoryId({
+    super.key,
+    required this.categoryUuid,
+    required this.title,
+    this.categoryIcon = '',
+  });
 
   @override
   State<CategoryId> createState() => _CategoryIdState();
@@ -29,10 +36,10 @@ class _CategoryIdState extends State<CategoryId> {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final bg = isDark ? AppColor.bgPageDark : AppColor.bgPageLight;
-    final cardBg = isDark ? AppColor.bgBlogDark : AppColor.bgBlogLight;
+    final bg = AppColor.pageBg(context);
+    final cardBg = AppColor.cardBg(context);
     final textColor = AppColor.titleText(context);
-    final borderColor = isDark ? const Color(0xFF333333) : AppColor.borderColor;
+    final borderColor = AppColor.border(context);
 
     return Scaffold(
       backgroundColor: AppColor.primary,
@@ -143,25 +150,80 @@ class _CategoryIdState extends State<CategoryId> {
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  ClipRRect(
-                                    borderRadius: BorderRadius.circular(9.46),
-                                    child: Image.network(
-                                      ApiConstants.imageUrl(item.img),
-                                      width: 352,
-                                      height: 160,
-                                      fit: BoxFit.cover,
-                                      errorBuilder: (context, error, stackTrace) =>
-                                          Container(
-                                            width: 332,
-                                            height: 149,
-                                            color: Colors.grey.shade200,
-                                            child: const Icon(
-                                              Icons.image,
-                                              color: Colors.grey,
-                                              size: 40,
-                                            ),
+                                  Stack(
+                                    children: [
+                                      ClipRRect(
+                                        borderRadius: BorderRadius.circular(
+                                          9.46,
+                                        ),
+                                        child: Image.network(
+                                          ApiConstants.imageUrl(item.img),
+                                          width: 352,
+                                          height: 160,
+                                          fit: BoxFit.cover,
+                                          errorBuilder:
+                                              (context, error, stackTrace) =>
+                                                  Container(
+                                                    width: 332,
+                                                    height: 149,
+                                                    color:
+                                                        Colors.grey.shade200,
+                                                    child: const Icon(
+                                                      Icons.image,
+                                                      color: Colors.grey,
+                                                      size: 40,
+                                                    ),
+                                                  ),
+                                        ),
+                                      ),
+                                      Positioned(
+                                        bottom: 8,  
+                                        left: 8,
+                                        child: Container(
+                                          padding: const EdgeInsets.symmetric(
+                                            horizontal: 10,
+                                            vertical: 4,
                                           ),
-                                    ),
+                                          decoration: BoxDecoration(
+                                            color: bg,
+                                            borderRadius:
+                                                BorderRadius.circular(20),
+                                          ),
+                                          child: Row(
+                                            mainAxisSize: MainAxisSize.min,
+                                            children: [
+                                              ClipRRect(
+                                                borderRadius:
+                                                    BorderRadius.circular(20),
+                                                child: Image.network(
+                                                  ApiConstants.imageUrl(
+                                                    widget.categoryIcon,
+                                                  ),
+                                                  width: 14,
+                                                  height: 14,
+                                                  fit: BoxFit.cover,
+                                                  errorBuilder:
+                                                      (_, __, ___) => Icon(
+                                                        Icons.build_outlined,
+                                                        size: 14,
+                                                        color:
+                                                            AppColor.primary,
+                                                      ),
+                                                ),
+                                              ),
+                                              const SizedBox(width: 4),
+                                              Text(
+                                                item.categoryName,
+                                                style: TextStyle(
+                                                  fontSize: 12,
+                                                  color: textColor,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                    ],
                                   ),
                                   const SizedBox(height: 8),
                                   Row(
@@ -170,13 +232,30 @@ class _CategoryIdState extends State<CategoryId> {
                                     children: [
                                       Expanded(
                                         child: Text(
-                                          item.nameTm,
+                                          item.name(context),
                                           style: const TextStyle(
                                             fontSize: 15,
                                             fontWeight: FontWeight.w500,
                                           ),
                                         ),
                                       ),
+                                      if (item.ratingCount > 0) ...[
+                                        Text(
+                                          item.avgRating.toStringAsFixed(1),
+                                          style: TextStyle(
+                                            fontSize: 13,
+                                            fontWeight: FontWeight.w600,
+                                            color: textColor,
+                                          ),
+                                        ),
+                                        const SizedBox(width: 2),
+                                        const Icon(
+                                          Icons.star_rounded,
+                                          size: 16,
+                                          color: Color(0xFFFBB725),
+                                        ),
+                                        const SizedBox(width: 8),
+                                      ],
                                       if (item.paymentMethod.price > 0)
                                         Text(
                                           "${item.paymentMethod.price} tmt",

@@ -6,6 +6,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../../core/api_service.dart';
 import '../../../../core/utils/theme/app_colors.dart';
+import '../../../../l10n/gen/app_localizations.dart';
 
 class SmsScreen extends StatefulWidget {
   const SmsScreen({super.key});
@@ -125,19 +126,22 @@ class _SmsScreenState extends State<SmsScreen> {
       final prefs = await SharedPreferences.getInstance();
       final code = _controllers.map((c) => c.text).join();
 
+      final t = AppLocalizations.of(context)!;
       if (_otpChannel == 'email') {
         final email = prefs.getString('email');
-        if (email == null) throw Exception('Email tapylmady');
+        if (email == null) throw Exception(t.smsEmailNotFound);
         await ApiService().verifyEmail(email: email, code: code);
       } else {
         final phone = prefs.getString('phone');
-        if (phone == null) throw Exception('Telefon belgisi tapylmady');
+        if (phone == null) throw Exception(t.smsPhoneNotFound);
         await ApiService().confirmPhoneOtp(phone: phone, code: code);
       }
 
       if (mounted) context.go('/check');
     } catch (e) {
-      setState(() => _error = 'Ýalňyşlyk: $e');
+      if (mounted) {
+        setState(() => _error = AppLocalizations.of(context)!.errorPrefix('$e'));
+      }
     } finally {
       if (mounted) setState(() => _isLoading = false);
     }
@@ -146,10 +150,11 @@ class _SmsScreenState extends State<SmsScreen> {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final bg = isDark ? AppColor.bgBlogDark : AppColor.bgBlogLight;
-    final cardBg = isDark ? AppColor.bgPageDark : AppColor.bgPageLight;
+    final bg = AppColor.cardBg(context);
+    final cardBg = AppColor.pageBg(context);
     final textColor = AppColor.titleText(context);
-    final borderColor = isDark ? const Color(0xFF333333) : AppColor.borderColor;
+    final borderColor = AppColor.border(context);
+    final t = AppLocalizations.of(context)!;
 
     if (!_isReady) {
       return Scaffold(
@@ -161,9 +166,9 @@ class _SmsScreenState extends State<SmsScreen> {
     return Scaffold(
       appBar: AppBar(
         toolbarHeight: 0,
-        backgroundColor: isDark ? AppColor.bgBlogDark : AppColor.bgBlogLight,
+        backgroundColor: AppColor.cardBg(context),
         systemOverlayStyle: SystemUiOverlayStyle(
-          statusBarColor: isDark ? AppColor.bgBlogDark : AppColor.bgBlogLight,
+          statusBarColor: AppColor.cardBg(context),
           statusBarIconBrightness: isDark ? Brightness.light : Brightness.dark,
           statusBarBrightness: isDark ? Brightness.light : Brightness.dark,
         ),
@@ -211,7 +216,7 @@ class _SmsScreenState extends State<SmsScreen> {
                 width: 59,
                 height: 59,
                 decoration: BoxDecoration(
-                  color: isDark ? AppColor.bgPageDark : AppColor.bgPageLight,
+                  color: AppColor.pageBg(context),
                   borderRadius: BorderRadius.circular(18),
                 ),
                 child: Padding(
@@ -228,8 +233,8 @@ class _SmsScreenState extends State<SmsScreen> {
 
               Text(
                 _otpChannel == 'email'
-                    ? 'E-poçtaňyza gelen kody giriziň'
-                    : 'Telefon belgiňize gelen kody giriziň',
+                    ? t.smsEnterEmailCode
+                    : t.smsEnterPhoneCode,
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   color: textColor,
@@ -332,7 +337,7 @@ class _SmsScreenState extends State<SmsScreen> {
                   GestureDetector(
                     onTap: _canResend ? _startTimer : null,
                     child: Text(
-                      'Kody täzeden ugratmak',
+                      t.resendCode,
                       style: TextStyle(
                         color: _canResend ? textColor : const Color(0xFF90979F),
                         fontSize: 15,
@@ -365,9 +370,9 @@ class _SmsScreenState extends State<SmsScreen> {
                             strokeWidth: 2,
                           ),
                         )
-                      : const Text(
-                          'Tassyklamak',
-                          style: TextStyle(
+                      : Text(
+                          t.confirmButton,
+                          style: const TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.w600,
                           ),

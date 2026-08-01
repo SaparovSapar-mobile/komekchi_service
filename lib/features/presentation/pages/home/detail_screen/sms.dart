@@ -2,7 +2,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
-import 'package:komekchi_service/main.dart';
+import 'package:komekchi_service/features/presentation/pages/home/settings/bottom_sheet.dart';
 
 import '../../../../../core/utils/theme/app_colors.dart';
 
@@ -101,10 +101,10 @@ class _SmsState extends State<Sms> {
     const blue = AppColor.primary;
 
 
-    final bg = isDark ? AppColor.bgBlogDark : AppColor.bgBlogLight;
-    // final cardBg = isDark ? AppColor.bgBlogDark : AppColor.bgBlogLight;
+    final bg = AppColor.cardBg(context);
+    // final cardBg = AppColor.cardBg(context);
     final textColor =  AppColor.titleText(context);
-    final borderColor = isDark ? const Color(0xFF333333) : AppColor.borderColor;
+    final borderColor = AppColor.border(context);
 
 
     return Scaffold(
@@ -151,12 +151,7 @@ class _SmsState extends State<Sms> {
                           color: blue,
                           size: 22,
                         ),
-                        onPressed: () {
-                          themeNotifier.value =
-                              themeNotifier.value == ThemeMode.light
-                              ? ThemeMode.dark
-                              : ThemeMode.light;
-                        },
+                        onPressed: () => toggleAppTheme(),
                       ),
                     ),
                   ],

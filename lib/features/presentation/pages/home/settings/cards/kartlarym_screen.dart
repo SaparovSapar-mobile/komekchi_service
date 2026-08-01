@@ -14,8 +14,8 @@ class KartlarymScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final bg = isDark ? AppColor.bgPageDark : AppColor.bgPageLight;
-    final cardBg = isDark ? AppColor.bgBlogDark : AppColor.bgBlogLight;
+    final bg = AppColor.pageBg(context);
+    final cardBg = AppColor.cardBg(context);
     final textColor = AppColor.titleText(context);
 
     return Scaffold(

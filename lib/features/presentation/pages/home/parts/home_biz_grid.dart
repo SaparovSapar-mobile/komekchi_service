@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../../core/utils/theme/app_colors.dart';
+import '../../../../../l10n/gen/app_localizations.dart';
 
 class BizItem {
   final Icon icon;
@@ -10,30 +11,30 @@ class BizItem {
   BizItem({required this.icon, required this.title});
 }
 
-final List<BizItem> defaultBizItems = [
+List<BizItem> defaultBizItems(AppLocalizations t) => [
   BizItem(
     icon: Icon(Icons.engineering, color: AppColor.primary, size: 34),
-    title: '7/24 goldaw',
+    title: t.biz247Support,
   ),
   BizItem(
     icon: Icon(Icons.date_range, color: AppColor.primary, size: 34),
-    title: 'Iş tertibi',
+    title: t.bizWorkSchedule,
   ),
   BizItem(
     icon: Icon(Icons.check_circle, color: AppColor.primary, size: 34),
-    title: 'Iş kepilligi',
+    title: t.bizWorkGuarantee,
   ),
   BizItem(
     icon: Icon(Icons.perm_phone_msg, color: AppColor.primary, size: 34),
-    title: 'Müşderi hyzmatlary',
+    title: t.bizCustomerService,
   ),
   BizItem(
     icon: Icon(Icons.account_balance_wallet, color: AppColor.primary, size: 34),
-    title: 'Töleg mümkinçilikleri',
+    title: t.bizPaymentOptions,
   ),
   BizItem(
     icon: Icon(Icons.stars, color: AppColor.primary, size: 34),
-    title: 'Ynamdar',
+    title: t.bizTrusted,
   ),
 ];
 
@@ -43,8 +44,7 @@ class HomeBizGrid extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    final bg = isDark ? AppColor.bgPageDark : AppColor.bgPageLight;
+    final bg = AppColor.pageBg(context);
     final textColor = AppColor.titleText(context);
     return GridView.builder(
       shrinkWrap: true,

@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:komekchi_service/core/utils/app_constants.dart';
+import 'package:komekchi_service/core/utils/localized_field.dart';
 import 'package:komekchi_service/features/presentation/bloc/about/about_cubit.dart';
 import 'package:komekchi_service/features/presentation/pages/home/home_screen.dart';
 
@@ -25,6 +26,10 @@ class _AboutScreenState extends State<AboutScreen> {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final bg = AppColor.pageBg(context);
+    final cardBg = AppColor.cardBg(context);
+
+
     final textColor = AppColor.titleText(context);
 
     return Scaffold(
@@ -41,8 +46,8 @@ class _AboutScreenState extends State<AboutScreen> {
       body: Container(
         width: double.infinity,
         margin: const EdgeInsets.only(top: 10),
-        decoration: const BoxDecoration(
-          color: Colors.white,
+        decoration:  BoxDecoration(
+          color: cardBg,
           borderRadius: BorderRadius.only(
             topLeft: Radius.circular(20),
             topRight: Radius.circular(20),
@@ -51,7 +56,7 @@ class _AboutScreenState extends State<AboutScreen> {
         child: Column(
           children: [
             // Header
-            AppBarWidget(textColor, isDark), Divider(height: 1, color: Color(0xFFF5F7FF)),
+            AppBarWidget(textColor, isDark), Divider(height: 1, color: bg),
 
             // Back
             Padding(
@@ -62,14 +67,14 @@ class _AboutScreenState extends State<AboutScreen> {
                     onPressed: () => context.pop(),
                     icon: const Icon(Icons.arrow_back_ios_new, size: 18),
                   ),
-                  const Text(
+                   Text(
                     'Yza',
-                    style: TextStyle(fontSize: 16, color: Colors.black),
+                    style: TextStyle(fontSize: 16, color: textColor),
                   ),
                 ],
               ),
             ),
-            const Divider(height: 1, color: Color(0xFFF5F7FF)),
+             Divider(height: 1, color: bg),
 
             // Content
             Expanded(
@@ -131,23 +136,26 @@ class _AboutScreenState extends State<AboutScreen> {
                               ),
                               const SizedBox(width: 10),
                               Expanded(
-                                child: Text(
-                                  item.nameTm,
-                                  style: const TextStyle(
-                                    fontSize: 17,
-                                    fontWeight: FontWeight.w700,
-                                    color: Colors.black,
+                                child: Padding(
+                                  padding: const EdgeInsets.only(top: 12.0),
+                                  child: Text(
+                                    item.name(context),
+                                    style:  TextStyle(
+                                      fontSize: 17,
+                                      fontWeight: FontWeight.w700,
+                                      color: textColor,
+                                    ),
                                   ),
                                 ),
                               ),
                             ],
                           ),
-                          const SizedBox(height: 16),
+                          const SizedBox(height: 20),
                           Text(
-                            item.descTm,
-                            style: const TextStyle(
+                            item.desc(context),
+                            style:  TextStyle(
                               fontSize: 12,
-                              color: Colors.black87,
+                              color: textColor,
                               height: 1.6,
                               letterSpacing: 0.1,
                             ),

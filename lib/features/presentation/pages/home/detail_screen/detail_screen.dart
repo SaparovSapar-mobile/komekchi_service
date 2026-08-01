@@ -3,8 +3,10 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:share_plus/share_plus.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:komekchi_service/core/utils/app_constants.dart';
+import 'package:komekchi_service/core/utils/localized_field.dart';
 import 'package:komekchi_service/core/utils/theme/app_text_style.dart';
 import 'package:komekchi_service/core/utils/theme/const.dart';
 import 'package:komekchi_service/features/domain/entities/rating.dart';
@@ -18,6 +20,7 @@ import 'package:komekchi_service/injector.dart';
 
 import '../../../../../core/utils/theme/app_colors.dart';
 import '../../../../../core/widgets/network_error_view.dart';
+import '../../../../../l10n/gen/app_localizations.dart';
 import 'map.dart';
 import 'parts/detail_badge.dart';
 import 'price_item.dart';
@@ -58,9 +61,11 @@ class _DetailScreenState extends State<DetailScreen> {
     super.dispose();
   }
 
-  void _shareItem(SubcategoryItem item) {
+  void _shareItem(BuildContext context, SubcategoryItem item) {
     final link = WebConstants.detailShareUrl(item.uuid);
-    SharePlus.instance.share(ShareParams(text: '${item.nameTm}\n$link'));
+    SharePlus.instance.share(
+      ShareParams(text: '${item.name(context)}\n$link'),
+    );
   }
 
   Future<void> _callSupport() async {
@@ -103,11 +108,11 @@ class _DetailScreenState extends State<DetailScreen> {
   Widget _buildContent(BuildContext context, SubcategoryItem item) {
     final screenWidth = MediaQuery.of(context).size.width;
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final bg = isDark ? AppColor.bgPageDark : AppColor.bgPageLight;
-    final cardBg = isDark ? AppColor.bgBlogDark : AppColor.bgBlogLight;
+    final bg = AppColor.pageBg(context);
+    final cardBg = AppColor.cardBg(context);
     final textColor = AppColor.titleText(context);
     final TextStyle textStyle = AppTextStyle.semiBold12;
-    final warningText = item.warningDesc.descTm;
+    final warningText = item.warningDesc.desc(context);
 
     return Scaffold(
       backgroundColor: AppColor.primary,

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'decorated_state_icon.dart';
-import '../error/faiulre.dart';
+import '../error/failure.dart';
 import '../utils/theme/app_colors.dart';
 
 enum NetworkErrorType { noInternet, server }

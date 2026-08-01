@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:komekchi_service/core/utils/theme/app_colors.dart';
+import 'package:komekchi_service/l10n/gen/app_localizations.dart';
 
 class BottomSheetShikayat extends StatefulWidget {
   final ValueChanged<bool> onSelected;
@@ -13,9 +14,9 @@ class BottomSheetShikayat extends StatefulWidget {
 class _BottomSheetShikayatState extends State<BottomSheetShikayat> {
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    final cardBg = isDark ? AppColor.bgBlogDark : AppColor.bgBlogLight;
+    final cardBg = AppColor.cardBg(context);
     final textColor = AppColor.titleText(context);
+    final t = AppLocalizations.of(context)!;
 
     return Column(
       mainAxisAlignment: MainAxisAlignment.end,
@@ -57,7 +58,7 @@ class _BottomSheetShikayatState extends State<BottomSheetShikayat> {
 
               // Title
               Text(
-                'Şikaýat etmek!',
+                t.complainSheetTitle,
                 style: TextStyle(
                   fontSize: 17,
                   fontWeight: FontWeight.w600,
@@ -85,7 +86,7 @@ class _BottomSheetShikayatState extends State<BottomSheetShikayat> {
                         ),
                       ),
                       child: Text(
-                        'Ýok',
+                        t.no,
                         style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w600,
@@ -112,9 +113,9 @@ class _BottomSheetShikayatState extends State<BottomSheetShikayat> {
                           borderRadius: BorderRadius.circular(12),
                         ),
                       ),
-                      child: const Text(
-                        'Howa',
-                        style: TextStyle(
+                      child: Text(
+                        t.yes,
+                        style: const TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w600,
                           color: Colors.white,

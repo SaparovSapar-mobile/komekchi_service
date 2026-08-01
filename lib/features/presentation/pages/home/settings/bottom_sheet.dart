@@ -2,12 +2,83 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:komekchi_service/core/api_service.dart';
 import 'package:komekchi_service/features/presentation/pages/home/settings/parts/logout_bottom_sheet.dart';
+import 'package:komekchi_service/l10n/gen/app_localizations.dart';
+import 'package:komekchi_service/main.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 // ─── Models ───────────────────────────────────────────────────────────────────
 
 enum AppLanguage { turkmen, russian, english, system }
 
 enum AppTheme { light, dark, system }
+
+// ─── Language switching ────────────────────────────────────────────────────────
+
+/// Shared by the Settings screen and onboarding's language icon — updates
+/// [localeNotifier] (so the whole app re-renders in the new language) and
+/// persists the choice so it survives an app restart.
+Future<void> applyAppLanguage(AppLanguage lang) async {
+  final Locale? locale = switch (lang) {
+    AppLanguage.turkmen => const Locale('tk'),
+    AppLanguage.russian => const Locale('ru'),
+    AppLanguage.english => const Locale('en'),
+    AppLanguage.system => null,
+  };
+  localeNotifier.value = locale;
+
+  final prefs = await SharedPreferences.getInstance();
+  await prefs.setString('app_language', lang.name);
+  if (locale != null) {
+    await prefs.setString('app_locale', locale.languageCode);
+  } else {
+    await prefs.remove('app_locale');
+  }
+}
+
+Future<AppLanguage> loadSavedAppLanguage() async {
+  final prefs = await SharedPreferences.getInstance();
+  final saved = prefs.getString('app_language');
+  return AppLanguage.values.firstWhere(
+    (l) => l.name == saved,
+    // No explicit choice saved yet — the app is following the device
+    // locale (see main.dart), so reflect that instead of claiming Turkmen.
+    orElse: () => AppLanguage.system,
+  );
+}
+
+// ─── Theme switching ───────────────────────────────────────────────────────────
+
+/// Mirrors [applyAppLanguage]: updates [themeNotifier] and persists the
+/// choice so it survives an app restart (main.dart applies it on cold start).
+Future<void> applyAppTheme(AppTheme theme) async {
+  themeNotifier.value = switch (theme) {
+    AppTheme.light => ThemeMode.light,
+    AppTheme.dark => ThemeMode.dark,
+    AppTheme.system => ThemeMode.system,
+  };
+
+  final prefs = await SharedPreferences.getInstance();
+  await prefs.setString('app_theme', theme.name);
+}
+
+Future<AppTheme> loadSavedAppTheme() async {
+  final prefs = await SharedPreferences.getInstance();
+  final saved = prefs.getString('app_theme');
+  return AppTheme.values.firstWhere(
+    (t) => t.name == saved,
+    orElse: () => AppTheme.system,
+  );
+}
+
+/// Quick light↔dark flip used by the small toggle icons on onboarding/auth
+/// screens — routes through [applyAppTheme] so it persists instead of
+/// silently falling out of sync with the Settings screen.
+Future<void> toggleAppTheme() async {
+  final next = themeNotifier.value == ThemeMode.light
+      ? AppTheme.dark
+      : AppTheme.light;
+  await applyAppTheme(next);
+}
 
 // ─── Bottom-sheet helpers ──────────────────────────────────────────────────────
 
@@ -45,20 +116,21 @@ class _LanguageSheet extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final t = AppLocalizations.of(context)!;
     final items = [
-      _LangItem(AppLanguage.turkmen, 'Turkmen', '🇹🇲'),
-      _LangItem(AppLanguage.russian, 'Rus dili', '🇷🇺'),
-      _LangItem(AppLanguage.english, 'English', '🇬🇧'),
+      _LangItem(AppLanguage.turkmen, t.languageTurkmen, '🇹🇲'),
+      _LangItem(AppLanguage.russian, t.languageRussian, '🇷🇺'),
+      _LangItem(AppLanguage.english, t.languageEnglish, '🇬🇧'),
       _LangItem(
         AppLanguage.system,
-        'Systems',
+        t.systemOption,
         null,
         icon: Icons.settings_outlined,
       ),
     ];
 
     return _SheetWrapper(
-      label: 'Diller',
+      label: t.language,
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: items.map((item) {
@@ -99,14 +171,15 @@ class _ThemeSheet extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final t = AppLocalizations.of(context)!;
     final items = [
-      _ThemeItem(AppTheme.light, 'Ýagty', Icons.wb_sunny_outlined),
-      _ThemeItem(AppTheme.dark, 'Garaňky', Icons.dark_mode_outlined),
-      _ThemeItem(AppTheme.system, 'Systems', Icons.settings_outlined),
+      _ThemeItem(AppTheme.light, t.themeLight, Icons.wb_sunny_outlined),
+      _ThemeItem(AppTheme.dark, t.themeDark, Icons.dark_mode_outlined),
+      _ThemeItem(AppTheme.system, t.systemOption, Icons.settings_outlined),
     ];
 
     return _SheetWrapper(
-      label: 'Tema',
+      label: t.theme,
       child: Column(
         mainAxisSize: MainAxisSize.min,
         mainAxisAlignment: MainAxisAlignment.end,

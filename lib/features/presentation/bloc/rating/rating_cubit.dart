@@ -2,7 +2,7 @@ import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:komekchi_service/features/domain/usecases/rating_usecase.dart';
 
-import '../../../../core/error/faiulre.dart';
+import '../../../../core/error/failure.dart';
 import '../../../domain/entities/rating.dart';
 
 part 'rating_state.dart';

@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+import '../../../../../l10n/gen/app_localizations.dart';
+
 Widget inputField({
+  required BuildContext context,
   required TextEditingController controller,
   String? text,
   required Color inputBg,
@@ -10,10 +13,13 @@ Widget inputField({
   required Color hintColor,
   FieldType type = FieldType.text,
   bool obscure = false,
+  bool readOnly = false,
   TextInputType keyboardType = TextInputType.text,
   Widget? suffix,
   String? Function(String?)? validator,
+  VoidCallback? onTap,
 }) {
+  final t = AppLocalizations.of(context)!;
   return Container(
     height: 52,
     decoration: BoxDecoration(
@@ -27,6 +33,8 @@ Widget inputField({
           child: TextFormField(
             controller: controller,
             obscureText: obscure,
+            readOnly: readOnly,
+            onTap: onTap,
             keyboardType: keyboardType,
             inputFormatters: type == FieldType.phone
                 ? [
@@ -39,7 +47,7 @@ Widget inputField({
                 (type == FieldType.phone
                     ? (value) {
                         if (value == null || value.length < 8) {
-                          return "Dolzhno byt 8 cifr";
+                          return t.phoneDigitsError;
                         }
                         return null;
                       }

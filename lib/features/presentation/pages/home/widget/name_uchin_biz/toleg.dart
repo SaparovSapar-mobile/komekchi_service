@@ -20,10 +20,10 @@ class Toleg extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final bg = isDark ? AppColor.bgBlogDark : AppColor.bgBlogLight;
-    final cardBg = isDark ? AppColor.bgBlogDark : AppColor.bgBlogLight;
-    final textColor =  AppColor.titleText(context);
-    final borderColor = isDark ? const Color(0xFF333333) : AppColor.borderColor;
+    final bg = AppColor.pageBg(context);
+    final cardBg = AppColor.cardBg(context);
+    final textColor = AppColor.titleText(context);
+    final borderColor = AppColor.border(context);
 
     return Scaffold(
       backgroundColor: AppColor.primary,
@@ -39,8 +39,8 @@ class Toleg extends StatelessWidget {
       body: Container(
         width: double.infinity,
         margin: const EdgeInsets.only(top: 10),
-        decoration: const BoxDecoration(
-          color: Colors.white,
+        decoration: BoxDecoration(
+          color: cardBg,
           borderRadius: BorderRadius.only(
             topLeft: Radius.circular(20),
             topRight: Radius.circular(20),
@@ -49,7 +49,7 @@ class Toleg extends StatelessWidget {
         child: Column(
           children: [
             // Header
-           AppBarWidget(textColor, isDark), const Divider(height: 1, color: Color(0xFFF5F7FF)),
+            AppBarWidget(textColor, isDark), Divider(height: 1, color: bg),
 
             // Back
             Padding(
@@ -60,14 +60,11 @@ class Toleg extends StatelessWidget {
                     onPressed: () => context.pop(),
                     icon: const Icon(Icons.arrow_back_ios_new, size: 18),
                   ),
-                  const Text(
-                    'Yza',
-                    style: TextStyle(fontSize: 16, color: Colors.black),
-                  ),
+                  Text('Yza', style: TextStyle(fontSize: 16, color: textColor)),
                 ],
               ),
             ),
-            const Divider(height: 1, color: Color(0xFFF5F7FF)),
+            Divider(height: 1, color: bg),
 
             // Content
             Expanded(
@@ -89,19 +86,19 @@ class Toleg extends StatelessWidget {
                             color: const Color(0xFFE8F0FF),
                             borderRadius: BorderRadius.circular(10),
                           ),
-                          child: Image.asset(
-                            "assets/images/icon/iamge_2.png",
-                            width: 50,
-                            height: 50,
+                          child: Icon(
+                            Icons.account_balance_wallet,
+                            size: 34,
+                            color: AppColor.primary,
                           ),
                         ),
                         const SizedBox(width: 10),
-                        const Text(
+                         Text(
                           'Töleg mümkinçilikleri',
                           style: TextStyle(
                             fontSize: 17,
                             fontWeight: FontWeight.w700,
-                            color: Colors.black,
+                            color: textColor,
                           ),
                         ),
                       ],
@@ -109,11 +106,11 @@ class Toleg extends StatelessWidget {
                     const SizedBox(height: 16),
 
                     // Intro text
-                    const Text(
+                    Text(
                       'Biz müşderilerimize amatly bolar ýaly dürli töleg görnüşlerini hödürleýäris.',
                       style: TextStyle(
                         fontSize: 14,
-                        color: Colors.black87,
+                        color: textColor,
                         height: 1.6,
                       ),
                       textAlign: TextAlign.justify,
@@ -125,25 +122,30 @@ class Toleg extends StatelessWidget {
                       _PaymentItem(
                         title: 'Nagt töleg',
                         subtitle: 'Sargyt gelende nagt töleg.',
+                        bg: textColor,
                       ),
                       _PaymentItem(
                         title: 'Terminal töleg',
                         subtitle: 'Sargydy bank kart arkaly töleg.',
+                        bg: textColor,
+
                       ),
                       _PaymentItem(
                         title: 'Onlaýn töleg',
                         subtitle: 'Sargydy bank kart arkaly töleg.',
+                        bg: textColor,
+
                       ),
                     ],
 
                     const SizedBox(height: 16),
 
                     // Bottom text
-                    const Text(
+                    Text(
                       'arkaly amala aşyryp bilersiňiz. Şeýle hem öňünden bron eden hyzmatlarynyz üçin öňünden ýa-da hyzmat ýerine ýetirildenden soň töleg etmek mümkinçiligi bardyr.\nBiziň maksadymyz — töleg prosesini mümkin boldugyça ýeňil, çalt we amatly etmekdir.',
                       style: TextStyle(
                         fontSize: 14,
-                        color: Colors.black87,
+                        color: textColor,
                         height: 1.6,
                       ),
                       textAlign: TextAlign.justify,
@@ -163,8 +165,9 @@ class Toleg extends StatelessWidget {
 class _PaymentItem extends StatelessWidget {
   final String title;
   final String subtitle;
+  final Color bg;
 
-  const _PaymentItem({required this.title, required this.subtitle});
+  const _PaymentItem({required this.title, required this.subtitle, required this.bg});
 
   @override
   Widget build(BuildContext context) {
@@ -180,10 +183,10 @@ class _PaymentItem extends StatelessWidget {
             children: [
               Text(
                 title,
-                style: const TextStyle(
+                style:  TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.w600,
-                  color: Colors.black,
+                  color: bg,
                 ),
               ),
               const SizedBox(height: 2),

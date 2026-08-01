@@ -7,10 +7,9 @@ class DividerWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Container(
-      color: isDark ? AppColor.bgPageDark : AppColor.bgPageLight,
+      color: AppColor.pageBg(context),
       height: 6,
       width: double.infinity,
       margin: const EdgeInsets.only(bottom: 10),

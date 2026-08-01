@@ -1,11 +1,14 @@
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 import 'package:komekchi_service/core/utils/theme/app_text_style.dart';
-import 'package:komekchi_service/main.dart';
+import 'package:komekchi_service/features/presentation/pages/home/settings/bottom_sheet.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../../core/api_service.dart';
 import '../../../../core/utils/theme/app_colors.dart';
+import '../../../../l10n/gen/app_localizations.dart';
 import 'parts/auth_helper.dart';
 
 part 'parts/login_form.dart';
@@ -33,6 +36,10 @@ class _AuthScreenState extends State<AuthScreen>
   bool _obscureRegPassword = true;
   bool _obscureConfirm = true;
   bool _agreed = true;
+  // Set true after a failed submit attempt with empty required fields —
+  // highlights the still-empty ones with a red border until the next
+  // submit attempt.
+  bool _showRegisterErrors = false;
   String _selectedRole = 'Ulanyjy';
   final List<String> _roles = ['Ulanyjy', 'Hyzmat Beriji'];
   final TextEditingController _nameController = TextEditingController();
@@ -70,18 +77,19 @@ class _AuthScreenState extends State<AuthScreen>
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final bg = isDark ? AppColor.bgBlogDark : AppColor.bgBlogLight;
-    final cardBg = isDark ? AppColor.bgBlogDark : AppColor.bgBlogLight;
-    final borderColor = isDark ? const Color(0xFF333333) : AppColor.borderColor;
+    final bg = AppColor.cardBg(context);
+    final cardBg = AppColor.cardBg(context);
+    final borderColor = AppColor.border(context);
     final TextStyle textStyle = AppTextStyle.semiBold18;
+    final t = AppLocalizations.of(context)!;
 
     return Scaffold(
       backgroundColor: bg,
       appBar: AppBar(
         toolbarHeight: 0,
-        backgroundColor: isDark ? AppColor.bgBlogDark : AppColor.bgBlogLight,
+        backgroundColor: AppColor.cardBg(context),
         systemOverlayStyle: SystemUiOverlayStyle(
-          statusBarColor: isDark ? AppColor.bgBlogDark : AppColor.bgBlogLight,
+          statusBarColor: AppColor.cardBg(context),
           statusBarIconBrightness: isDark ? Brightness.light : Brightness.dark,
           statusBarBrightness: isDark ? Brightness.light : Brightness.dark,
         ),
@@ -104,7 +112,7 @@ class _AuthScreenState extends State<AuthScreen>
                     onPressed: () => context.pop(),
                   ),
                   Text(
-                    widget.showLogin ? 'Hasaba durmak' : 'Agza bolmak',
+                    widget.showLogin ? t.authLoginTitle : t.authRegisterTitle,
                     style: textStyle.copyWith(
                       color: AppColor.titleText(context),
                     ),
@@ -117,18 +125,13 @@ class _AuthScreenState extends State<AuthScreen>
                       width: 36,
                       height: 36,
                     ),
-                    onPressed: () {
-                      themeNotifier.value =
-                          themeNotifier.value == ThemeMode.light
-                          ? ThemeMode.dark
-                          : ThemeMode.light;
-                    },
+                    onPressed: () => toggleAppTheme(),
                   ),
                 ],
               ),
             ),
             Container(
-              color: isDark ? AppColor.bgPageDark : AppColor.bgPageLight,
+              color: AppColor.pageBg(context),
               height: 6,
               width: double.infinity,
               margin: const EdgeInsets.only(bottom: 10),
@@ -139,7 +142,7 @@ class _AuthScreenState extends State<AuthScreen>
               child: Container(
                 height: 48,
                 decoration: BoxDecoration(
-                  color: isDark ? AppColor.bgPageDark : AppColor.bgPageLight,
+                  color: AppColor.pageBg(context),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: TabBar(
@@ -166,9 +169,9 @@ class _AuthScreenState extends State<AuthScreen>
                   ),
                   splashFactory: NoSplash.splashFactory,
                   overlayColor: WidgetStateProperty.all(Colors.transparent),
-                  tabs: const [
-                    Tab(text: 'Telefon belgi'),
-                    Tab(text: 'Email'),
+                  tabs: [
+                    Tab(text: t.tabPhone),
+                    Tab(text: t.tabEmail),
                   ],
                 ),
               ),

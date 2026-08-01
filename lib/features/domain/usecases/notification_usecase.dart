@@ -1,14 +1,14 @@
 import 'package:dartz/dartz.dart';
-import 'package:komekchi_service/features/domain/repositories/repository_app.dart';
-import '../../../core/error/faiulre.dart';
+import 'package:komekchi_service/features/domain/repositories/notification_repository.dart';
+import '../../../core/error/failure.dart';
 
 class UpdateNotificationPreferenceUsecase {
-  final GetAppRepository getAppsRepository;
+  final NotificationRepository repository;
 
-  UpdateNotificationPreferenceUsecase({required this.getAppsRepository});
+  UpdateNotificationPreferenceUsecase({required this.repository});
 
   Future<Either<Failure, void>> call({required bool isNotification}) {
-    return getAppsRepository.updateNotificationPreference(
+    return repository.updateNotificationPreference(
       isNotification: isNotification,
     );
   }

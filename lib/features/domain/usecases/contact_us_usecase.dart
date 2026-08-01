@@ -1,8 +1,7 @@
 import 'package:dartz/dartz.dart';
-import 'package:komekchi_service/features/domain/repositories/repository_app.dart';
+import 'package:komekchi_service/features/domain/repositories/contact_us_repository.dart';
 
-import '../../../core/error/faiulre.dart';
-import '../../../core/usecase/usecase.dart';
+import '../../../core/error/failure.dart';
 
 class ContactUsParams {
   final String? email;
@@ -12,14 +11,13 @@ class ContactUsParams {
   const ContactUsParams({this.email, this.phone, required this.message});
 }
 
-class ContactUsUsecase implements UseCases<void, ContactUsParams> {
-  final GetAppRepository getAppsRepository;
+class ContactUsUsecase {
+  final ContactUsRepository repository;
 
-  ContactUsUsecase({required this.getAppsRepository});
+  ContactUsUsecase({required this.repository});
 
-  @override
   Future<Either<Failure, void>> call(ContactUsParams params) async {
-    return await getAppsRepository.sendContactUs(
+    return await repository.sendContactUs(
       email: params.email,
       phone: params.phone,
       message: params.message,

@@ -15,6 +15,8 @@ class SubcategoryItem {
   final bool isFeatured;
   final PaymentMethod paymentMethod;
   final WarningDesc warningDesc;
+  final double avgRating;
+  final int ratingCount;
   final String createdAt;
   final String updatedAt;
 
@@ -33,6 +35,8 @@ class SubcategoryItem {
     required this.isFeatured,
     required this.paymentMethod,
     required this.warningDesc,
+    required this.avgRating,
+    required this.ratingCount,
     required this.createdAt,
     required this.updatedAt,
   });

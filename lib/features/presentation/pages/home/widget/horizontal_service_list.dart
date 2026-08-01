@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:komekchi_service/core/utils/app_constants.dart';
+import 'package:komekchi_service/core/utils/localized_field.dart';
 import 'package:komekchi_service/features/domain/entities/subcategory.dart';
 import 'package:komekchi_service/features/presentation/bloc/subcategory/subcategory_cubit.dart';
 import 'package:komekchi_service/features/presentation/pages/home/home_screen.dart';
@@ -9,6 +10,7 @@ import 'package:komekchi_service/injector.dart';
 
 import '../../../../../core/utils/theme/app_colors.dart';
 import '../../../../../core/widgets/branded_shimmer.dart';
+import '../../../../../l10n/gen/app_localizations.dart';
 
 class HorizontalServiceList extends StatefulWidget {
   final bool is24_7;
@@ -106,7 +108,9 @@ class _HorizontalServiceListState extends State<HorizontalServiceList> {
               final items = (state as SubcategorySuccess).items;
 
               if (items.isEmpty) {
-                return const Center(child: Text('Hyzmat tapylmady'));
+                return Center(
+                  child: Text(AppLocalizations.of(context)!.homeServiceNotFound),
+                );
               }
 
               return ListView.builder(
@@ -162,15 +166,38 @@ class _ServiceCard extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 8),
-            Text(
-              item.nameTm,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: TextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.w500,
-                color: textColor,
-              ),
+            Row(
+              children: [
+                Expanded(
+                  child: Text(
+                    item.name(context),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w500,
+                      color: textColor,
+                    ),
+                  ),
+                ),
+                if (item.ratingCount > 0) ...[
+                  const SizedBox(width: 4),
+                  Text(
+                    item.avgRating.toStringAsFixed(1),
+                    style: TextStyle(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w600,
+                      color: textColor,
+                    ),
+                  ),
+                  const SizedBox(width: 2),
+                  const Icon(
+                    Icons.star_rounded,
+                    size: 16,
+                    color: Color(0xFFFBB725),
+                  ),
+                ],
+              ],
             ),
           ],
         ),

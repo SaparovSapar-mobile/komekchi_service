@@ -5,6 +5,7 @@ import 'package:komekchi_service/features/presentation/bloc/contact_us/contact_u
 import 'package:komekchi_service/core/utils/theme/app_colors.dart';
 import 'package:komekchi_service/features/presentation/pages/home/home_screen.dart';
 import 'package:komekchi_service/injector.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 enum _ContactMethod { phone, email }
 
@@ -32,6 +33,30 @@ class _HatYazmakViewState extends State<_HatYazmakView> {
   final _contactController = TextEditingController();
   final _messageController = TextEditingController();
   _ContactMethod _method = _ContactMethod.phone;
+  String? _savedPhone;
+
+  bool get _phoneLocked =>
+      _method == _ContactMethod.phone &&
+      _savedPhone != null &&
+      _savedPhone!.isNotEmpty;
+
+  @override
+  void initState() {
+    super.initState();
+    _prefillPhone();
+  }
+
+  Future<void> _prefillPhone() async {
+    final prefs = await SharedPreferences.getInstance();
+    final phone = prefs.getString('phone');
+    if (phone == null || phone.isEmpty || !mounted) return;
+    setState(() {
+      _savedPhone = phone;
+      if (_method == _ContactMethod.phone) {
+        _contactController.text = phone;
+      }
+    });
+  }
 
   @override
   void dispose() {
@@ -54,11 +79,11 @@ class _HatYazmakViewState extends State<_HatYazmakView> {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final bg = isDark ? AppColor.bgBlogDark : AppColor.bgBlogLight;
-    final cardBg = isDark ? AppColor.bgPageDark : AppColor.bgPageLight;
+    final bg = AppColor.cardBg(context);
+    final cardBg = AppColor.pageBg(context);
     final textColor = AppColor.titleText(context);
     final hintColor = AppColor.descriptionText(context);
-    final borderColor = isDark ? const Color(0xFF333333) : AppColor.borderColor;
+    final borderColor = AppColor.border(context);
 
     return BlocListener<ContactUsCubit, ContactUsState>(
       listener: (context, state) {
@@ -182,7 +207,8 @@ class _HatYazmakViewState extends State<_HatYazmakView> {
                                     onTap: () {
                                       setState(() {
                                         _method = _ContactMethod.phone;
-                                        _contactController.clear();
+                                        _contactController.text =
+                                            _savedPhone ?? '';
                                       });
                                     },
                                   ),
@@ -216,10 +242,16 @@ class _HatYazmakViewState extends State<_HatYazmakView> {
                           const SizedBox(height: 8),
                           TextFormField(
                             controller: _contactController,
+                            readOnly: _phoneLocked,
                             keyboardType: _method == _ContactMethod.phone
                                 ? TextInputType.phone
                                 : TextInputType.emailAddress,
-                            style: TextStyle(color: textColor, fontSize: 15),
+                            style: TextStyle(
+                              color: _phoneLocked
+                                  ? Colors.grey.shade600
+                                  : textColor,
+                              fontSize: 15,
+                            ),
                             validator: (v) {
                               if (v == null || v.trim().isEmpty) {
                                 return _method == _ContactMethod.phone
@@ -238,7 +270,16 @@ class _HatYazmakViewState extends State<_HatYazmakView> {
                                   : 'you@example.com',
                               hintStyle: TextStyle(color: hintColor),
                               filled: true,
-                              fillColor: bg,
+                              fillColor: _phoneLocked
+                                  ? Colors.grey.shade200
+                                  : bg,
+                              suffixIcon: _phoneLocked
+                                  ? Icon(
+                                      Icons.lock_outline,
+                                      size: 18,
+                                      color: Colors.grey.shade500,
+                                    )
+                                  : null,
                               contentPadding: const EdgeInsets.symmetric(
                                 horizontal: 14,
                                 vertical: 14,

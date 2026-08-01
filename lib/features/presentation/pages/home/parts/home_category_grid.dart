@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../../core/utils/app_constants.dart';
+import '../../../../../core/utils/localized_field.dart';
 import '../../../../../core/utils/theme/app_colors.dart';
 import '../../../bloc/category/get_category_cubit.dart';
 
@@ -12,6 +13,8 @@ class HomeCategoryGrid extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final bg = AppColor.pageBg(context);
     return BlocBuilder<GetCategoryCubit, GetCategoryState>(
       builder: (context, state) {
         if (state is GetCategoryLoading) {
@@ -37,7 +40,7 @@ class HomeCategoryGrid extends StatelessWidget {
           final categories = state.dataCategory;
           // "Hemmesi" tile always appended at the end.
           final itemCount = categories.length + 1;
-          const catgBg = Color(0xFFF6F8FD);
+          final catgBg = bg;
 
           return GridView.builder(
             shrinkWrap: true,
@@ -67,7 +70,8 @@ class HomeCategoryGrid extends StatelessWidget {
                           "/categoryId",
                           extra: {
                             'uuid': category.uuid,
-                            'title': category.nameTm,
+                            'title': category.name(context),
+                            'icon': category.iconImg,
                           },
                         );
                       }
@@ -78,15 +82,18 @@ class HomeCategoryGrid extends StatelessWidget {
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(10),
                         color: catgBg,
-                        border: Border.all(color: const Color(0xFFC6D2FF)),
+                        border: Border.all(color:isDark ? const Color(0xFFC6D2FF).withOpacity(0.5) :  const Color(0xFFC6D2FF)),
                       ),
                       child: Padding(
                         padding: const EdgeInsets.all(12),
                         child: isLast
-                            ? Image.asset(
-                                'assets/images/newcategory/image10.png',
-                                fit: BoxFit.contain,
-                              )
+                            ? Padding(
+                              padding: const EdgeInsets.all(3.0),
+                              child: Image.asset(
+                                  'assets/images/newcategory/image10.png',
+                                  fit: BoxFit.contain,
+                                ),
+                            )
                             : Image.network(
                                 ApiConstants.imageUrl(
                                   categories[index].iconImg,
@@ -104,7 +111,7 @@ class HomeCategoryGrid extends StatelessWidget {
                   SizedBox(
                     width: cellWidth,
                     child: Text(
-                      isLast ? 'Hemmesi' : categories[index].nameTm,
+                      isLast ? 'Hemmesi' : categories[index].name(context),
                       maxLines: 2,
                       textAlign: TextAlign.center,
                       style: TextStyle(

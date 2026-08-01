@@ -9,11 +9,10 @@ class SectionCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
     // final textColor = AppColor.titleText(context);
-    // final bg = isDark ? AppColor.bgPageDark : AppColor.bgPageLight;
-    final cardBg = isDark ? AppColor.bgBlogDark : AppColor.bgBlogLight;
-    // final borderColor = isDark ? const Color(0xFF333333) : AppColor.borderColor;
+    // final bg = AppColor.pageBg(context);
+    final cardBg = AppColor.cardBg(context);
+    // final borderColor = AppColor.border(context);
 
     return Container(
       decoration: BoxDecoration(

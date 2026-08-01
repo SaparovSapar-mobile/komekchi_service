@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:komekchi_service/core/utils/app_constants.dart';
+import 'package:komekchi_service/core/utils/localized_field.dart';
 import 'package:komekchi_service/features/domain/entities/subcategory.dart';
 
 import '../../../../../../core/utils/theme/app_colors.dart';
@@ -18,9 +19,8 @@ class SubcategoryResultCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    final cardBg = isDark ? AppColor.bgBlogDark : AppColor.bgBlogLight;
-    final borderColor = isDark ? const Color(0xFF333333) : AppColor.borderColor;
+    final cardBg = AppColor.cardBg(context);
+    final borderColor = AppColor.border(context);
 
     return GestureDetector(
       onTap: onTap,
@@ -55,7 +55,7 @@ class SubcategoryResultCard extends StatelessWidget {
               children: [
                 Expanded(
                   child: Text(
-                    item.nameTm,
+                    item.name(context),
                     style: TextStyle(
                       fontSize: 15,
                       fontWeight: FontWeight.w500,

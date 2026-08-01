@@ -29,9 +29,19 @@ class _BankBottomSheetState extends State<BankBottomSheet> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final cardBg = AppColor.cardBg(context);
+    final textColor = AppColor.titleText(context);
+    final radioBg = isDark ? AppColor.bgPageDark : Colors.white;
+    final radioBorder = isDark ? Colors.grey.shade700 : Colors.grey.shade300;
+
     return Container(
       height: 306,
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+      decoration: BoxDecoration(
+        color: cardBg,
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+      ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -50,12 +60,12 @@ class _BankBottomSheetState extends State<BankBottomSheet> {
           const SizedBox(height: 44),
 
           // Title
-          const Text(
+          Text(
             'Bank saýlaň',
             style: TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.w700,
-              color: Colors.black,
+              color: textColor,
             ),
           ),
           const SizedBox(height: 8),
@@ -99,7 +109,7 @@ class _BankBottomSheetState extends State<BankBottomSheet> {
                                     fontWeight: isSelected
                                         ? FontWeight.w600
                                         : FontWeight.w400,
-                                    color: Colors.black,
+                                    color: textColor,
                                   ),
                                 ),
                               ],
@@ -115,12 +125,10 @@ class _BankBottomSheetState extends State<BankBottomSheet> {
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
                         border: Border.all(
-                          color: isSelected
-                              ? AppColor.primary
-                              : Colors.grey.shade300,
+                          color: isSelected ? AppColor.primary : radioBorder,
                           width: isSelected ? 6 : 1.5,
                         ),
-                        color: Colors.white,
+                        color: radioBg,
                       ),
                     ),
                   ],

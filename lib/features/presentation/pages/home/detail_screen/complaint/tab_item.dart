@@ -16,8 +16,7 @@ class TabItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final cardBg = isDark ? AppColor.bgBlogDark : AppColor.bgBlogLight;
+    final cardBg = AppColor.cardBg(context);
     final textColor = AppColor.titleText(context);
    
     return Expanded(
@@ -57,9 +56,8 @@ class TabItem extends StatelessWidget {
 
 
  Widget buildEmailField(BuildContext context ,TextEditingController emailController) {
-  final isDark = Theme.of(context).brightness == Brightness.dark;
-    final cardBg = isDark ? AppColor.bgBlogDark : AppColor.bgBlogLight;
-    final bg = isDark ? AppColor.bgPageDark : AppColor.bgPageLight;
+    final cardBg = AppColor.cardBg(context);
+    final bg = AppColor.pageBg(context);
     final textColor = AppColor.titleText(context);
     return Column(
       key: const ValueKey('email'),
@@ -107,8 +105,8 @@ class TabItem extends StatelessWidget {
 
  Widget buildPhoneField(BuildContext context, TextEditingController regPhoneController) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final borderColor = isDark ? const Color(0xFF333333) : AppColor.borderColor;
-    final inputBg = isDark ? AppColor.bgPageDark : AppColor.bgPageLight;
+    final borderColor = AppColor.border(context);
+    final inputBg = AppColor.pageBg(context);
     final hintColor = isDark ? Colors.white38 : Colors.black38;
     return Column(
       key: const ValueKey('phone'),
@@ -129,6 +127,7 @@ class TabItem extends StatelessWidget {
             const SizedBox(width: 10),
             Expanded(
               child: inputField(
+                context: context,
                 controller: regPhoneController,
                 inputBg: inputBg,
                 type: FieldType.phone,

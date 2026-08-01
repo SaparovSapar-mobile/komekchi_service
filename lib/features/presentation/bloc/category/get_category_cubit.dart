@@ -2,7 +2,7 @@ import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:komekchi_service/features/domain/usecases/category_usecase.dart';
 
-import '../../../../core/error/faiulre.dart';
+import '../../../../core/error/failure.dart';
 import '../../../domain/entities/category.dart';
 
 part 'get_category_state.dart';

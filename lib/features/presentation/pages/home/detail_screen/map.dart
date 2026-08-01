@@ -1,39 +1,19 @@
 // Vyzyvay pervый bottomsheet:
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 import 'package:komekchi_service/features/domain/entities/address.dart';
 import 'package:komekchi_service/features/domain/entities/address_type.dart';
 import 'package:komekchi_service/features/domain/usecases/address_usecase.dart';
 import 'package:komekchi_service/features/presentation/bloc/address/address_cubit.dart';
 import 'package:komekchi_service/features/presentation/bloc/address/address_type_cubit.dart';
 import 'package:komekchi_service/injector.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../../../core/utils/theme/app_colors.dart';
+import '../../../../../l10n/gen/app_localizations.dart';
 import '../map_screen.dart';
-
-String _addressTypeLabel(String name) {
-  switch (name) {
-    case 'home_address':
-      return 'Öý';
-    case 'work_address':
-      return 'Iş';
-    case 'other':
-      return 'Başga';
-    default:
-      return name;
-  }
-}
-
-IconData _addressTypeIcon(String name) {
-  switch (name) {
-    case 'home_address':
-      return Icons.home_outlined;
-    case 'work_address':
-      return Icons.work_outline;
-    default:
-      return Icons.location_on_outlined;
-  }
-}
+import '../widget/address_type_display.dart';
 
 void showSalgyBottomSheet(BuildContext context) {
   showModalBottomSheet(
@@ -56,11 +36,23 @@ class _SalgyBottomSheet extends StatefulWidget {
 
 class _SalgyBottomSheetState extends State<_SalgyBottomSheet> {
   late final AddressCubit _addressCubit = sl<AddressCubit>();
+  bool _isLoggedIn = true;
 
   @override
   void initState() {
     super.initState();
-    _addressCubit.fetchAddresses();
+    _checkLoginAndFetch();
+  }
+
+  // Addresses require auth — check for a saved token *before* hitting the
+  // API instead of surfacing a raw "Not Acceptable"-style backend error to
+  // a guest/logged-out user.
+  Future<void> _checkLoginAndFetch() async {
+    final prefs = await SharedPreferences.getInstance();
+    final loggedIn = prefs.getString('auth_token') != null;
+    if (!mounted) return;
+    setState(() => _isLoggedIn = loggedIn);
+    if (loggedIn) _addressCubit.fetchAddresses();
   }
 
   @override
@@ -92,19 +84,20 @@ class _SalgyBottomSheetState extends State<_SalgyBottomSheet> {
   }
 
   Future<void> _delete(AddressItem item) async {
+    final t = AppLocalizations.of(context)!;
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('Salgyny pozmalymy?'),
+        title: Text(t.deleteAddressTitle),
         content: Text(item.address),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx, false),
-            child: const Text('Ýok'),
+            child: Text(t.no),
           ),
           TextButton(
             onPressed: () => Navigator.pop(ctx, true),
-            child: const Text('Howa'),
+            child: Text(t.yes),
           ),
         ],
       ),
@@ -124,8 +117,77 @@ class _SalgyBottomSheetState extends State<_SalgyBottomSheet> {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final cardBg = isDark ? AppColor.bgBlogDark : AppColor.bgBlogLight;
+    final cardBg = AppColor.cardBg(context);
     final rootContext = Navigator.of(context, rootNavigator: true).context;
+    final t = AppLocalizations.of(context)!;
+
+    if (!_isLoggedIn) {
+      return Container(
+        decoration: BoxDecoration(
+          color: cardBg,
+          borderRadius: const BorderRadius.only(
+            topLeft: Radius.circular(20),
+            topRight: Radius.circular(20),
+          ),
+        ),
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Center(
+              child: Container(
+                width: 40,
+                height: 4,
+                decoration: BoxDecoration(
+                  color: Colors.grey.shade300,
+                  borderRadius: BorderRadius.circular(10),
+                ),
+              ),
+            ),
+            const SizedBox(height: 24),
+            Icon(
+              Icons.person_off_outlined,
+              size: 40,
+              color: Colors.grey.shade400,
+            ),
+            const SizedBox(height: 12),
+            Text(
+              t.notLoggedInTitle,
+              textAlign: TextAlign.center,
+              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
+            ),
+            const SizedBox(height: 6),
+            Text(
+              t.notLoggedInAddressesSubtitle,
+              textAlign: TextAlign.center,
+              style: TextStyle(fontSize: 13, color: Colors.grey.shade500),
+            ),
+            const SizedBox(height: 20),
+            SizedBox(
+              width: double.infinity,
+              height: 48,
+              child: ElevatedButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                  rootContext.push('/login');
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppColor.primary,
+                  foregroundColor: Colors.white,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
+                child: Text(
+                  t.loginButton,
+                  style: const TextStyle(fontWeight: FontWeight.w600),
+                ),
+              ),
+            ),
+          ],
+        ),
+      );
+    }
 
     return Container(
       decoration: BoxDecoration(
@@ -153,9 +215,9 @@ class _SalgyBottomSheetState extends State<_SalgyBottomSheet> {
             ),
           ),
           const SizedBox(height: 16),
-          const Text(
-            'Salgy ady',
-            style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700),
+          Text(
+            t.addressSheetTitle,
+            style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w700),
           ),
           const SizedBox(height: 12),
 
@@ -183,11 +245,20 @@ class _SalgyBottomSheetState extends State<_SalgyBottomSheet> {
               final items = (state as AddressSuccess).items;
 
               if (items.isEmpty) {
-                return Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 12),
-                  child: Text(
-                    'Salgy ýok',
-                    style: TextStyle(color: Colors.grey.shade400),
+                return Container(
+                  margin: const EdgeInsets.only(left: 2),
+                  width: double.infinity,
+                  padding: const EdgeInsets.only(left: 6),
+                  decoration: BoxDecoration(
+                    color: AppColor.pageBg(context),
+                    borderRadius: BorderRadius.circular(7),
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 12),
+                    child: Text(
+                      t.noAddresses,
+                      style: TextStyle(color: Colors.grey.shade400),
+                    ),
                   ),
                 );
               }
@@ -213,7 +284,7 @@ class _SalgyBottomSheetState extends State<_SalgyBottomSheet> {
                                     borderRadius: BorderRadius.circular(8),
                                   ),
                                   child: Icon(
-                                    _addressTypeIcon(item.addressTypeName),
+                                    addressTypeIcon(item.addressTypeName),
                                     color: AppColor.primary,
                                     size: 20,
                                   ),
@@ -225,7 +296,8 @@ class _SalgyBottomSheetState extends State<_SalgyBottomSheet> {
                                         CrossAxisAlignment.start,
                                     children: [
                                       Text(
-                                        _addressTypeLabel(
+                                        addressTypeLabel(
+                                          t,
                                           item.addressTypeName,
                                         ),
                                         style: const TextStyle(
@@ -285,7 +357,7 @@ class _SalgyBottomSheetState extends State<_SalgyBottomSheet> {
                     width: 38,
                     height: 38,
                     decoration: BoxDecoration(
-                      color: const Color(0xFFE8F0FF),
+                      color: AppColor.pageBg(context),
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: const Icon(
@@ -295,9 +367,12 @@ class _SalgyBottomSheetState extends State<_SalgyBottomSheet> {
                     ),
                   ),
                   const SizedBox(width: 12),
-                  const Text(
-                    'Täze salgy goşmak',
-                    style: TextStyle(fontSize: 15, fontWeight: FontWeight.w500),
+                  Text(
+                    t.addNewAddress,
+                    style: const TextStyle(
+                      fontSize: 15,
+                      fontWeight: FontWeight.w500,
+                    ),
                   ),
                 ],
               ),
@@ -314,7 +389,7 @@ class _SalgyBottomSheetState extends State<_SalgyBottomSheet> {
 void showSalgyAtiandyrBottomSheet(
   BuildContext context, {
   required ValueChanged<String> onLocationAdded,
-  String initialText = '', // ← добавь
+  String initialText = '',
   String? editUuid,
   AddressTypeItem? initialType,
 }) {
@@ -357,6 +432,7 @@ class _SalgyAtiandyrBottomSheetState extends State<_SalgyAtiandyrBottomSheet> {
   late final AddressTypeCubit _typeCubit = sl<AddressTypeCubit>();
   AddressTypeItem? _selectedType;
   bool _isSubmitting = false;
+  late final FocusNode _addressFocusNode;
 
   @override
   void initState() {
@@ -367,11 +443,25 @@ class _SalgyAtiandyrBottomSheetState extends State<_SalgyAtiandyrBottomSheet> {
     _selectedLocation = widget.initialText;
     _selectedType = widget.initialType;
     _typeCubit.fetchAddressTypes();
+
+    // The field starts pre-filled with map coordinates (or the previous
+    // value when editing) — select it all on focus so typing a real name
+    // replaces it in one go instead of requiring a manual clear first.
+    _addressFocusNode = FocusNode();
+    _addressFocusNode.addListener(() {
+      if (_addressFocusNode.hasFocus) {
+        _controller.selection = TextSelection(
+          baseOffset: 0,
+          extentOffset: _controller.text.length,
+        );
+      }
+    });
   }
 
   @override
   void dispose() {
     _controller.dispose();
+    _addressFocusNode.dispose();
     _typeCubit.close();
     super.dispose();
   }
@@ -414,12 +504,23 @@ class _SalgyAtiandyrBottomSheetState extends State<_SalgyAtiandyrBottomSheet> {
   @override
   Widget build(BuildContext context) {
     final isEdit = widget.editUuid != null;
+    final t = AppLocalizations.of(context)!;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+       final cardBg = AppColor.cardBg(context);
+       final bg = AppColor.pageBg(context);
 
     return Padding(
       padding: EdgeInsets.only(
         bottom: MediaQuery.of(context).viewInsets.bottom,
       ),
       child: Container(
+        decoration: BoxDecoration(
+          color: cardBg,
+          borderRadius: const BorderRadius.only(
+                topLeft: Radius.circular(20),
+                topRight: Radius.circular(20),
+              ),
+        ),
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -438,7 +539,7 @@ class _SalgyAtiandyrBottomSheetState extends State<_SalgyAtiandyrBottomSheet> {
             ),
             const SizedBox(height: 16),
             Text(
-              isEdit ? 'Salgyny üýtgetmek' : 'Salgy atiandyr',
+              isEdit ? t.editAddressTitle : t.newAddressTitle,
               style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w700),
             ),
             const SizedBox(height: 12),
@@ -446,12 +547,13 @@ class _SalgyAtiandyrBottomSheetState extends State<_SalgyAtiandyrBottomSheet> {
             // Text field
             TextField(
               controller: _controller,
+              focusNode: _addressFocusNode,
               onChanged: (val) => setState(() => _selectedLocation = val),
               decoration: InputDecoration(
-                hintText: 'Howly jaý',
+                hintText: t.addressHint,
                 hintStyle: TextStyle(color: Colors.grey.shade400),
                 filled: true,
-                fillColor: const Color(0xFFF6F8FD),
+                fillColor: bg,
                 suffixIcon: _controller.text.isNotEmpty
                     ? IconButton(
                         icon: const Icon(Icons.cancel, color: Colors.grey),
@@ -467,11 +569,11 @@ class _SalgyAtiandyrBottomSheetState extends State<_SalgyAtiandyrBottomSheet> {
                 ),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(10),
-                  borderSide: const BorderSide(color: Color(0xFFEEEEEE)),
+                  borderSide:  BorderSide(color:bg),
                 ),
                 enabledBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(10),
-                  borderSide: const BorderSide(color: Color(0xFFEEEEEE)),
+                  borderSide:  BorderSide(color: bg),
                 ),
                 focusedBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(10),
@@ -484,16 +586,23 @@ class _SalgyAtiandyrBottomSheetState extends State<_SalgyAtiandyrBottomSheet> {
             // Yerinizi girizin — otkryvaet map
             GestureDetector(
               onTap: () {
+                // Capture the root Navigator *before* popping this sheet —
+                // by the time onLocationSelected fires later, this widget's
+                // own `context` is already unmounted (the sheet was closed),
+                // so reusing it would crash showSalgyAtiandyrBottomSheet.
+                final rootNavigator = Navigator.of(
+                  context,
+                  rootNavigator: true,
+                );
                 Navigator.pop(context);
                 // Otkryvay map screen
-                Navigator.push(
-                  context,
+                rootNavigator.push(
                   MaterialPageRoute(
                     builder: (_) => MapScreen(
                       onLocationSelected: (locationName) {
                         Future.delayed(const Duration(milliseconds: 300), () {
                           showSalgyAtiandyrBottomSheet(
-                            context,
+                            rootNavigator.context,
                             onLocationAdded: widget.onLocationAdded,
                             initialText: locationName, // ← передаём текст сюда
                             editUuid: widget.editUuid,
@@ -511,12 +620,12 @@ class _SalgyAtiandyrBottomSheetState extends State<_SalgyAtiandyrBottomSheet> {
                     width: 28,
                     height: 28,
                     decoration: BoxDecoration(
-                      color: const Color(0xFFE8F0FF),
+                      color: bg,
                       borderRadius: BorderRadius.circular(6),
                     ),
-                    child: const Icon(
+                    child:  Icon(
                       Icons.add,
-                      color: AppColor.primary,
+                      color:isDark ? Colors.white :  AppColor.primary,
                       size: 18,
                     ),
                   ),
@@ -524,16 +633,16 @@ class _SalgyAtiandyrBottomSheetState extends State<_SalgyAtiandyrBottomSheet> {
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text(
-                        'Salgym',
-                        style: TextStyle(
+                      Text(
+                        t.salgymTitle,
+                        style: const TextStyle(
                           fontSize: 14,
                           color: AppColor.primary,
                           fontWeight: FontWeight.w500,
                         ),
                       ),
                       Text(
-                        'Ýeriňizi giriziň',
+                        t.salgymEnterLocation,
                         style: TextStyle(
                           fontSize: 12,
                           color: Colors.grey.shade500,
@@ -553,9 +662,9 @@ class _SalgyAtiandyrBottomSheetState extends State<_SalgyAtiandyrBottomSheet> {
 
             // Salgy görnüşi (address type)
             const SizedBox(height: 16),
-            const Text(
-              'Salgy görnüşi',
-              style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
+            Text(
+              t.addressType,
+              style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
             ),
             const SizedBox(height: 8),
             BlocBuilder<AddressTypeCubit, AddressTypeState>(
@@ -595,20 +704,20 @@ class _SalgyAtiandyrBottomSheetState extends State<_SalgyAtiandyrBottomSheet> {
                           vertical: 8,
                         ),
                         decoration: BoxDecoration(
-                          color: isSelected ? AppColor.primary : Colors.white,
+                          color: isSelected ? AppColor.primary :bg,
                           borderRadius: BorderRadius.circular(8),
                           border: Border.all(
                             color: isSelected
                                 ? AppColor.primary
-                                : Colors.grey.shade300,
+                                : bg,
                           ),
                         ),
                         child: Text(
-                          _addressTypeLabel(type.name),
+                          addressTypeLabel(t, type.name),
                           style: TextStyle(
                             fontSize: 13,
                             fontWeight: FontWeight.w500,
-                            color: isSelected ? Colors.white : Colors.black54,
+                            color: AppColor.titleText(context),
                           ),
                         ),
                       ),
@@ -642,7 +751,7 @@ class _SalgyAtiandyrBottomSheetState extends State<_SalgyAtiandyrBottomSheet> {
                           ),
                         )
                       : Text(
-                          isEdit ? 'Üýtgetmek' : 'Goşmak',
+                          isEdit ? t.edit : t.add,
                           style: const TextStyle(
                             color: Colors.white,
                             fontSize: 15,

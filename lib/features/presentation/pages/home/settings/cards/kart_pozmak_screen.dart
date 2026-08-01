@@ -55,10 +55,10 @@ class _KartPozmakScreenState extends State<KartPozmakScreen> {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final bg = isDark ? AppColor.bgPageDark : AppColor.bgPageLight;
-    final cardBg = isDark ? AppColor.bgBlogDark : AppColor.bgBlogLight;
+    final bg = AppColor.pageBg(context);
+    final cardBg = AppColor.cardBg(context);
     final textColor = AppColor.titleText(context);
-    final borderColor = isDark ? const Color(0xFF333333) : AppColor.borderColor;
+    final borderColor = AppColor.border(context);
     final hintColor = isDark ? Colors.white38 : Colors.black38;
 
     return Scaffold(
@@ -158,6 +158,7 @@ class _KartPozmakScreenState extends State<KartPozmakScreen> {
                     ),
                     const SizedBox(height: 8),
                     inputField(
+                      context: context,
                       controller: _numberController,
                       inputBg: cardBg,
                       borderColor: borderColor,
@@ -176,6 +177,7 @@ class _KartPozmakScreenState extends State<KartPozmakScreen> {
                     ),
                     const SizedBox(height: 8),
                     inputField(
+                      context: context,
                       controller: _expiryController,
                       inputBg: cardBg,
                       borderColor: borderColor,
@@ -194,6 +196,7 @@ class _KartPozmakScreenState extends State<KartPozmakScreen> {
                     ),
                     const SizedBox(height: 8),
                     inputField(
+                      context: context,
                       controller: _nameController,
                       inputBg: cardBg,
                       borderColor: borderColor,

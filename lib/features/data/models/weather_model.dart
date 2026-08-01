@@ -1,19 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:komekchi_service/features/domain/entities/weather.dart';
 
-class WeatherModel {
-  final String description;
-  final num temperature, windSpeed;
-  final int humidity;
-  final IconData iconData;
-  final bool isDay;
-
+class WeatherModel extends WeatherItem {
   WeatherModel({
-    required this.temperature,
-    required this.description,
-    required this.iconData,
-    required this.humidity,
-    required this.windSpeed,
-    required this.isDay,
+    required super.temperature,
+    required super.description,
+    required super.iconData,
+    required super.humidity,
+    required super.windSpeed,
+    required super.isDay,
   });
 
   factory WeatherModel.defaultValue() {

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../../../l10n/gen/app_localizations.dart';
 import 'bronlar_screen.dart';
 
 class StatusBadge extends StatelessWidget {
@@ -8,6 +9,7 @@ class StatusBadge extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final t = AppLocalizations.of(context)!;
     Color bgColor;
     Color textColor;
     String label;
@@ -16,22 +18,22 @@ class StatusBadge extends StatelessWidget {
       case BronStatus.pending:
         bgColor = Colors.orange.shade50;
         textColor = Colors.orange;
-        label = 'Garaşylýar';
+        label = t.statusPending;
         break;
       case BronStatus.completed:
         bgColor = Colors.green.shade50;
         textColor = Colors.green;
-        label = 'Tamamlanan';
+        label = t.tabCompleted;
         break;
       case BronStatus.cancelled:
         bgColor = Colors.red.shade50;
         textColor = Colors.red;
-        label = 'Ýatyryldy';
+        label = t.tabCancelled;
         break;
       case BronStatus.unknown:
         bgColor = Colors.grey.shade200;
         textColor = Colors.grey;
-        label = 'Näbelli';
+        label = t.statusUnknown;
         break;
     }
 

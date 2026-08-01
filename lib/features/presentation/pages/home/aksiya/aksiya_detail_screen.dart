@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:komekchi_service/core/utils/app_constants.dart';
+import 'package:komekchi_service/core/utils/localized_field.dart';
 import 'package:komekchi_service/features/presentation/bloc/aksiya/aksiya_detail_cubit.dart';
 
 import '../../../../../core/utils/theme/app_colors.dart';
@@ -12,8 +13,7 @@ class AksiyaDetailScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    final bg = isDark ? AppColor.bgPageDark : AppColor.bgPageLight;
+    final bg = AppColor.pageBg(context);
     final textColor = AppColor.titleText(context);
 
     return Scaffold(
@@ -85,7 +85,7 @@ class AksiyaDetailScreen extends StatelessWidget {
                           ClipRRect(
                             borderRadius: BorderRadius.circular(14),
                             child: Image.network(
-                              ApiConstants.imageUrl(item.imgTm),
+                              ApiConstants.imageUrl(item.img(context)),
                               width: double.infinity,
                               height: 200,
                               fit: BoxFit.cover,

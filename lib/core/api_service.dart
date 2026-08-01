@@ -232,35 +232,64 @@ class ApiService {
   // Не у всех эндпоинтов есть токены в ответе (например, verify-email
   // может просто активировать аккаунт без авто-логина) — поэтому мягко
   // выходим, если структуры нет, вместо падения с ошибкой.
+  //
+  // Backends aren't always consistent about where the tokens live in the
+  // response body, so this checks the common shapes in order —
+  // data.tokens.access_token, data.access_token, top-level access_token —
+  // plus camelCase spellings, before giving up. A silent miss here means
+  // the login "succeeds" (status 200) but 'auth_token' never gets saved,
+  // so the user gets bounced back to onboarding on the next cold start.
   Future<void> _saveTokens(Map<String, dynamic> responseData) async {
-    final data = responseData['data'];
-    if (data == null) return;
+    final data =
+        responseData['data'] as Map<String, dynamic>? ?? responseData;
+
+    final tokenContainers = <Map<String, dynamic>>[
+      if (data['tokens'] is Map) Map<String, dynamic>.from(data['tokens']),
+      data,
+      responseData,
+    ];
+
+    String? accessToken;
+    String? refreshToken;
+    for (final container in tokenContainers) {
+      accessToken ??= _asString(
+        container['access_token'] ?? container['accessToken'],
+      );
+      refreshToken ??= _asString(
+        container['refresh_token'] ?? container['refreshToken'],
+      );
+    }
 
     final prefs = await SharedPreferences.getInstance();
 
-    final tokens = data['tokens'];
-    if (tokens != null) {
-      final accessToken = tokens['access_token'];
-      final refreshToken = tokens['refresh_token'];
-
-      if (accessToken != null) {
-        await prefs.setString('auth_token', accessToken);
-      }
-      if (refreshToken != null) {
-        await prefs.setString('refresh_token', refreshToken);
-      }
+    if (accessToken != null) {
+      await prefs.setString('auth_token', accessToken);
+    } else {
+      print(
+        "⚠️ _saveTokens: no access_token found in login response — "
+        "the session won't be cached. Response was: $responseData",
+      );
+    }
+    if (refreshToken != null) {
+      await prefs.setString('refresh_token', refreshToken);
     }
 
-    final user = data['user'];
+    final user =
+        data['user'] as Map<String, dynamic>? ??
+        responseData['user'] as Map<String, dynamic>?;
     if (user != null) {
-      if (user['name'] != null) {
-        await prefs.setString('name', user['name']);
-      }
-      if (user['uuid'] != null) {
-        await prefs.setString('user_uuid', user['uuid']);
-      }
+      final name = _asString(user['name']);
+      final uuid = _asString(user['uuid']);
+      final phone = _asString(
+        user['phone'] ?? user['phone_number'] ?? user['phoneNumber'],
+      );
+      if (name != null) await prefs.setString('name', name);
+      if (uuid != null) await prefs.setString('user_uuid', uuid);
+      if (phone != null) await prefs.setString('phone', phone);
     }
   }
+
+  String? _asString(dynamic value) => value?.toString();
 
   // Шаг 2: пользователь ввёл OTP из SMS → верифицируем
 }

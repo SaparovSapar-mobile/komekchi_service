@@ -9,10 +9,16 @@ extension AuthRegisterForm on _AuthScreenState {
     Color textColor,
     Color borderColor,
   ) {
-    final inputBg = isDark ? AppColor.bgPageDark : AppColor.bgPageLight;
+    final inputBg = AppColor.pageBg(context);
     final hintColor = AppColor.titleText(context);
     const blue = AppColor.primary;
     final isEmail = _methodTabController.index == 1;
+    final t = AppLocalizations.of(context)!;
+
+    Color fieldBorder(TextEditingController controller) =>
+        _showRegisterErrors && controller.text.trim().isEmpty
+            ? Colors.red
+            : borderColor;
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16.0),
@@ -61,7 +67,7 @@ extension AuthRegisterForm on _AuthScreenState {
 
           // Ady Familýasy
           Text(
-            'Ady Familýasy',
+            t.nameLabel,
             style: TextStyle(
               color: textColor,
               fontSize: 14,
@@ -70,10 +76,11 @@ extension AuthRegisterForm on _AuthScreenState {
           ),
           const SizedBox(height: 8),
           inputField(
+            context: context,
             controller: _nameController,
             inputBg: inputBg,
-            text: "Adyňyzy giriziň",
-            borderColor: borderColor,
+            text: t.nameHint,
+            borderColor: fieldBorder(_nameController),
             textColor: textColor,
             hintColor: Colors.grey,
           ),
@@ -82,7 +89,7 @@ extension AuthRegisterForm on _AuthScreenState {
 
           // Telefon / Email
           Text(
-            isEmail ? 'Email' : 'Telefon belgiňiz',
+            isEmail ? t.tabEmail : t.phoneLabel,
             style: TextStyle(
               color: textColor,
               fontSize: 14,
@@ -92,10 +99,11 @@ extension AuthRegisterForm on _AuthScreenState {
           const SizedBox(height: 8),
           isEmail
               ? inputField(
+                  context: context,
                   controller: _regEmailController,
                   inputBg: inputBg,
-                  text: "Emailyňyzy giriziň",
-                  borderColor: borderColor,
+                  text: t.emailHint,
+                  borderColor: fieldBorder(_regEmailController),
                   textColor: textColor,
                   hintColor: hintColor,
                   keyboardType: TextInputType.emailAddress,
@@ -106,10 +114,11 @@ extension AuthRegisterForm on _AuthScreenState {
                     const SizedBox(width: 10),
                     Expanded(
                       child: inputField(
+                        context: context,
                         controller: _regPhoneController,
                         inputBg: inputBg,
                         type: FieldType.phone,
-                        borderColor: borderColor,
+                        borderColor: fieldBorder(_regPhoneController),
                         textColor: textColor,
                         hintColor: hintColor,
                         keyboardType: TextInputType.phone,
@@ -122,7 +131,7 @@ extension AuthRegisterForm on _AuthScreenState {
 
           // Password
           Text(
-            'Açar sözi',
+            t.passwordLabel,
             style: TextStyle(
               color: textColor,
               fontSize: 14,
@@ -131,9 +140,10 @@ extension AuthRegisterForm on _AuthScreenState {
           ),
           const SizedBox(height: 8),
           inputField(
+            context: context,
             controller: _regPasswordController,
             inputBg: inputBg,
-            borderColor: borderColor,
+            borderColor: fieldBorder(_regPasswordController),
             textColor: textColor,
             hintColor: hintColor,
             obscure: _obscureRegPassword,
@@ -154,7 +164,7 @@ extension AuthRegisterForm on _AuthScreenState {
 
           // Confirm password
           Text(
-            'Açar sözüňizi tassyklaň',
+            t.confirmPasswordLabel,
             style: TextStyle(
               color: textColor,
               fontSize: 14,
@@ -163,9 +173,10 @@ extension AuthRegisterForm on _AuthScreenState {
           ),
           const SizedBox(height: 8),
           inputField(
+            context: context,
             controller: _confirmController,
             inputBg: inputBg,
-            borderColor: borderColor,
+            borderColor: fieldBorder(_confirmController),
             textColor: textColor,
             hintColor: hintColor,
             obscure: _obscureConfirm,
@@ -196,7 +207,7 @@ extension AuthRegisterForm on _AuthScreenState {
                 onChanged: (v) => _refresh(() => _agreed = v ?? false),
               ),
               Text(
-                'Düzgünler bilen tanyşdym?',
+                t.agreeTerms,
                 style: TextStyle(
                   color: textColor,
                   fontSize: 14,
@@ -214,6 +225,22 @@ extension AuthRegisterForm on _AuthScreenState {
             child: ElevatedButton(
               onPressed: _agreed
                   ? () async {
+                      final requiredControllers = [
+                        _nameController,
+                        isEmail ? _regEmailController : _regPhoneController,
+                        _regPasswordController,
+                        _confirmController,
+                      ];
+                      final hasEmptyField = requiredControllers.any(
+                        (c) => c.text.trim().isEmpty,
+                      );
+                      if (hasEmptyField) {
+                        _refresh(() => _showRegisterErrors = true);
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text(t.fillAllFields)),
+                        );
+                        return;
+                      }
                       try {
                         if (isEmail) {
                           await ApiService().registerWithEmail(
@@ -233,13 +260,13 @@ extension AuthRegisterForm on _AuthScreenState {
                         if (context.mounted) context.push("/smsscreen");
                       } catch (e) {
                         ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text('Ýalňyşlyk: $e')),
+                          SnackBar(content: Text(t.errorPrefix('$e'))),
                         );
                       }
                     }
                   : null,
               child: Text(
-                'Kod ugratmak',
+                t.sendCode,
                 style: textStyle1.copyWith(color: AppColor.titleDark),
               ),
             ),

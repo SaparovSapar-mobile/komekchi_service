@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:go_router/go_router.dart';
+import 'package:komekchi_service/core/utils/pin_storage.dart';
 import 'package:komekchi_service/features/domain/usecases/notification_usecase.dart';
 import 'package:komekchi_service/features/presentation/pages/home/home_screen.dart';
 import 'package:komekchi_service/injector.dart';
@@ -7,7 +9,6 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../../../core/utils/theme/app_colors.dart';
 import '../../../../../l10n/gen/app_localizations.dart';
-import '../../../../../main.dart';
 import 'bottom_sheet.dart';
 import 'parts/about_us_section.dart';
 import 'parts/general_settings_section.dart';
@@ -23,7 +24,7 @@ class SettingsScreen extends StatefulWidget {
 
 class _SettingsScreenState extends State<SettingsScreen> {
   bool sesliBildirisler = true;
-  bool pinKod = true;
+  bool pinKod = false;
 
   AppLanguage _selectedLanguage = AppLanguage.turkmen;
   AppTheme _selectedTheme = AppTheme.dark;
@@ -36,6 +37,44 @@ class _SettingsScreenState extends State<SettingsScreen> {
     super.initState();
     _loadUser();
     _loadLanguage();
+    _loadTheme();
+    _loadPin();
+  }
+
+  Future<void> _loadTheme() async {
+    final theme = await loadSavedAppTheme();
+    if (mounted) setState(() => _selectedTheme = theme);
+  }
+
+  Future<void> _loadPin() async {
+    final prefs = await SharedPreferences.getInstance();
+    if (!mounted) return;
+    setState(() => pinKod = prefs.getBool(pinEnabledStorageKey) ?? false);
+  }
+
+  /// Turning it on with no PIN saved yet opens the setup screen first —
+  /// the toggle only flips once a PIN actually exists.
+  Future<void> _togglePin(bool enable) async {
+    final prefs = await SharedPreferences.getInstance();
+
+    if (enable) {
+      final hasPin = prefs.getString(pinCodeStorageKey) != null;
+      if (!hasPin) {
+        final created = await context.push<bool>('/pinCode');
+        if (created == true && mounted) setState(() => pinKod = true);
+        return;
+      }
+      await prefs.setBool(pinEnabledStorageKey, true);
+      setState(() => pinKod = true);
+    } else {
+      await prefs.setBool(pinEnabledStorageKey, false);
+      setState(() => pinKod = false);
+    }
+  }
+
+  Future<void> _openPinScreen() async {
+    final result = await context.push<bool>('/pinCode');
+    if (result == true && mounted) setState(() => pinKod = true);
   }
 
   Future<void> _loadUser() async {
@@ -48,33 +87,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
   }
 
   Future<void> _loadLanguage() async {
-    final prefs = await SharedPreferences.getInstance();
-    final saved = prefs.getString('app_language');
-    final lang = AppLanguage.values.firstWhere(
-      (l) => l.name == saved,
-      orElse: () => AppLanguage.turkmen,
-    );
+    final lang = await loadSavedAppLanguage();
     if (mounted) setState(() => _selectedLanguage = lang);
   }
 
   Future<void> _selectLanguage(AppLanguage lang) async {
     setState(() => _selectedLanguage = lang);
-
-    final Locale? locale = switch (lang) {
-      AppLanguage.turkmen => const Locale('tk'),
-      AppLanguage.russian => const Locale('ru'),
-      AppLanguage.english => const Locale('en'),
-      AppLanguage.system => null,
-    };
-    localeNotifier.value = locale;
-
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setString('app_language', lang.name);
-    if (locale != null) {
-      await prefs.setString('app_locale', locale.languageCode);
-    } else {
-      await prefs.remove('app_locale');
-    }
+    await applyAppLanguage(lang);
   }
 
   Future<void> _toggleNotifications() async {
@@ -96,27 +115,27 @@ class _SettingsScreenState extends State<SettingsScreen> {
   }
 
   // Текст для отображения в строке настроек
-  String get _languageLabel {
+  String _languageLabel(AppLocalizations t) {
     switch (_selectedLanguage) {
       case AppLanguage.turkmen:
-        return 'Türkmen';
+        return t.languageTurkmen;
       case AppLanguage.russian:
-        return 'Rus dili';
+        return t.languageRussian;
       case AppLanguage.english:
-        return 'English';
+        return t.languageEnglish;
       case AppLanguage.system:
-        return 'Systems';
+        return t.systemOption;
     }
   }
 
-  String get _themeLabel {
+  String _themeLabel(AppLocalizations t) {
     switch (_selectedTheme) {
       case AppTheme.light:
-        return 'Ýagty';
+        return t.themeLight;
       case AppTheme.dark:
-        return 'Garaňky';
+        return t.themeDark;
       case AppTheme.system:
-        return 'Systems';
+        return t.systemOption;
     }
   }
 
@@ -132,7 +151,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final textColor = AppColor.titleText(context);
-    final bg = isDark ? AppColor.bgPageDark : AppColor.bgPageLight;
+    final bg = AppColor.pageBg(context);
+    final t = AppLocalizations.of(context)!;
 
     return Scaffold(
       backgroundColor: AppColor.primary,
@@ -179,26 +199,19 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
                     GeneralSettingsSection(
                       selectedLanguage: _selectedLanguage,
-                      languageLabel: _languageLabel,
-                      onLanguageSelected: (lang) {
-                        setState(() => _selectedLanguage = lang);
-                      },
+                      languageLabel: _languageLabel(t),
+                      onLanguageSelected: _selectLanguage,
                       selectedTheme: _selectedTheme,
-                      themeLabel: _themeLabel,
+                      themeLabel: _themeLabel(t),
                       onThemeSelected: (theme) {
                         setState(() => _selectedTheme = theme);
-
-                        // Если используешь themeNotifier из main.dart:
-                        themeNotifier.value = theme == AppTheme.light
-                            ? ThemeMode.light
-                            : theme == AppTheme.dark
-                            ? ThemeMode.dark
-                            : ThemeMode.system;
+                        applyAppTheme(theme);
                       },
                       notificationsEnabled: sesliBildirisler,
                       onToggleNotifications: _toggleNotifications,
                       pinEnabled: pinKod,
-                      onTogglePin: () => setState(() => pinKod = !pinKod),
+                      onTogglePin: () => _togglePin(!pinKod),
+                      onTapPin: _openPinScreen,
                     ),
 
                     const SizedBox(height: 16),

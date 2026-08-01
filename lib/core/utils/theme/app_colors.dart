@@ -46,4 +46,22 @@ class AppColor {
       Theme.of(context).brightness == Brightness.dark
           ? descriptionDark
           : descriptionLight;
+
+  /// Фон страницы (внешний контейнер экрана)
+  static Color pageBg(BuildContext context) =>
+      Theme.of(context).brightness == Brightness.dark
+          ? bgPageDark
+          : bgPageLight;
+
+  /// Фон карточек/полей внутри страницы
+  static Color cardBg(BuildContext context) =>
+      Theme.of(context).brightness == Brightness.dark
+          ? bgBlogDark
+          : bgBlogLight;
+
+  /// Цвет рамки полей ввода/карточек
+  static Color border(BuildContext context) =>
+      Theme.of(context).brightness == Brightness.dark
+          ? const Color(0xFF333333)
+          : borderColor;
 }

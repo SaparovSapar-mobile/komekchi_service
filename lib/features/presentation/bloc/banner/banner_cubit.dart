@@ -1,6 +1,5 @@
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
-import 'package:komekchi_service/core/usecase/usecase.dart';
 import 'package:komekchi_service/features/domain/entities/banners.dart';
 import 'package:komekchi_service/features/domain/usecases/banner_usecase.dart';
 
@@ -13,7 +12,7 @@ class BannerCubit extends Cubit<BannerState> {
   Future<void> fetchBanners() async {
     emit(BannerLoading());
 
-    final result = await bannerUsecase(NoParams());
+    final result = await bannerUsecase();
     result.fold(
       (failure) => emit(BannerError(message: failure.message)),
       (banner) => emit(BannerSuccess(banner: banner)),

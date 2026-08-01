@@ -1,9 +1,8 @@
 import 'package:dartz/dartz.dart';
 import 'package:komekchi_service/features/domain/entities/search_result.dart';
-import 'package:komekchi_service/features/domain/repositories/repository_app.dart';
+import 'package:komekchi_service/features/domain/repositories/search_repository.dart';
 
-import '../../../core/error/faiulre.dart';
-import '../../../core/usecase/usecase.dart';
+import '../../../core/error/failure.dart';
 
 class SearchParams {
   final String query;
@@ -13,14 +12,13 @@ class SearchParams {
   const SearchParams({required this.query, this.page = 1, this.limit = 20});
 }
 
-class SearchUsecase implements UseCases<SearchResult, SearchParams> {
-  final GetAppRepository getAppsRepository;
+class SearchUsecase {
+  final SearchRepository repository;
 
-  SearchUsecase({required this.getAppsRepository});
+  SearchUsecase({required this.repository});
 
-  @override
   Future<Either<Failure, SearchResult>> call(SearchParams params) async {
-    return await getAppsRepository.searchServices(
+    return await repository.searchServices(
       query: params.query,
       page: params.page,
       limit: params.limit,

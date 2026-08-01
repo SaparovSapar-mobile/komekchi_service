@@ -1,26 +1,24 @@
 import 'package:dartz/dartz.dart';
 import 'package:komekchi_service/features/domain/entities/banners.dart';
-import 'package:komekchi_service/features/domain/repositories/repository_app.dart';
-import '../../../core/error/faiulre.dart';
-import '../../../core/usecase/usecase.dart';
+import 'package:komekchi_service/features/domain/repositories/banner_repository.dart';
+import '../../../core/error/failure.dart';
 
-class BannerUsecase implements UseCases<List<BannerItem>, NoParams> {
-  final GetAppRepository getAppsRepository;
+class BannerUsecase {
+  final BannerRepository repository;
 
-  BannerUsecase({required this.getAppsRepository});
+  BannerUsecase({required this.repository});
 
-  @override
-  Future<Either<Failure, List<BannerItem>>> call(NoParams params) async {
-    return await getAppsRepository.getBanners();
+  Future<Either<Failure, List<BannerItem>>> call() async {
+    return await repository.getBanners();
   }
 }
 
 class GetBannerByIdUsecase {
-  final GetAppRepository getAppsRepository;
+  final BannerRepository repository;
 
-  GetBannerByIdUsecase({required this.getAppsRepository});
+  GetBannerByIdUsecase({required this.repository});
 
   Future<Either<Failure, BannerItem>> call(String uuid) {
-    return getAppsRepository.getBannerById(uuid);
+    return repository.getBannerById(uuid);
   }
 }

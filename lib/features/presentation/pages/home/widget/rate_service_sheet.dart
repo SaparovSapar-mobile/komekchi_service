@@ -48,20 +48,11 @@ class _RateServiceSheet extends StatefulWidget {
 
 class _RateServiceSheetState extends State<_RateServiceSheet> {
   int _stars = 0;
-  final TextEditingController _commentController = TextEditingController();
-
-  @override
-  void dispose() {
-    _commentController.dispose();
-    super.dispose();
-  }
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    final bg = isDark ? AppColor.bgBlogDark : AppColor.bgBlogLight;
+    final bg = AppColor.cardBg(context);
     final textColor = AppColor.titleText(context);
-    final borderColor = isDark ? const Color(0xFF333333) : AppColor.borderColor;
 
     return BlocConsumer<SubmitRatingCubit, SubmitRatingState>(
       listener: (context, state) {
@@ -135,25 +126,7 @@ class _RateServiceSheetState extends State<_RateServiceSheet> {
                     }),
                   ),
                 ),
-                const SizedBox(height: 12),
-
-                TextField(
-                  controller: _commentController,
-                  maxLines: 3,
-                  style: TextStyle(color: textColor),
-                  decoration: InputDecoration(
-                    hintText: 'Pikiriňizi ýazyň (hökman däl)',
-                    filled: true,
-                    fillColor: isDark
-                        ? AppColor.bgPageDark
-                        : AppColor.bgPageLight,
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      borderSide: BorderSide(color: borderColor),
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 16),
+                const SizedBox(height: 20),
 
                 SizedBox(
                   width: double.infinity,
@@ -164,9 +137,6 @@ class _RateServiceSheetState extends State<_RateServiceSheet> {
                             categoryUuid: widget.categoryUuid,
                             subcategoryUuid: widget.subcategoryUuid,
                             stars: _stars,
-                            comment: _commentController.text.trim().isEmpty
-                                ? null
-                                : _commentController.text.trim(),
                           )
                         : null,
                     style: ElevatedButton.styleFrom(

@@ -2,14 +2,15 @@ part of '../detail_screen.dart';
 
 extension DetailDescriptionSection on _DetailScreenState {
   Widget _buildDescriptionSection(BuildContext context, SubcategoryItem item) {
+    final t = AppLocalizations.of(context)!;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Padding(
-          padding: EdgeInsets.symmetric(horizontal: 15, vertical: 6),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 6),
           child: Text(
-            'Barada',
-            style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+            t.aboutTitle,
+            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
           ),
         ),
         Padding(
@@ -23,12 +24,10 @@ extension DetailDescriptionSection on _DetailScreenState {
                 height: 1.5,
               ),
               children: [
-                TextSpan(text: item.descTm),
+                TextSpan(text: item.desc(context)),
                 if (item.paymentMethod.consultation)
                   TextSpan(
-                    text: isExpanded
-                        ? ' Maslahat bermek hyzmaty hem elýeterlidir.'
-                        : '',
+                    text: isExpanded ? t.consultationNote : '',
                   ),
               ],
             ),

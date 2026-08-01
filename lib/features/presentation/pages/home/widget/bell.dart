@@ -77,10 +77,9 @@ class BildirislerScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final bg = isDark ? AppColor.bgBlogDark : AppColor.bgBlogLight;
-    final cardBg = isDark ? AppColor.bgBlogDark : AppColor.bgBlogLight;
-    final textColor =  AppColor.titleText(context);
-    final borderColor = isDark ? const Color(0xFF333333) : AppColor.borderColor;
+    final bg = AppColor.pageBg(context);
+    final cardBg = AppColor.cardBg(context);
+    final textColor = AppColor.titleText(context);
 
     return Scaffold(
       backgroundColor: AppColor.primary,
@@ -96,8 +95,8 @@ class BildirislerScreen extends StatelessWidget {
       body: Container(
         width: double.infinity,
         margin: const EdgeInsets.only(top: 10),
-        decoration: const BoxDecoration(
-          color: Colors.white,
+        decoration: BoxDecoration(
+          color: cardBg,
           borderRadius: BorderRadius.only(
             topLeft: Radius.circular(20),
             topRight: Radius.circular(20),
@@ -106,7 +105,7 @@ class BildirislerScreen extends StatelessWidget {
         child: Column(
           children: [
             // Header
-            AppBarWidget(textColor, isDark), const Divider(height: 1, color: Color(0xFFF5F7FF)),
+            AppBarWidget(textColor, isDark), Divider(height: 1, color: cardBg),
 
             // Back + Title
             Padding(
@@ -117,30 +116,30 @@ class BildirislerScreen extends StatelessWidget {
                     onPressed: () => context.pop(),
                     icon: const Icon(Icons.arrow_back_ios_new, size: 18),
                   ),
-                  const Text(
+                   Text(
                     'Bildirişler',
                     style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.w700,
-                      color: Colors.black,
+                      color: AppColor.titleText(context),
                     ),
                   ),
                 ],
               ),
             ),
-            const Divider(height: 1, color: Color(0xFFF5F7FF)),
+            Divider(height: 1, color: cardBg),
 
             // List
             Expanded(
               child: Container(
                 padding: const EdgeInsets.only(top: 5),
-                decoration: BoxDecoration(color: const Color(0xFFF5F7FF)),
+                decoration: BoxDecoration(color: cardBg),
                 child: ListView.separated(
                   itemCount: items.length,
                   separatorBuilder: (_, __) =>
-                      const Divider(height: 1, color: Color(0xFFF5F7FF)),
+                      Divider(height: 1, color: cardBg),
                   itemBuilder: (context, index) {
-                    return _BildirisCard(item: items[index]);
+                    return _BildirisCard(item: items[index], bg: bg,);
                   },
                 ),
               ),
@@ -154,17 +153,20 @@ class BildirislerScreen extends StatelessWidget {
 
 class _BildirisCard extends StatelessWidget {
   final BildirisItem item;
-  const _BildirisCard({required this.item});
+  final Color bg;
+  const _BildirisCard({required this.item, required this.bg});
 
   @override
   Widget build(BuildContext context) {
+    final cardBg = AppColor.cardBg(context);
+    final textColor = AppColor.titleText(context);
     return GestureDetector(
       onTap: () {},
       child: Container(
         height: 112,
 
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: bg,
           borderRadius: BorderRadius.circular(10),
         ),
         margin: const EdgeInsets.symmetric(horizontal: 15, vertical: 2.5),
@@ -199,10 +201,10 @@ class _BildirisCard extends StatelessWidget {
                               children: [
                                 Text(
                                   item.title,
-                                  style: const TextStyle(
+                                  style:  TextStyle(
                                     fontSize: 12,
                                     fontWeight: FontWeight.w600,
-                                    color: Colors.black,
+                                    color: textColor,
                                   ),
                                 ),
                                 if (item.subtitle.isNotEmpty)
@@ -210,7 +212,7 @@ class _BildirisCard extends StatelessWidget {
                                     item.subtitle,
                                     style: TextStyle(
                                       fontSize: 10,
-                                      color: Color(0xfF90979F),
+                                      color: AppColor.descriptionText(context),
                                     ),
                                   ),
                               ],
@@ -219,7 +221,7 @@ class _BildirisCard extends StatelessWidget {
                           if (item.hasArrow)
                             Icon(
                               Icons.chevron_right,
-                              color: Colors.black,
+                              color: textColor,
                               size: 20,
                             ),
                         ],
@@ -235,7 +237,7 @@ class _BildirisCard extends StatelessWidget {
             const SizedBox(height: 4),
             Text(
               item.date,
-              style: TextStyle(fontSize: 12, color: Color(0xFF262626)),
+              style: TextStyle(fontSize: 12, color: AppColor.descriptionText(context)),
             ),
             const SizedBox(height: 4),
             Row(
@@ -243,7 +245,7 @@ class _BildirisCard extends StatelessWidget {
                 Expanded(
                   child: Text(
                     item.description,
-                    style: TextStyle(fontSize: 12, color: Color(0xFF90979F)),
+                    style: TextStyle(fontSize: 12, color: AppColor.descriptionText(context)),
                     overflow: TextOverflow.ellipsis,
                   ),
                 ),
@@ -252,7 +254,7 @@ class _BildirisCard extends StatelessWidget {
                 Container(
                   padding: const EdgeInsets.all(6),
                   decoration: BoxDecoration(
-                    color: Color(0xFFF7F7F8),
+                    color: cardBg,
                     borderRadius: BorderRadius.circular(4),
                   ),
                   child: Row(
@@ -263,7 +265,7 @@ class _BildirisCard extends StatelessWidget {
                             : 'okalmady',
                         style: TextStyle(
                           fontSize: 10,
-                          color: Color(0xFF262626),
+                          color: textColor,
                         ),
                       ),
                       const SizedBox(width: 10),

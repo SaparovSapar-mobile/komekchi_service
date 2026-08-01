@@ -7,7 +7,7 @@ class WeatherInitial extends WeatherState {}
 class WeatherLoading extends WeatherState {}
 
 class WeatherLoaded extends WeatherState {
-  final WeatherModel weather;
+  final WeatherItem weather;
   WeatherLoaded(this.weather);
 }
 

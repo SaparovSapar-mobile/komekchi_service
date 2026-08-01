@@ -20,10 +20,10 @@ class Hyzmat extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final bg = isDark ? AppColor.bgBlogDark : AppColor.bgBlogLight;
-    final cardBg = isDark ? AppColor.bgBlogDark : AppColor.bgBlogLight;
-    final textColor =  AppColor.titleText(context);
-    final borderColor = isDark ? const Color(0xFF333333) : AppColor.borderColor;
+    final bg = AppColor.pageBg(context);
+    final cardBg = AppColor.cardBg(context);
+    final textColor = AppColor.titleText(context);
+    final borderColor = AppColor.border(context);
 
     return Scaffold(
       backgroundColor: AppColor.primary,
@@ -39,8 +39,8 @@ class Hyzmat extends StatelessWidget {
       body: Container(
         width: double.infinity,
         margin: const EdgeInsets.only(top: 10),
-        decoration: const BoxDecoration(
-          color: Colors.white,
+        decoration: BoxDecoration(
+          color: cardBg,
           borderRadius: BorderRadius.only(
             topLeft: Radius.circular(20),
             topRight: Radius.circular(20),
@@ -49,7 +49,7 @@ class Hyzmat extends StatelessWidget {
         child: Column(
           children: [
             // Header
-            AppBarWidget(textColor, isDark), const Divider(height: 1, color: Color(0xFFF5F7FF)),
+            AppBarWidget(textColor, isDark), Divider(height: 1, color: bg),
 
             // Back
             Padding(
@@ -60,14 +60,11 @@ class Hyzmat extends StatelessWidget {
                     onPressed: () => context.pop(),
                     icon: const Icon(Icons.arrow_back_ios_new, size: 18),
                   ),
-                  const Text(
-                    'Yza',
-                    style: TextStyle(fontSize: 16, color: Colors.black),
-                  ),
+                  Text('Yza', style: TextStyle(fontSize: 16, color: textColor)),
                 ],
               ),
             ),
-            const Divider(height: 1, color: Color(0xFFF5F7FF)),
+            Divider(height: 1, color: bg),
 
             // Content
             Expanded(
@@ -86,22 +83,22 @@ class Hyzmat extends StatelessWidget {
                           width: 44,
                           height: 44,
                           decoration: BoxDecoration(
-                            color: const Color(0xFFE8F0FF),
+                            color: bg,
                             borderRadius: BorderRadius.circular(10),
                           ),
-                          child: Image.asset(
-                            "assets/images/icon/image_1.png",
-                            width: 50,
-                            height: 50,
+                          child: Icon(
+                            Icons.perm_phone_msg,
+                            size: 34,
+                            color: AppColor.primary,
                           ),
                         ),
                         const SizedBox(width: 10),
-                        const Text(
+                        Text(
                           'Müşderi hyzmatlary',
                           style: TextStyle(
                             fontSize: 17,
                             fontWeight: FontWeight.w700,
-                            color: Colors.black,
+                            color: textColor,
                           ),
                         ),
                       ],
@@ -109,11 +106,11 @@ class Hyzmat extends StatelessWidget {
                     const SizedBox(height: 16),
 
                     // Description text
-                    const Text(
+                     Text(
                       'Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry\'s standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry\'s standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into ele..',
                       style: TextStyle(
                         fontSize: 12,
-                        color: Colors.black87,
+                        color: textColor,
                         height: 1.6,
                         letterSpacing: 0.1,
                       ),

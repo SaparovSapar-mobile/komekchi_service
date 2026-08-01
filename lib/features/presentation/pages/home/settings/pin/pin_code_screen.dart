@@ -1,13 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
+import 'package:komekchi_service/core/utils/pin_storage.dart';
+import 'package:komekchi_service/features/presentation/pages/home/widget/pin_numpad.dart';
+import 'package:komekchi_service/l10n/gen/app_localizations.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../../../../core/utils/theme/app_colors.dart';
 import '../../home_screen.dart';
 
-/// Экран задания Pin-кода. Пока только UI (локальное состояние,
-/// "Tassyklamak" просто закрывает экран) — логику сверки/сохранения
-/// подключим отдельно.
+enum _PinStage { enter, confirm }
+
+/// Sets or changes the app-lock PIN: enter 4 digits, then re-enter to
+/// confirm. On match, saves the PIN and marks the lock as enabled, then
+/// pops with `true`. Backing out (or a mismatch loop) leaves nothing saved.
 class PinCodeScreen extends StatefulWidget {
   const PinCodeScreen({super.key});
 
@@ -17,11 +23,21 @@ class PinCodeScreen extends StatefulWidget {
 
 class _PinCodeScreenState extends State<PinCodeScreen> {
   static const int _pinLength = 4;
+
+  _PinStage _stage = _PinStage.enter;
   String _pin = '';
+  String _firstEntry = '';
+  String? _error;
 
   void _onDigit(String digit) {
     if (_pin.length >= _pinLength) return;
-    setState(() => _pin += digit);
+    setState(() {
+      _error = null;
+      _pin += digit;
+    });
+    if (_pin.length == _pinLength) {
+      Future.delayed(const Duration(milliseconds: 150), _onComplete);
+    }
   }
 
   void _onBackspace() {
@@ -29,14 +45,42 @@ class _PinCodeScreenState extends State<PinCodeScreen> {
     setState(() => _pin = _pin.substring(0, _pin.length - 1));
   }
 
+  Future<void> _onComplete() async {
+    if (!mounted) return;
+
+    if (_stage == _PinStage.enter) {
+      setState(() {
+        _firstEntry = _pin;
+        _pin = '';
+        _stage = _PinStage.confirm;
+      });
+      return;
+    }
+
+    if (_pin != _firstEntry) {
+      setState(() {
+        _error = AppLocalizations.of(context)!.pinMismatch;
+        _pin = '';
+        _firstEntry = '';
+        _stage = _PinStage.enter;
+      });
+      return;
+    }
+
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(pinCodeStorageKey, _pin);
+    await prefs.setBool(pinEnabledStorageKey, true);
+    if (mounted) context.pop(true);
+  }
+
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final bg = isDark ? AppColor.bgPageDark : AppColor.bgPageLight;
-    final cardBg = isDark ? AppColor.bgBlogDark : AppColor.bgBlogLight;
+    final bg = AppColor.pageBg(context);
+    final cardBg = AppColor.cardBg(context);
     final textColor = AppColor.titleText(context);
-    final borderColor = isDark ? const Color(0xFF333333) : AppColor.borderColor;
-    final isComplete = _pin.length == _pinLength;
+    final borderColor = AppColor.border(context);
+    final t = AppLocalizations.of(context)!;
 
     return Scaffold(
       backgroundColor: AppColor.primary,
@@ -100,7 +144,7 @@ class _PinCodeScreenState extends State<PinCodeScreen> {
                   ),
                   const SizedBox(height: 12),
                   Text(
-                    'Pin kod',
+                    t.pinCode,
                     style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.w700,
@@ -109,12 +153,21 @@ class _PinCodeScreenState extends State<PinCodeScreen> {
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    'Koduňyzy 2 gezek tassyklaň.',
+                    _stage == _PinStage.enter
+                        ? t.pinCreateSubtitle
+                        : t.pinConfirmSubtitle,
                     style: TextStyle(
                       fontSize: 13,
                       color: AppColor.descriptionText(context),
                     ),
                   ),
+                  if (_error != null) ...[
+                    const SizedBox(height: 8),
+                    Text(
+                      _error!,
+                      style: const TextStyle(fontSize: 13, color: Colors.red),
+                    ),
+                  ],
                   const SizedBox(height: 20),
 
                   Row(
@@ -147,183 +200,13 @@ class _PinCodeScreenState extends State<PinCodeScreen> {
                       );
                     }),
                   ),
-                  const SizedBox(height: 24),
-
-                  SizedBox(
-                    width: double.infinity,
-                    height: 52,
-                    child: ElevatedButton(
-                      onPressed: isComplete ? () => context.pop() : null,
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: AppColor.primary,
-                        disabledBackgroundColor: AppColor.primary.withValues(
-                          alpha: 0.4,
-                        ),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                      ),
-                      child: const Text(
-                        'Tassyklamak',
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w600,
-                          color: Colors.white,
-                        ),
-                      ),
-                    ),
-                  ),
                 ],
               ),
             ),
 
             const Spacer(),
 
-            _Numpad(onDigit: _onDigit, onBackspace: _onBackspace),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class _Numpad extends StatelessWidget {
-  final ValueChanged<String> onDigit;
-  final VoidCallback onBackspace;
-
-  const _Numpad({required this.onDigit, required this.onBackspace});
-
-  static const _keys = [
-    ['1', ''],
-    ['2', 'ABC'],
-    ['3', 'DEF'],
-    ['4', 'GHI'],
-    ['5', 'JKL'],
-    ['6', 'MNO'],
-    ['7', 'PQRS'],
-    ['8', 'TUV'],
-    ['9', 'WXYZ'],
-  ];
-
-  @override
-  Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    final keyBg = isDark ? AppColor.bgBlogDark : Colors.white;
-    final padBg = isDark ? AppColor.bgPageDark : const Color(0xFFECECEC);
-    final textColor = AppColor.titleText(context);
-
-    return Container(
-      width: double.infinity,
-      color: padBg,
-      padding: const EdgeInsets.fromLTRB(12, 12, 12, 20),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          for (var row = 0; row < 3; row++)
-            Padding(
-              padding: const EdgeInsets.only(bottom: 10),
-              child: Row(
-                children: List.generate(3, (col) {
-                  final key = _keys[row * 3 + col];
-                  return Expanded(
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 4),
-                      child: _NumKey(
-                        digit: key[0],
-                        letters: key[1],
-                        bg: keyBg,
-                        textColor: textColor,
-                        onTap: () => onDigit(key[0]),
-                      ),
-                    ),
-                  );
-                }),
-              ),
-            ),
-          Row(
-            children: [
-              const Expanded(child: SizedBox()),
-              Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 4),
-                  child: _NumKey(
-                    digit: '0',
-                    letters: '',
-                    bg: keyBg,
-                    textColor: textColor,
-                    onTap: () => onDigit('0'),
-                  ),
-                ),
-              ),
-              Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 4),
-                  child: GestureDetector(
-                    onTap: onBackspace,
-                    child: SizedBox(
-                      height: 56,
-                      child: Icon(
-                        Icons.backspace_outlined,
-                        color: textColor.withValues(alpha: 0.5),
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _NumKey extends StatelessWidget {
-  final String digit;
-  final String letters;
-  final Color bg;
-  final Color textColor;
-  final VoidCallback onTap;
-
-  const _NumKey({
-    required this.digit,
-    required this.letters,
-    required this.bg,
-    required this.textColor,
-    required this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        height: 56,
-        decoration: BoxDecoration(
-          color: bg,
-          borderRadius: BorderRadius.circular(12),
-        ),
-        alignment: Alignment.center,
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text(
-              digit,
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.w600,
-                color: textColor,
-              ),
-            ),
-            if (letters.isNotEmpty)
-              Text(
-                letters,
-                style: TextStyle(
-                  fontSize: 9,
-                  letterSpacing: 1,
-                  color: textColor.withValues(alpha: 0.5),
-                ),
-              ),
+            PinNumpad(onDigit: _onDigit, onBackspace: _onBackspace),
           ],
         ),
       ),

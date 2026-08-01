@@ -1,25 +1,25 @@
 import 'package:dartz/dartz.dart';
 import 'package:komekchi_service/features/domain/entities/order.dart';
-import 'package:komekchi_service/features/domain/repositories/repository_app.dart';
-import '../../../core/error/faiulre.dart';
+import 'package:komekchi_service/features/domain/repositories/order_repository.dart';
+import '../../../core/error/failure.dart';
 
 class GetOrdersUsecase {
-  final GetAppRepository getAppsRepository;
+  final OrderRepository repository;
 
-  GetOrdersUsecase({required this.getAppsRepository});
+  GetOrdersUsecase({required this.repository});
 
   Future<Either<Failure, List<OrderItem>>> call({String? status}) {
-    return getAppsRepository.getOrders(status: status);
+    return repository.getOrders(status: status);
   }
 }
 
 class GetOrderByIdUsecase {
-  final GetAppRepository getAppsRepository;
+  final OrderRepository repository;
 
-  GetOrderByIdUsecase({required this.getAppsRepository});
+  GetOrderByIdUsecase({required this.repository});
 
   Future<Either<Failure, OrderItem>> call(String uuid) {
-    return getAppsRepository.getOrderById(uuid);
+    return repository.getOrderById(uuid);
   }
 }
 
@@ -42,12 +42,12 @@ class CreateOrderParams {
 }
 
 class CreateOrderUsecase {
-  final GetAppRepository getAppsRepository;
+  final OrderRepository repository;
 
-  CreateOrderUsecase({required this.getAppsRepository});
+  CreateOrderUsecase({required this.repository});
 
   Future<Either<Failure, OrderItem>> call(CreateOrderParams params) {
-    return getAppsRepository.createOrder(
+    return repository.createOrder(
       subcategoryUuid: params.subcategoryUuid,
       address: params.address,
       note: params.note,
@@ -59,11 +59,11 @@ class CreateOrderUsecase {
 }
 
 class CancelOrderUsecase {
-  final GetAppRepository getAppsRepository;
+  final OrderRepository repository;
 
-  CancelOrderUsecase({required this.getAppsRepository});
+  CancelOrderUsecase({required this.repository});
 
   Future<Either<Failure, OrderItem>> call(String uuid) {
-    return getAppsRepository.cancelOrder(uuid);
+    return repository.cancelOrder(uuid);
   }
 }

@@ -7,6 +7,7 @@ extension DetailPriceSection on _DetailScreenState {
     Color bg,
   ) {
     final price = item.paymentMethod.price;
+    final t = AppLocalizations.of(context)!;
 
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 15),
@@ -21,7 +22,7 @@ extension DetailPriceSection on _DetailScreenState {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'Bahasy',
+                t.priceLabel,
                 style: TextStyle(fontSize: 14, color: AppColor.titleText(context)),
               ),
               Text(
@@ -94,8 +95,13 @@ extension DetailPriceSection on _DetailScreenState {
   ) {
     final price = item.paymentMethod.price;
     final salePercent = item.paymentMethod.sale;
+    final t = AppLocalizations.of(context)!;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    // final bg = AppColor.pageBg(context);
+    final cardBg = AppColor.cardBg(context);
 
     return Container(
+      
       margin: const EdgeInsets.symmetric(horizontal: 10),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(20),
@@ -106,13 +112,13 @@ extension DetailPriceSection on _DetailScreenState {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            PriceRow(label: 'Hyzmat bahasy:', value: '$price TMT'),
+            PriceRow(label: t.servicePriceLabel, value: '$price TMT'),
             const SizedBox(height: 8),
-            PriceRow(label: 'Arzanladyş:', value: '$salePercent%'),
+            PriceRow(label: t.discountLabel, value: '$salePercent%'),
             if (item.paymentMethod.consultation) ...[
               const SizedBox(height: 8),
               PriceRow(
-                label: 'Maslahat bermek:',
+                label: t.consultationPriceLabel,
                 value: '${item.paymentMethod.forPersonPrice} tmt',
               ),
             ],
@@ -124,16 +130,16 @@ extension DetailPriceSection on _DetailScreenState {
                   height: 53,
                   padding: const EdgeInsets.only(left: 14.0, top: 4, bottom: 2),
                   decoration: BoxDecoration(
-                    color: Color(0xFFF6F8FD),
-                    border: Border.all(color: Color(0xFFC6D2FF)),
+                    color:isDark ? AppColor.bgPageDark : Color(0xFFF6F8FD),
+                    border: Border.all(color:isDark ? Color(0xFFC6D2FF).withOpacity(0.3) :  Color(0xFFC6D2FF)),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        "Jemi:",
-                        style: TextStyle(fontSize: 14, color: Colors.black),
+                        t.orderTotal,
+                        style: TextStyle(fontSize: 14, color: AppColor.titleText(context)),
                       ),
                       const SizedBox(height: 2),
                       Text(
@@ -146,7 +152,16 @@ extension DetailPriceSection on _DetailScreenState {
                 const SizedBox(width: 12),
                 Expanded(
                   child: GestureDetector(
-                    onTap: () {
+                    onTap: () async {
+                      final prefs = await SharedPreferences.getInstance();
+                      final token = prefs.getString('auth_token');
+                      if (!context.mounted) return;
+
+                      if (token == null || token.isEmpty) {
+                        context.push('/login');
+                        return;
+                      }
+
                       context.push(
                         "/date",
                         extra: {
@@ -167,7 +182,7 @@ extension DetailPriceSection on _DetailScreenState {
                         children: [
                           Flexible(
                             child: Text(
-                              "Tassyklamak",
+                              t.confirmButton,
                               style: TextStyle(fontSize: 16, color: Colors.white),
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,

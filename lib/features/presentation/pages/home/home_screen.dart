@@ -12,6 +12,7 @@ import 'package:komekchi_service/injector.dart';
 import '../../../../core/widgets/network_error_view.dart';
 import '../../../../core/utils/theme/app_colors.dart';
 import '../../../../core/utils/theme/const.dart';
+import '../../../../l10n/gen/app_localizations.dart';
 import 'parts/home_aksiya_section.dart';
 import 'parts/home_app_bar.dart';
 import 'parts/home_biz_grid.dart';
@@ -59,7 +60,8 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final bg = isDark ? AppColor.bgBlogDark : AppColor.bgBlogLight;
+    final bg = isDark ? AppColor.bgPageDark : AppColor.bgBlogLight;
+    final cardBg = AppColor.cardBg(context);
     final textColor = AppColor.titleText(context);
 
     return Container(
@@ -75,7 +77,17 @@ class _HomeScreenState extends State<HomeScreen> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.start,
         children: [
-          AppBarWidget(textColor, isDark),
+          Container(
+            decoration: BoxDecoration(
+              color: cardBg,
+              borderRadius: const BorderRadius.only(
+                topLeft: Radius.circular(20),
+                topRight: Radius.circular(20),
+              ),
+            ),
+            child: AppBarWidget(textColor, isDark),
+          ),
+
           SalgymBar(isDark: isDark, textColor: textColor),
           const SizedBox(height: 5),
           Expanded(
@@ -98,6 +110,9 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Widget _buildContent(BuildContext context) {
     final textColor = AppColor.titleText(context);
+    final t = AppLocalizations.of(context)!;
+    final bg = AppColor.pageBg(context);
+    final cardBg = AppColor.cardBg(context);
 
     return RefreshIndicator(
       color: AppColor.primary,
@@ -106,41 +121,50 @@ class _HomeScreenState extends State<HomeScreen> {
         physics: const AlwaysScrollableScrollPhysics(),
         padding: EdgeInsets.only(bottom: MediaQuery.of(context).padding.bottom),
         controller: widget.scrollController,
-        child: Column(
-          children: [
-            const DividerWidget(),
-            GestureDetector(
-              onTap: () => context.push("/allCategory"),
-              child: const Subtitle(text: "Hyzmatlar"),
-            ),
-            HomeCategoryGrid(textColor: textColor),
-            const DividerWidget(),
-            BannerSlider(),
-            const DividerWidget(),
-            HorizontalServiceList(is24_7: true, text: "7/24 hyzmatlar"),
-            const DividerWidget(),
-            HorizontalServiceList(isFeatured: true, text: "Öňde baryjylar"),
-            const DividerWidget(),
-            GestureDetector(
-              onTap: () => context.push("/aksiya"),
-              child: const Subtitle(text: "Aksiýalar"),
-            ),
-            HomeAksiyaSection(aksiyaCubit: _aksiyaCubit),
-            const DividerWidget(),
-            BannerSlider(showTypeOneOnly: false),
-            const DividerWidget(),
-            const Padding(
-              padding: EdgeInsets.symmetric(vertical: 5.0, horizontal: 15.0),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: [
-                  Text("Näme üçin biz?", style: TextStyle(fontSize: 14)),
-                ],
+        child: Container(
+          color: cardBg,
+          child: Column(
+            children: [
+              const DividerWidget(),
+              GestureDetector(
+                onTap: () => context.push("/allCategory"),
+                child: Subtitle(text: t.homeServices),
               ),
-            ),
-            HomeBizGrid(biz: defaultBizItems),
-            const SizedBox(height: 30),
-          ],
+              HomeCategoryGrid(textColor: textColor),
+              const DividerWidget(),
+              BannerSlider(),
+              const DividerWidget(),
+              HorizontalServiceList(is24_7: true, text: t.home247Services),
+              const DividerWidget(),
+              HorizontalServiceList(isFeatured: true, text: t.homeTopProviders),
+              const DividerWidget(),
+              GestureDetector(
+                onTap: () => context.push("/aksiya"),
+                child: Subtitle(text: t.homePromotions),
+              ),
+              HomeAksiyaSection(aksiyaCubit: _aksiyaCubit),
+              const DividerWidget(),
+              BannerSlider(showTypeOneOnly: false),
+              const DividerWidget(),
+              Padding(
+                padding: const EdgeInsets.symmetric(
+                  vertical: 5.0,
+                  horizontal: 15.0,
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    Text(t.homeWhyUs, style: const TextStyle(fontSize: 14)),
+                  ],
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.only(bottom:  8.0),
+                child: HomeBizGrid(biz: defaultBizItems(t)),
+              ),
+              Container(height: 30, color: bg),
+            ],
+          ),
         ),
       ),
     );

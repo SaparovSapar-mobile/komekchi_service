@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 
 import '../../../../../core/utils/theme/app_colors.dart';
-import '../../../../../core/utils/theme/app_theme.dart';
 
 class TolegBottomSheet extends StatefulWidget {
   final String? selected;
@@ -18,8 +17,8 @@ class _TolegBottomSheetState extends State<TolegBottomSheet> {
 
   final List<TolegItem> items = const [
     TolegItem(title: 'Nagt töleg', subtitle: 'Sargyt gelende nagt töleg.'),
-    // TolegItem(title: 'Terminal töleg', subtitle: 'Sargydy bank kart arkaly töleg.'),
-    // TolegItem(title: 'Onlaýn töleg', subtitle: 'Sargydy bank kart arkaly töleg.'),
+    TolegItem(title: 'Terminal töleg', subtitle: 'Sargydy bank kart arkaly töleg.'),
+    TolegItem(title: 'Onlaýn töleg', subtitle: 'Sargydy bank kart arkaly töleg.'),
   ];
 
   @override
@@ -30,9 +29,20 @@ class _TolegBottomSheetState extends State<TolegBottomSheet> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final cardBg = AppColor.cardBg(context);
+    final textColor = AppColor.titleText(context);
+    final descColor = AppColor.descriptionText(context);
+    final radioBg = isDark ? AppColor.bgPageDark : Colors.white;
+    final radioBorder = isDark ? Colors.grey.shade700 : Colors.grey.shade300;
+
     return Container(
       height: 306,
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+      decoration: BoxDecoration(
+        color: cardBg,
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+      ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -51,9 +61,9 @@ class _TolegBottomSheetState extends State<TolegBottomSheet> {
           const SizedBox(height: 44),
 
           // Title
-          const Text(
+          Text(
             'Tölegiň görnüşi',
-            style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700, color: Colors.black),
+            style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700, color: textColor),
           ),
           const SizedBox(height: 8),
 
@@ -69,7 +79,7 @@ class _TolegBottomSheetState extends State<TolegBottomSheet> {
               },
               child: Container(
                 height: 59,
-                width: 351,
+                width: double.infinity,
                 color: Colors.transparent,
                 // padding: const EdgeInsets.symmetric(vertical: 14),
                 child: Row(
@@ -85,13 +95,13 @@ class _TolegBottomSheetState extends State<TolegBottomSheet> {
                             style: TextStyle(
                               fontSize: 14,
                               fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
-                              color: Colors.black,
+                              color: textColor,
                             ),
                           ),
                           const SizedBox(height: 1),
                           Text(
                             item.subtitle,
-                            style: TextStyle(fontSize: 12, color: Colors.grey.shade500),
+                            style: TextStyle(fontSize: 12, color: descColor),
                           ),
                         ],
                       ),
@@ -103,10 +113,10 @@ class _TolegBottomSheetState extends State<TolegBottomSheet> {
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
                         border: Border.all(
-                          color: isSelected ? AppColor.primary : Colors.grey.shade300,
+                          color: isSelected ? AppColor.primary : radioBorder,
                           width: isSelected ? 6 : 1.5,
                         ),
-                        color: Colors.white,
+                        color: radioBg,
                       ),
                     ),
                   ],

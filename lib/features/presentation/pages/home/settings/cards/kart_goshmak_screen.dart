@@ -62,10 +62,10 @@ class _KartGoshmakScreenState extends State<KartGoshmakScreen> {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final bg = isDark ? AppColor.bgPageDark : AppColor.bgPageLight;
-    final cardBg = isDark ? AppColor.bgBlogDark : AppColor.bgBlogLight;
+    final bg = AppColor.pageBg(context);
+    final cardBg = AppColor.cardBg(context);
     final textColor = AppColor.titleText(context);
-    final borderColor = isDark ? const Color(0xFF333333) : AppColor.borderColor;
+    final borderColor = AppColor.border(context);
     final hintColor = isDark ? Colors.white38 : Colors.black38;
 
     return Scaffold(
@@ -146,6 +146,7 @@ class _KartGoshmakScreenState extends State<KartGoshmakScreen> {
                     ),
                     const SizedBox(height: 8),
                     inputField(
+                      context: context,
                       controller: _numberController,
                       inputBg: cardBg,
                       text: '0000 0000 0000 0000',
@@ -166,6 +167,7 @@ class _KartGoshmakScreenState extends State<KartGoshmakScreen> {
                     ),
                     const SizedBox(height: 8),
                     inputField(
+                      context: context,
                       controller: _expiryController,
                       inputBg: cardBg,
                       text: 'AA/ÝY',
@@ -186,6 +188,7 @@ class _KartGoshmakScreenState extends State<KartGoshmakScreen> {
                     ),
                     const SizedBox(height: 8),
                     inputField(
+                      context: context,
                       controller: _nameController,
                       inputBg: cardBg,
                       text: 'Adyňyzy giriziň',

@@ -14,7 +14,7 @@ extension DetailTopBar on _DetailScreenState {
           const SizedBox(width: 10),
           Expanded(
             child: Text(
-              item.nameTm,
+              item.name(context),
               overflow: TextOverflow.ellipsis,
               style: AppTextStyle.semiBold16.copyWith(
                 color: AppColor.titleText(context),

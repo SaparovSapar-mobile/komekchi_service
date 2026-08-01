@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../core/utils/theme/app_colors.dart';
+import '../../../../l10n/gen/app_localizations.dart';
 
 class CheckScreen extends StatefulWidget {
   const CheckScreen({super.key});
@@ -107,11 +108,11 @@ class _CheckScreenState extends State<CheckScreen>
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    final bg = isDark ? AppColor.bgBlogDark : AppColor.bgBlogLight;
-    // final cardBg = isDark ? AppColor.bgPageDark : AppColor.bgPageLight;
+    final bg = AppColor.cardBg(context);
+    final t = AppLocalizations.of(context)!;
+    // final cardBg = AppColor.pageBg(context);
     // final textColor = isDark ? AppColor.titleTextDark : AppColor.titleTextLight;
-    // final borderColor = isDark ? const Color(0xFF333333) : AppColor.borderColor;
+    // final borderColor = AppColor.border(context);
 
     return Scaffold(
       backgroundColor: bg,
@@ -169,7 +170,7 @@ class _CheckScreenState extends State<CheckScreen>
                     child: FadeTransition(
                       opacity: _textOpacity,
                       child: Text(
-                        'Tassyklandy!',
+                        t.confirmedTitle,
                         style: TextStyle(
                           color: AppColor.titleText(context),
                           fontSize: 18,
@@ -204,9 +205,9 @@ class _CheckScreenState extends State<CheckScreen>
                           borderRadius: BorderRadius.circular(14),
                         ),
                       ),
-                      child: const Text(
-                        'Dowam etmek',
-                        style: TextStyle(
+                      child: Text(
+                        t.continueButton,
+                        style: const TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w600,
                         ),

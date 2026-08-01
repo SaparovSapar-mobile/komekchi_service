@@ -98,10 +98,10 @@ class _SearchScreenState extends State<SearchScreen> {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final cardBg = isDark ? AppColor.bgPageDark : AppColor.bgPageLight;
-    final bg = isDark ? AppColor.bgBlogDark : AppColor.bgBlogLight;
+    final cardBg = AppColor.pageBg(context);
+    final bg = AppColor.cardBg(context);
     final textColor = AppColor.titleText(context);
-    final borderColor = isDark ? AppColor.bgBlogDark : AppColor.borderColor;
+    final borderColor = AppColor.border(context);
     final TextStyle textStyle = AppTextStyle.regular14;
 
     return Scaffold(
@@ -161,6 +161,10 @@ class _SearchScreenState extends State<SearchScreen> {
                   enabledBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
                     borderSide: BorderSide(color: borderColor),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: const BorderSide(color: AppColor.primary),
                   ),
                 ),
               ),

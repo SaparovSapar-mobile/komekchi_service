@@ -94,16 +94,11 @@ flutter:
     - assets/images/icon/
     - assets/images/logo/
     - assets/images/bells/
-    - assets/images/hyzmat/
-    - assets/images/bottom/
-    - assets/images/details/
+    - assets/images/social/
     - assets/images/service/
     - assets/images/settings/
-    - assets/images/category/
-    - assets/images/bizbarada/
     - assets/images/onboarding/
     - assets/images/newcategory/
-    - assets/images/bottom_dark/
 
 
   # An image asset can refer to one or more resolution-specific "variants", see

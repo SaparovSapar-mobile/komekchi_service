@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../../core/utils/app_constants.dart';
+import '../../../../../core/utils/localized_field.dart';
 import '../../../../../core/widgets/branded_shimmer.dart';
 import '../../../../domain/entities/aksiya.dart';
 import '../../../bloc/aksiya/aksiya_cubit.dart';
@@ -72,21 +73,21 @@ class AksiyaPreviewCard extends StatelessWidget {
         context.push("/aksiyaDetail", extra: {"uuid": item.uuid});
       },
       child: Container(
-        width: 174,
+        width: 194,
         margin: const EdgeInsets.only(right: 10),
         child: ClipRRect(
           borderRadius: BorderRadius.circular(9.46),
           child: Image.network(
-            ApiConstants.imageUrl(item.imgTm),
-            width: 174,
+            ApiConstants.imageUrl(item.img(context)),
+            width: 194,
             height: 106,
             fit: BoxFit.cover,
             errorBuilder: (context, error, stackTrace) {
               return Container(
-                width: 174,
+                width: 194,
                 height: 106,
                 color: Colors.grey.shade200,
-                child: const Icon(Icons.image, color: Colors.grey),
+                child: const Icon(Icons.image, color: Colors.grey),  
               );
             },
           ),

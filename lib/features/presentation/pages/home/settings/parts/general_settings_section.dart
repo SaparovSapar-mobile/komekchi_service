@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../../../core/utils/theme/app_colors.dart';
+import '../../../../../../l10n/gen/app_localizations.dart';
 import '../bottom_sheet.dart';
 import '../settings_card.dart';
 import '../settings_row.dart';
@@ -23,6 +24,7 @@ class GeneralSettingsSection extends StatelessWidget {
 
   final bool pinEnabled;
   final VoidCallback onTogglePin;
+  final VoidCallback onTapPin;
 
   const GeneralSettingsSection({
     super.key,
@@ -36,17 +38,19 @@ class GeneralSettingsSection extends StatelessWidget {
     required this.onToggleNotifications,
     required this.pinEnabled,
     required this.onTogglePin,
+    required this.onTapPin,
   });
 
   @override
   Widget build(BuildContext context) {
+    final t = AppLocalizations.of(context)!;
     return SectionCard(
-      text: 'Sazlamalar',
+      text: t.settingsTitle,
       children: [
         SettingsRow(
           image: "assets/images/settings/translate.png",
           iconColor: Colors.blue,
-          title: 'Diller',
+          title: t.language,
           trailing: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
@@ -72,7 +76,7 @@ class GeneralSettingsSection extends StatelessWidget {
         SettingsRow(
           image: "assets/images/settings/luna.png",
           iconColor: Colors.indigo,
-          title: 'Tema',
+          title: t.theme,
           trailing: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
@@ -94,9 +98,9 @@ class GeneralSettingsSection extends StatelessWidget {
         SettingsRow(
           image: "assets/images/settings/location.png",
           iconColor: Colors.red,
-          title: 'Salgylarym',
+          title: t.myAddresses,
           trailing: Icon(Icons.chevron_right, color: Colors.grey.shade400),
-          onTap: () {},
+          onTap: () => context.push('/salgylarym'),
         ),
         // SettingsRow(
         //   image: "assets/images/settings/cart.png",
@@ -108,7 +112,7 @@ class GeneralSettingsSection extends StatelessWidget {
         SettingsRow(
           image: "assets/images/settings/bell.png",
           iconColor: Colors.blue,
-          title: 'Sesli bildirişler',
+          title: t.voiceNotifications,
           onTap: onToggleNotifications,
           trailing: SettingsToggleSwitch(
             value: notificationsEnabled,
@@ -118,8 +122,8 @@ class GeneralSettingsSection extends StatelessWidget {
         SettingsRow(
           image: "assets/images/settings/lock.png",
           iconColor: Colors.blue,
-          title: 'Pin kod',
-          onTap: () => context.push('/pinCode'),
+          title: t.pinCode,
+          onTap: onTapPin,
           trailing: SettingsToggleSwitch(value: pinEnabled, onTap: onTogglePin),
         ),
       ],

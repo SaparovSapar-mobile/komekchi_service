@@ -16,9 +16,8 @@ class BankSelectField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    final inputBg = isDark ? AppColor.bgPageDark : AppColor.bgPageLight;
-    final borderColor = isDark ? const Color(0xFF333333) : AppColor.borderColor;
+    final inputBg = AppColor.pageBg(context);
+    final borderColor = AppColor.border(context);
     final textColor = AppColor.titleText(context);
 
     return GestureDetector(
@@ -55,8 +54,7 @@ class BankSelectField extends StatelessWidget {
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
       builder: (sheetContext) {
-        final isDark = Theme.of(sheetContext).brightness == Brightness.dark;
-        final bg = isDark ? AppColor.bgBlogDark : AppColor.bgBlogLight;
+        final bg = AppColor.cardBg(context);
         final textColor = AppColor.titleText(sheetContext);
 
         return Container(

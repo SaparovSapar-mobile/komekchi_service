@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:komekchi_service/main.dart';
+import 'package:komekchi_service/features/presentation/pages/home/settings/bottom_sheet.dart';
 
 import '../../../../core/utils/theme/app_colors.dart';
+import '../../../../l10n/gen/app_localizations.dart';
 
 class ForgotPass extends StatefulWidget {
   final bool showLogin;
@@ -41,10 +42,11 @@ class _ForgotPassState extends State<ForgotPass>
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
-    final bg = isDark ? AppColor.bgBlogDark : AppColor.bgBlogLight;
-    final cardBg = isDark ? AppColor.bgBlogDark : AppColor.bgBlogLight;
+    final bg = AppColor.cardBg(context);
+    final cardBg = AppColor.cardBg(context);
     final textColor = AppColor.titleText(context);
-    final borderColor = isDark ? const Color(0xFF333333) : AppColor.borderColor;
+    final borderColor = AppColor.border(context);
+    final t = AppLocalizations.of(context)!;
 
     return Scaffold(
       backgroundColor: bg,
@@ -69,7 +71,7 @@ class _ForgotPassState extends State<ForgotPass>
                   AnimatedSwitcher(
                     duration: const Duration(milliseconds: 300),
                     child: Text(
-                      'Hasaba durmak',
+                      t.authLoginTitle,
                       key: ValueKey(_showLogin),
                       style: TextStyle(
                         color: textColor,
@@ -90,12 +92,7 @@ class _ForgotPassState extends State<ForgotPass>
                             width: 36,
                             height: 36,
                           ),
-                    onPressed: () {
-                      themeNotifier.value =
-                          themeNotifier.value == ThemeMode.light
-                          ? ThemeMode.dark
-                          : ThemeMode.light;
-                    },
+                    onPressed: () => toggleAppTheme(),
                   ),
                 ],
               ),
@@ -156,9 +153,10 @@ class _ForgotPassState extends State<ForgotPass>
     Color textColor,
     Color borderColor,
   ) {
-    final inputBg = isDark ? AppColor.bgPageDark : AppColor.bgPageLight;
+    final inputBg = AppColor.pageBg(context);
     final hintColor = isDark ? Colors.white38 : Colors.black38;
     const blue = AppColor.primary;
+    final t = AppLocalizations.of(context)!;
 
     return Column(
       key: const ValueKey('login'),
@@ -175,7 +173,7 @@ class _ForgotPassState extends State<ForgotPass>
 
         // Phone
         Text(
-          'Telefon belgiňiz',
+          t.phoneLabel,
           style: TextStyle(
             color: textColor,
             fontSize: 14,
@@ -208,7 +206,7 @@ class _ForgotPassState extends State<ForgotPass>
 
         // Password
         Text(
-          'Açar sözi',
+          t.passwordLabel,
           style: TextStyle(
             color: textColor,
             fontSize: 14,
@@ -238,7 +236,7 @@ class _ForgotPassState extends State<ForgotPass>
 
         SizedBox(height: 10),
         Text(
-          'Açar sözi gaýtala',
+          t.repeatPasswordLabel,
           style: TextStyle(
             color: textColor,
             fontSize: 14,
@@ -281,9 +279,9 @@ class _ForgotPassState extends State<ForgotPass>
                 borderRadius: BorderRadius.circular(14),
               ),
             ),
-            child: const Text(
-              'Tassykla',
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+            child: Text(
+              t.confirmShort,
+              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
             ),
           ),
         ),

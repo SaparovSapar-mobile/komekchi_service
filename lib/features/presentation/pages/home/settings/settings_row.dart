@@ -24,9 +24,8 @@ class SettingsRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
     // final textColor = AppColor.titleText(context);
-    final cardBg = isDark ? AppColor.bgPageDark : AppColor.bgPageLight;
+    final cardBg = AppColor.pageBg(context);
     final TextStyle textStyle = AppTextStyle.medium12;
 
     return Padding(

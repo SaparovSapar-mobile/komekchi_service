@@ -4,7 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:komekchi_service/features/domain/entities/search_result.dart';
 import 'package:komekchi_service/features/domain/usecases/search_usecase.dart';
 
-import '../../../../core/error/faiulre.dart';
+import '../../../../core/error/failure.dart';
 
 part 'search_state.dart';
 

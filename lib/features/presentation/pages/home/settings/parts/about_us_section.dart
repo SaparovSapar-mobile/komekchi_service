@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../../../l10n/gen/app_localizations.dart';
 import '../settings_card.dart';
 import '../settings_row.dart';
 
@@ -10,20 +11,21 @@ class AboutUsSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final t = AppLocalizations.of(context)!;
     return SectionCard(
-      text: 'Biz barada',
+      text: t.aboutUs,
       children: [
         SettingsRow(
           image: "assets/images/settings/!.png",
           iconColor: Colors.blue,
-          title: 'Karhana barada',
+          title: t.aboutCompany,
           trailing: Icon(Icons.chevron_right, color: Colors.grey.shade400),
           onTap: () => context.push('/24goldaw'),
         ),
         SettingsRow(
           image: "assets/images/settings/contactus.png",
           iconColor: Colors.blue,
-          title: 'Biz bilen habarlaşmak',
+          title: t.contactUs,
           trailing: Icon(Icons.chevron_right, color: Colors.grey.shade400),
           onTap: () {
             context.push('/contactUs');
@@ -32,7 +34,7 @@ class AboutUsSection extends StatelessWidget {
         SettingsRow(
           image: "assets/images/settings/chat.png",
           iconColor: Colors.blue,
-          title: 'Hat yazmak',
+          title: t.writeLetter,
           trailing: Icon(Icons.chevron_right, color: Colors.grey.shade400),
           onTap: () {
             context.push('/nagilelik');
@@ -41,9 +43,9 @@ class AboutUsSection extends StatelessWidget {
         SettingsRow(
           image: "assets/images/settings/verify.png",
           iconColor: Colors.blue,
-          title: 'Gizlinlik syýasaty',
+          title: t.privacyPolicy,
           trailing: Icon(Icons.chevron_right, color: Colors.grey.shade400),
-          onTap: () {},
+          onTap: () => context.push('/privacyPolicy'),
         ),
       ],
     );

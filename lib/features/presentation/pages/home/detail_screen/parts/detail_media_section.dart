@@ -9,6 +9,7 @@ extension DetailMediaSection on _DetailScreenState {
     Color bg,
     String warningText,
   ) {
+    final t = AppLocalizations.of(context)!;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -74,7 +75,7 @@ extension DetailMediaSection on _DetailScreenState {
                   borderRadius: BorderRadius.circular(6),
                 ),
                 child: Text(
-                  item.nameTm,
+                  item.name(context),
                   style: AppTextStyle.semiBold12.copyWith(
                     color: isDark ? AppColor.titleDark : AppColor.primary,
                   ),
@@ -88,7 +89,7 @@ extension DetailMediaSection on _DetailScreenState {
         Padding(
           padding: EdgeInsets.symmetric(horizontal: 15),
           child: Text(
-            item.nameTm,
+            item.name(context),
             style: AppTextStyle.semiBold20.copyWith(
               color: AppColor.titleText(context),
             ),
@@ -103,7 +104,7 @@ extension DetailMediaSection on _DetailScreenState {
               children: [
                 if (item.is24_7) DetailBadge(text: "7/24"),
                 if (item.is24_7 && item.isFeatured) const SizedBox(width: 6),
-                if (item.isFeatured) DetailBadge(text: "Öňde baryjy"),
+                if (item.isFeatured) DetailBadge(text: t.badgeTopProvider),
               ],
             ),
           ),

@@ -21,9 +21,11 @@ import 'package:komekchi_service/features/presentation/pages/home/settings/cards
 import 'package:komekchi_service/features/presentation/pages/home/settings/cards/kart_goshmak_screen.dart';
 import 'package:komekchi_service/features/presentation/pages/home/settings/cards/kart_pozmak_screen.dart';
 import 'package:komekchi_service/features/presentation/pages/home/settings/cards/kartlarym_screen.dart';
+import 'package:komekchi_service/features/presentation/pages/home/settings/address/salgylarym_screen.dart';
 import 'package:komekchi_service/features/presentation/pages/home/settings/contact_us/contact_us_page.dart';
 import 'package:komekchi_service/features/presentation/pages/home/settings/contact_us/hat_yazmak_page.dart';
 import 'package:komekchi_service/features/presentation/pages/home/settings/pin/pin_code_screen.dart';
+import 'package:komekchi_service/features/presentation/pages/home/settings/privacy/privacy_policy_screen.dart';
 import 'package:komekchi_service/features/presentation/pages/home/widget/bell.dart';
 import 'package:komekchi_service/features/presentation/pages/home/widget/name_uchin_biz/about_screen.dart';
 import 'package:komekchi_service/features/presentation/pages/home/widget/name_uchin_biz/hyzmat.dart';
@@ -31,19 +33,26 @@ import 'package:komekchi_service/features/presentation/pages/home/widget/name_uc
 import 'package:komekchi_service/features/presentation/pages/home/widget/name_uchin_biz/ish_tertibi.dart';
 import 'package:komekchi_service/features/presentation/pages/home/widget/name_uchin_biz/toleg.dart';
 import 'package:komekchi_service/features/presentation/pages/home/widget/name_uchin_biz/ynamdar.dart';
-import 'package:komekchi_service/features/presentation/pages/home/widget/select_date.dart';
-import 'package:komekchi_service/features/presentation/pages/map/main_screen.dart';
+import 'package:komekchi_service/features/presentation/pages/home/widget/select/select_date.dart';
+import 'package:komekchi_service/features/presentation/pages/main_screen.dart/main_screen.dart';
 import 'package:komekchi_service/injector.dart';
 
 import '../../features/presentation/pages/auth/check_screen.dart';
 import '../../features/presentation/pages/auth/sms_screen.dart';
 import '../../features/presentation/pages/home/aksiya/aksiyalar_screen.dart';
-import '../../features/presentation/pages/home/widget/selected_date.dart';
+import '../../features/presentation/pages/home/widget/select/selected_date.dart';
 // import '../../features/presentation/pages/splash/lock_screen.dart'; // TODO: gaýtadan işe girizmeli bolanda aç
 import '../../features/presentation/pages/splash/onboarding_screen.dart';
+import '../../features/presentation/pages/splash/pin_unlock_screen.dart';
 
-final appRouter = GoRouter(
-  initialLocation: '/onboarding',
+late final GoRouter appRouter;
+
+/// Built once in main() after checking whether a stored auth token exists,
+/// so an already-registered user lands on '/main' instead of the
+/// onboarding/login flow on every cold start.
+GoRouter buildAppRouter({required String initialLocation}) {
+  return GoRouter(
+  initialLocation: initialLocation,
   routes: [
     // Telefon gulpy arkaly girişi wagtlaýyn öçürildi — heniz gerek däl.
     // GoRoute(path: '/lock', builder: (_, __) => const LockScreen()),
@@ -119,6 +128,10 @@ final appRouter = GoRouter(
     GoRoute(path: '/contactUs', builder: (_, __) => const ContactUsPage()),
     GoRoute(path: '/hatYazmak', builder: (_, __) => const HatYazmakPage()),
     GoRoute(path: '/kartlarym', builder: (_, __) => const KartlarymScreen()),
+    GoRoute(
+      path: '/salgylarym',
+      builder: (_, __) => const SalgylarymScreen(),
+    ),
     // GoRoute(
     //   path: '/kartGoshmak',
     //   builder: (_, __) => const KartGoshmakScreen(),
@@ -131,6 +144,11 @@ final appRouter = GoRouter(
       },
     ),
     GoRoute(path: '/pinCode', builder: (_, __) => const PinCodeScreen()),
+    GoRoute(
+      path: '/privacyPolicy',
+      builder: (_, __) => const PrivacyPolicyScreen(),
+    ),
+    GoRoute(path: '/pinUnlock', builder: (_, __) => const PinUnlockScreen()),
 
     GoRoute(
       path: '/selectedDate',
@@ -160,6 +178,7 @@ final appRouter = GoRouter(
           child: CategoryId(
             categoryUuid: data['uuid'] as String,
             title: data['title'] as String,
+            categoryIcon: data['icon'] as String? ?? '',
           ),
         );
       },
@@ -177,4 +196,5 @@ final appRouter = GoRouter(
       },
     ),
   ],
-);
+  );
+}

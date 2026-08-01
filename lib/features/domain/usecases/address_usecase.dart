@@ -1,36 +1,36 @@
 import 'package:dartz/dartz.dart';
 import 'package:komekchi_service/features/domain/entities/address.dart';
 import 'package:komekchi_service/features/domain/entities/address_type.dart';
-import 'package:komekchi_service/features/domain/repositories/repository_app.dart';
-import '../../../core/error/faiulre.dart';
+import 'package:komekchi_service/features/domain/repositories/address_repository.dart';
+import '../../../core/error/failure.dart';
 
 class GetAddressTypesUsecase {
-  final GetAppRepository getAppsRepository;
+  final AddressRepository repository;
 
-  GetAddressTypesUsecase({required this.getAppsRepository});
+  GetAddressTypesUsecase({required this.repository});
 
   Future<Either<Failure, List<AddressTypeItem>>> call() {
-    return getAppsRepository.getAddressTypes();
+    return repository.getAddressTypes();
   }
 }
 
 class GetAddressesUsecase {
-  final GetAppRepository getAppsRepository;
+  final AddressRepository repository;
 
-  GetAddressesUsecase({required this.getAppsRepository});
+  GetAddressesUsecase({required this.repository});
 
   Future<Either<Failure, List<AddressItem>>> call() {
-    return getAppsRepository.getAddresses();
+    return repository.getAddresses();
   }
 }
 
 class GetAddressByIdUsecase {
-  final GetAppRepository getAppsRepository;
+  final AddressRepository repository;
 
-  GetAddressByIdUsecase({required this.getAppsRepository});
+  GetAddressByIdUsecase({required this.repository});
 
   Future<Either<Failure, AddressItem>> call(String uuid) {
-    return getAppsRepository.getAddressById(uuid);
+    return repository.getAddressById(uuid);
   }
 }
 
@@ -45,12 +45,12 @@ class CreateAddressParams {
 }
 
 class CreateAddressUsecase {
-  final GetAppRepository getAppsRepository;
+  final AddressRepository repository;
 
-  CreateAddressUsecase({required this.getAppsRepository});
+  CreateAddressUsecase({required this.repository});
 
   Future<Either<Failure, AddressItem>> call(CreateAddressParams params) {
-    return getAppsRepository.createAddress(
+    return repository.createAddress(
       address: params.address,
       addressTypeUuid: params.addressTypeUuid,
     );
@@ -70,12 +70,12 @@ class UpdateAddressParams {
 }
 
 class UpdateAddressUsecase {
-  final GetAppRepository getAppsRepository;
+  final AddressRepository repository;
 
-  UpdateAddressUsecase({required this.getAppsRepository});
+  UpdateAddressUsecase({required this.repository});
 
   Future<Either<Failure, AddressItem>> call(UpdateAddressParams params) {
-    return getAppsRepository.updateAddress(
+    return repository.updateAddress(
       uuid: params.uuid,
       address: params.address,
       addressTypeUuid: params.addressTypeUuid,
@@ -84,11 +84,11 @@ class UpdateAddressUsecase {
 }
 
 class DeleteAddressUsecase {
-  final GetAppRepository getAppsRepository;
+  final AddressRepository repository;
 
-  DeleteAddressUsecase({required this.getAppsRepository});
+  DeleteAddressUsecase({required this.repository});
 
   Future<Either<Failure, void>> call(String uuid) {
-    return getAppsRepository.deleteAddress(uuid);
+    return repository.deleteAddress(uuid);
   }
 }

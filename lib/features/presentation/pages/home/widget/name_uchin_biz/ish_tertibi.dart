@@ -20,10 +20,10 @@ class IshTertibi extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final bg = isDark ? AppColor.bgBlogDark : AppColor.bgBlogLight;
-    final cardBg = isDark ? AppColor.bgBlogDark : AppColor.bgBlogLight;
+    final bg = AppColor.pageBg(context);
+    final cardBg = AppColor.cardBg(context);
     final textColor =  AppColor.titleText(context);
-    final borderColor = isDark ? const Color(0xFF333333) : AppColor.borderColor;
+    final borderColor = AppColor.border(context);
 
     return Scaffold(
       backgroundColor: AppColor.primary,
@@ -39,8 +39,8 @@ class IshTertibi extends StatelessWidget {
       body: Container(
         width: double.infinity,
         margin: const EdgeInsets.only(top: 10),
-        decoration: const BoxDecoration(
-          color: Colors.white,
+        decoration:  BoxDecoration(
+          color: cardBg,
           borderRadius: BorderRadius.only(
             topLeft: Radius.circular(20),
             topRight: Radius.circular(20),
@@ -49,7 +49,7 @@ class IshTertibi extends StatelessWidget {
         child: Column(
           children: [
             // Header
-            AppBarWidget(textColor, isDark), Divider(height: 1, color: Color(0xFFF5F7FF)),
+            AppBarWidget(textColor, isDark), Divider(height: 1, color: bg),
 
             // Back
             Padding(
@@ -60,14 +60,14 @@ class IshTertibi extends StatelessWidget {
                     onPressed: () => context.pop(),
                     icon: const Icon(Icons.arrow_back_ios_new, size: 18),
                   ),
-                  const Text(
+                   Text(
                     'Yza',
-                    style: TextStyle(fontSize: 16, color: Colors.black),
+                    style: TextStyle(fontSize: 16, color:textColor),
                   ),
                 ],
               ),
             ),
-            const Divider(height: 1, color: Color(0xFFF5F7FF)),
+             Divider(height: 1, color:bg),
 
             // Content
             Expanded(
@@ -86,22 +86,18 @@ class IshTertibi extends StatelessWidget {
                           width: 44,
                           height: 44,
                           decoration: BoxDecoration(
-                            color: const Color(0xFFE8F0FF),
+                            color: bg,
                             borderRadius: BorderRadius.circular(10),
                           ),
-                          child: Image.asset(
-                            "assets/images/hyzmat/tertip.png",
-                            width: 50,
-                            height: 50,
-                          ),
+                          child: Icon(Icons.date_range, size: 34, color: AppColor.primary,)
                         ),
                         const SizedBox(width: 10),
-                        const Text(
+                         Text(
                           'Iş tertibi',
                           style: TextStyle(
                             fontSize: 17,
                             fontWeight: FontWeight.w700,
-                            color: Colors.black,
+                            color: textColor,
                           ),
                         ),
                       ],
@@ -109,12 +105,12 @@ class IshTertibi extends StatelessWidget {
                     const SizedBox(height: 20),
 
                     // Biz hepdaniň 7 güni
-                    const Text(
+                     Text(
                       'Biz hepdäniň 7 güni:',
                       style: TextStyle(
                         fontSize: 15,
                         fontWeight: FontWeight.w700,
-                        color: Colors.black,
+                        color: textColor,
                       ),
                     ),
                     const SizedBox(height: 10),
@@ -141,9 +137,9 @@ class IshTertibi extends StatelessWidget {
                             const SizedBox(width: 8),
                             Text(
                               day,
-                              style: const TextStyle(
+                              style:  TextStyle(
                                 fontSize: 15,
-                                color: Colors.black,
+                                color: textColor,
                               ),
                             ),
                           ],
@@ -154,11 +150,11 @@ class IshTertibi extends StatelessWidget {
                     const SizedBox(height: 12),
 
                     // Description
-                    const Text(
+                     Text(
                       'günleri hyzmat berýäris.\nIslendik günüň islendik sagadynda sargyt edip ýa-da öňünden bronlap bilersiňiz.\nMüşderiniň islegine görä işgärleriň sanyny artdyryp ýa-da azaldyp bolýar. Işgärlerimiz tertipli, tejribeli we ýörite uniformaly ýagdaýda gelip, işleri ýokary hilli ýerine ýetirip gaýdýarlar.',
                       style: TextStyle(
                         fontSize: 14,
-                        color: Colors.black87,
+                        color: textColor,
                         height: 1.6,
                       ),
                       textAlign: TextAlign.justify,

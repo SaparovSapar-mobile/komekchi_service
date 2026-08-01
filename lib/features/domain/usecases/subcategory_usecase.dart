@@ -1,8 +1,8 @@
 import 'package:dartz/dartz.dart';
 import 'package:komekchi_service/features/domain/entities/common.dart';
 import 'package:komekchi_service/features/domain/entities/subcategory.dart';
-import 'package:komekchi_service/features/domain/repositories/repository_app.dart';
-import '../../../core/error/faiulre.dart';
+import 'package:komekchi_service/features/domain/repositories/subcategory_repository.dart';
+import '../../../core/error/failure.dart';
 
 class GetSubcategoriesParams {
   final String? categoryUuid;
@@ -21,14 +21,14 @@ class GetSubcategoriesParams {
 }
 
 class GetSubcategoriesUsecase {
-  final GetAppRepository getAppsRepository;
+  final SubcategoryRepository repository;
 
-  GetSubcategoriesUsecase({required this.getAppsRepository});
+  GetSubcategoriesUsecase({required this.repository});
 
   Future<Either<Failure, PaginatedResult<SubcategoryItem>>> call(
     GetSubcategoriesParams params,
   ) {
-    return getAppsRepository.getSubcategories(
+    return repository.getSubcategories(
       categoryUuid: params.categoryUuid,
       is24_7: params.is24_7,
       isFeatured: params.isFeatured,
@@ -39,11 +39,11 @@ class GetSubcategoriesUsecase {
 }
 
 class GetSubcategoryByIdUsecase {
-  final GetAppRepository getAppsRepository;
+  final SubcategoryRepository repository;
 
-  GetSubcategoryByIdUsecase({required this.getAppsRepository});
+  GetSubcategoryByIdUsecase({required this.repository});
 
   Future<Either<Failure, SubcategoryItem>> call(String uuid) {
-    return getAppsRepository.getSubcategoryById(uuid);
+    return repository.getSubcategoryById(uuid);
   }
 }

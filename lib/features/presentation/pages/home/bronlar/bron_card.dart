@@ -3,12 +3,16 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:komekchi_service/core/utils/app_constants.dart';
 import 'package:komekchi_service/core/utils/theme/app_text_style.dart';
+import 'package:komekchi_service/features/domain/entities/address.dart';
 import 'package:komekchi_service/features/domain/entities/order.dart';
+import 'package:komekchi_service/features/domain/usecases/address_usecase.dart';
 import 'package:komekchi_service/features/presentation/bloc/subcategory/subcategory_detail_cubit.dart';
 import 'package:komekchi_service/injector.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../../../core/utils/theme/app_colors.dart';
+import '../../../../../l10n/gen/app_localizations.dart';
+import '../widget/address_type_display.dart';
 import '../widget/rate_service_sheet.dart';
 import 'bottom_sheet_shikayat.dart';
 import 'bronlar_screen.dart';
@@ -28,6 +32,11 @@ class _BronCardState extends State<BronCard> {
   late final SubcategoryDetailCubit _subcategoryDetailCubit =
       sl<SubcategoryDetailCubit>();
 
+  // The order only stores the raw address text (often raw coordinates) it
+  // was submitted with. To show "Öý/Iş/Başga" instead, we match it against
+  // the user's currently saved addresses by content.
+  List<AddressItem> _savedAddresses = [];
+
   OrderItem get order => widget.order;
   VoidCallback? get onCancel => widget.onCancel;
 
@@ -35,6 +44,20 @@ class _BronCardState extends State<BronCard> {
   void initState() {
     super.initState();
     _subcategoryDetailCubit.fetchSubcategoryById(order.subcategoryUuid);
+    _loadSavedAddresses();
+  }
+
+  Future<void> _loadSavedAddresses() async {
+    final result = await sl<GetAddressesUsecase>().call();
+    if (!mounted) return;
+    result.fold((_) {}, (items) => setState(() => _savedAddresses = items));
+  }
+
+  String _displayAddress(AppLocalizations t) {
+    final match = _savedAddresses.where((a) => a.address == order.address);
+    return match.isEmpty
+        ? order.address
+        : addressTypeLabel(t, match.first.addressTypeName);
   }
 
   @override
@@ -68,8 +91,8 @@ class _BronCardState extends State<BronCard> {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final bg = isDark ? AppColor.bgBlogDark : AppColor.bgBlogLight;
-    final cardBg = isDark ? AppColor.bgPageDark : AppColor.bgPageLight;
+    final bg = AppColor.cardBg(context);
+    final cardBg = AppColor.pageBg(context);
     final TextStyle textStyle = AppTextStyle.medium14;
     final TextStyle textStyle1 = AppTextStyle.medium12;
     final TextStyle textStyle2 = AppTextStyle.regular12;
@@ -78,6 +101,7 @@ class _BronCardState extends State<BronCard> {
     final shortNumber = order.uuid.length >= 6
         ? order.uuid.substring(0, 6).toUpperCase()
         : order.uuid.toUpperCase();
+    final t = AppLocalizations.of(context)!;
 
     return Container(
       decoration: BoxDecoration(
@@ -182,7 +206,7 @@ class _BronCardState extends State<BronCard> {
                         ),
                       ),
                       Text(
-                        'Sany: ${order.quantity}',
+                        t.orderQuantity(order.quantity),
                         style: TextStyle(
                           fontSize: 10,
                           color: Color(0xFF90979F),
@@ -213,6 +237,7 @@ class _BronCardState extends State<BronCard> {
                     ),
                     child: Row(
                       children: [
+                        SizedBox(width: 3,),
                         Icon(
                           Icons.location_on_outlined,
                           size: 16,
@@ -221,7 +246,7 @@ class _BronCardState extends State<BronCard> {
                         const SizedBox(width: 6),
                         Expanded(
                           child: Text(
-                            order.address,
+                            _displayAddress(t),
                             style: const TextStyle(fontSize: 13),
                             overflow: TextOverflow.ellipsis,
                           ),
@@ -246,7 +271,7 @@ class _BronCardState extends State<BronCard> {
                     child: Row(
                       children: [
                         Text(
-                          'Jemi: ',
+                          t.orderTotal,
                           style: textStyle4.copyWith(
                             color: AppColor.titleText(context),
                           ),
@@ -280,15 +305,15 @@ class _BronCardState extends State<BronCard> {
                   child: OutlinedButton(
                     onPressed: () => _showBottomSheetShikayat(context),
                     style: OutlinedButton.styleFrom(
-                      side: BorderSide(color: Colors.red.shade200),
-                      backgroundColor: Colors.red.shade50,
+                      side:BorderSide(color:isDark ? Colors.transparent : Colors.red.shade200),
+                      backgroundColor:isDark ?  Color(0x1AFF5050) : Colors.red.shade50,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(8),
                       ),
                       padding: const EdgeInsets.symmetric(vertical: 8),
                     ),
                     child: Text(
-                      'Şikaýat etmek',
+                      t.complain,
                       style: TextStyle(
                         fontSize: 13,
                         color: Colors.red.shade400,
@@ -312,7 +337,7 @@ class _BronCardState extends State<BronCard> {
                         padding: const EdgeInsets.symmetric(vertical: 8),
                       ),
                       child: Text(
-                        'Ýatyrmak',
+                        t.cancelBooking,
                         style: textStyle.copyWith(color: AppColor.primary),
                       ),
                     ),
@@ -339,7 +364,7 @@ class _BronCardState extends State<BronCard> {
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Text(
-                            'Baha bermek',
+                            t.rateService,
                             style: textStyle.copyWith(color: Colors.white),
                           ),
                           const SizedBox(width: 4),

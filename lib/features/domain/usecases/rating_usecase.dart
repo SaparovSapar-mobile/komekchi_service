@@ -1,20 +1,19 @@
 import 'package:dartz/dartz.dart';
 import 'package:komekchi_service/features/domain/entities/rating.dart';
-import 'package:komekchi_service/features/domain/repositories/repository_app.dart';
+import 'package:komekchi_service/features/domain/repositories/rating_repository.dart';
 
-import '../../../core/error/faiulre.dart';
-import '../../../core/usecase/usecase.dart';
+import '../../../core/error/failure.dart';
 
 class GetRatingsUsecase {
-  final GetAppRepository getAppsRepository;
+  final RatingRepository repository;
 
-  GetRatingsUsecase({required this.getAppsRepository});
+  GetRatingsUsecase({required this.repository});
 
   Future<Either<Failure, List<RatingItem>>> call({
     String? categoryUuid,
     String? subcategoryUuid,
   }) {
-    return getAppsRepository.getRatings(
+    return repository.getRatings(
       categoryUuid: categoryUuid,
       subcategoryUuid: subcategoryUuid,
     );
@@ -35,14 +34,13 @@ class SubmitRatingParams {
   });
 }
 
-class SubmitRatingUsecase implements UseCases<void, SubmitRatingParams> {
-  final GetAppRepository getAppsRepository;
+class SubmitRatingUsecase {
+  final RatingRepository repository;
 
-  SubmitRatingUsecase({required this.getAppsRepository});
+  SubmitRatingUsecase({required this.repository});
 
-  @override
   Future<Either<Failure, void>> call(SubmitRatingParams params) {
-    return getAppsRepository.submitRating(
+    return repository.submitRating(
       categoryUuid: params.categoryUuid,
       subcategoryUuid: params.subcategoryUuid,
       stars: params.stars,

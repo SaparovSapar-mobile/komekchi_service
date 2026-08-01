@@ -31,5 +31,146 @@
   "newVersion": "Täze wersiýa",
 
   "myPage": "Meniň sahypam",
-  "user": "Ulanyjy"
+  "user": "Ulanyjy",
+
+  "homeServices": "Hyzmatlar",
+  "home247Services": "7/24 hyzmatlar",
+  "homeTopProviders": "Öňde baryjylar",
+  "homePromotions": "Aksiýalar",
+  "homeWhyUs": "Näme üçin biz?",
+  "homeServiceNotFound": "Hyzmat tapylmady",
+
+  "salgymTitle": "Salgym",
+  "salgymEnterLocation": "Ýeriňizi giriziň",
+
+  "biz247Support": "7/24 goldaw",
+  "bizWorkSchedule": "Iş tertibi",
+  "bizWorkGuarantee": "Iş kepilligi",
+  "bizCustomerService": "Müşderi hyzmatlary",
+  "bizPaymentOptions": "Töleg mümkinçilikleri",
+  "bizTrusted": "Ynamdar",
+
+  "bronlarTitle": "Bronlarym",
+  "tabAll": "Hemmesi",
+  "tabPending": "Garasylyar",
+  "tabCancelled": "Ýatyryldy",
+  "tabCompleted": "Tamamlanan",
+
+  "cancelBookingTitle": "Bron ýatyrylsynmy?",
+  "cancelBookingBody": "N°{code} bronyny ýatyrmak isleýärsiňizmi?",
+  "@cancelBookingBody": {
+    "placeholders": {"code": {"type": "String"}}
+  },
+  "no": "Ýok",
+  "yes": "Howa",
+  "retry": "Gaýtadan synanyşmak",
+
+  "orderQuantity": "Sany: {count}",
+  "@orderQuantity": {
+    "placeholders": {"count": {"type": "int"}}
+  },
+  "orderTotal": "Jemi: ",
+  "complain": "Şikaýat etmek",
+  "cancelBooking": "Ýatyrmak",
+  "rateService": "Baha bermek",
+
+  "statusPending": "Garaşylýar",
+  "statusUnknown": "Näbelli",
+
+  "complainSheetTitle": "Şikaýat etmek!",
+
+  "addressTypeHome": "Öý",
+  "addressTypeWork": "Iş",
+  "addressTypeOther": "Başga",
+  "addressSheetTitle": "Salgy ady",
+  "noAddresses": "Salgy ýok",
+  "deleteAddressTitle": "Salgyny pozmalymy?",
+  "addNewAddress": "Täze salgy goşmak",
+  "editAddressTitle": "Salgyny üýtgetmek",
+  "newAddressTitle": "Salgy atiandyr",
+  "addressHint": "Howly jaý",
+  "addressType": "Salgy görnüşi",
+  "edit": "Üýtgetmek",
+  "add": "Goşmak",
+
+  "authLoginTitle": "Hasaba durmak",
+  "authRegisterTitle": "Agza bolmak",
+  "tabPhone": "Telefon belgi",
+  "tabEmail": "Email",
+  "phoneLabel": "Telefon belgiňiz",
+  "emailHint": "Emailyňyzy giriziň",
+  "passwordLabel": "Açar sözi",
+  "forgotPasswordLink": "Açar sözi ýatdan çykardym",
+  "confirmButton": "Tassyklamak",
+  "errorPrefix": "Ýalňyşlyk: {error}",
+  "@errorPrefix": {
+    "placeholders": {"error": {"type": "String"}}
+  },
+  "nameLabel": "Ady Familýasy",
+  "nameHint": "Adyňyzy giriziň",
+  "confirmPasswordLabel": "Açar sözüňizi tassyklaň",
+  "agreeTerms": "Düzgünler bilen tanyşdym?",
+  "sendCode": "Kod ugratmak",
+  "confirmedTitle": "Tassyklandy!",
+  "continueButton": "Dowam etmek",
+  "repeatPasswordLabel": "Açar sözi gaýtala",
+  "confirmShort": "Tassykla",
+  "phoneDigitsError": "8 sanly bolmaly",
+
+  "smsEmailNotFound": "Email tapylmady",
+  "smsPhoneNotFound": "Telefon belgisi tapylmady",
+  "smsEnterEmailCode": "E-poçtaňyza gelen kody giriziň",
+  "smsEnterPhoneCode": "Telefon belgiňize gelen kody giriziň",
+  "resendCode": "Kody täzeden ugratmak",
+
+  "detailCall": "Jaň etmek",
+  "detailMap": "Karta",
+  "detailShare": "Paýlaşmak",
+  "ratingsTitle": "Bahalar",
+  "aboutTitle": "Barada",
+  "consultationNote": " Maslahat bermek hyzmaty hem elýeterlidir.",
+  "priceLabel": "Bahasy",
+  "servicePriceLabel": "Hyzmat bahasy:",
+  "discountLabel": "Arzanladyş:",
+  "consultationPriceLabel": "Maslahat bermek:",
+  "badgeTopProvider": "Öňde baryjy",
+
+  "onboardTitle1": "Siziň üçin iň gowy - Kömekçi hyzmat",
+  "onboardSubtitle1": "Eliňiziň aşagynda dürli görnüş bilen, zerurlyklaryňyza laýyk hyzmaty aňsatlyk bilen tapyň.",
+  "onboardTitle2": "Iş tejribesini anyklaň?",
+  "onboardSubtitle2": "Iş çözgütleri aňsatlyk bilen kabul etmek üçin hünärmenlerden tejribe iş başarnyklary bilen tanyş boluň.",
+  "onboardTitle3": "Iş ýerine ýetirildi!",
+  "onboardSubtitle3": "Ussat hünärmenler siziň işiňiziň netijeli gowy ýerine ýetirilmegine üpjün ederler.",
+  "onboardGuest": "Gezelenç",
+  "next": "Indiki",
+
+  "pinCreateSubtitle": "Täze pin kod giriziň",
+  "pinConfirmSubtitle": "Kody gaýtadan giriziň",
+  "pinMismatch": "Kodlar gabat gelmedi, gaýtadan synanyň",
+  "pinUnlockSubtitle": "Dowam etmek üçin pin kody giriziň",
+  "pinWrong": "Nädogry pin kod",
+  "forgotPinCode": "Pin kody ýatdan çykardym",
+
+  "notLoggedInTitle": "Hasabyňyz ýok",
+  "notLoggedInAddressesSubtitle": "Salgylary görmek we goşmak üçin ulgama giriň",
+  "loginButton": "Girmek",
+
+  "navHome": "Esasy",
+  "navSearch": "Gözleg",
+
+  "enterOrderDataTitle": "Maglumatlaryňyzy giriziň",
+  "orderInfoBanner": "Eger siz hyzmat sargyt edip, soň pikirlerňizi üýtgetseňiz ýa-da hyzmatdan ýüz öwürseňiz",
+  "fullNameLabel": "Doly adyňyz",
+  "addressLabel": "Salgy",
+  "addressPlaceholder": "Salgyňyzy giriziň",
+  "noteLabel": "Bellik",
+  "noteOptionalHint": "Bellik (hökmany däl)",
+  "paymentTypeLabel": "Töleg şekili",
+  "paymentTypeHint": "Töleg görnüşi saýlaň",
+  "serviceTimeNotSelected": "Hyzmat we wagt saýlanmady",
+  "orderCreatedSuccess": "Bron üstünlikli döredildi",
+  "submitOrderButton": "Çagyryş",
+
+  "incorrectPassword": "Nädogry açar sözi",
+  "fillAllFields": "Hemme maglumatlary giriziň"
 }

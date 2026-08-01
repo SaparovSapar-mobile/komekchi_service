@@ -9,10 +9,11 @@ extension AuthLoginForm on _AuthScreenState {
     Color textColor,
     Color borderColor,
   ) {
-    final inputBg = isDark ? AppColor.bgPageDark : AppColor.bgPageLight;
+    final inputBg = AppColor.pageBg(context);
     final hintColor = isDark ? Colors.white38 : Colors.black38;
     const blue = AppColor.primary;
     final isEmail = _methodTabController.index == 1;
+    final t = AppLocalizations.of(context)!;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -30,7 +31,7 @@ extension AuthLoginForm on _AuthScreenState {
 
         // Telefon / Email
         Text(
-          isEmail ? 'Email' : 'Telefon belgiňiz',
+          isEmail ? t.tabEmail : t.phoneLabel,
           style: TextStyle(
             color: textColor,
             fontSize: 14,
@@ -40,9 +41,10 @@ extension AuthLoginForm on _AuthScreenState {
         const SizedBox(height: 8),
         isEmail
             ? inputField(
+                context: context,
                 controller: _loginEmailController,
                 inputBg: inputBg,
-                text: "Emailyňyzy giriziň",
+                text: t.emailHint,
                 borderColor: borderColor,
                 textColor: textColor,
                 hintColor: hintColor,
@@ -54,6 +56,7 @@ extension AuthLoginForm on _AuthScreenState {
                   const SizedBox(width: 10),
                   Expanded(
                     child: inputField(
+                      context: context,
                       controller: _loginPhoneController,
                       inputBg: inputBg,
                       type: FieldType.phone,
@@ -70,7 +73,7 @@ extension AuthLoginForm on _AuthScreenState {
 
         // Password
         Text(
-          'Açar sözi',
+          t.passwordLabel,
           style: TextStyle(
             color: textColor,
             fontSize: 14,
@@ -79,6 +82,7 @@ extension AuthLoginForm on _AuthScreenState {
         ),
         const SizedBox(height: 8),
         inputField(
+          context: context,
           controller: _loginPasswordController,
           inputBg: inputBg,
           borderColor: borderColor,
@@ -104,7 +108,7 @@ extension AuthLoginForm on _AuthScreenState {
         TextButton(
           onPressed: () => context.push('/forgot'),
           child: Text(
-            "Açar sözi ýatdan çykardym",
+            t.forgotPasswordLink,
             style: TextStyle(
               color: isDark ? AppColor.titleDark : AppColor.primary,
               fontSize: 14,
@@ -128,11 +132,35 @@ extension AuthLoginForm on _AuthScreenState {
                   login: login,
                   password: _loginPasswordController.text,
                 );
+                // Backend's user object doesn't always include the phone
+                // number — when logging in via the phone tab we already
+                // know it for certain, so save it as a safety net for
+                // screens that prefill it (e.g. the order form).
+                if (!isEmail) {
+                  final prefs = await SharedPreferences.getInstance();
+                  await prefs.setString('phone', login);
+                }
                 if (context.mounted) context.go("/main");
+              } on DioException catch (e) {
+                // Backend responds 400 with code EE-40101 for a bad
+                // login/password combo (confirmed against the live API —
+                // it does NOT use 401 for this case).
+                final data = e.response?.data;
+                final errorCode = data is Map ? data['code']?.toString() : null;
+                final wrongPassword =
+                    errorCode == 'EE-40101' || e.response?.statusCode == 401;
+                if (!context.mounted) return;
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(
+                      wrongPassword ? t.incorrectPassword : t.errorPrefix('$e'),
+                    ),
+                  ),
+                );
               } catch (e) {
                 ScaffoldMessenger.of(
                   context,
-                ).showSnackBar(SnackBar(content: Text('Ýalňyşlyk: $e')));
+                ).showSnackBar(SnackBar(content: Text(t.errorPrefix('$e'))));
               }
             },
             style: ElevatedButton.styleFrom(
@@ -143,9 +171,9 @@ extension AuthLoginForm on _AuthScreenState {
                 borderRadius: BorderRadius.circular(14),
               ),
             ),
-            child: const Text(
-              'Tassyklamak',
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+            child: Text(
+              t.confirmButton,
+              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
             ),
           ),
         ),
@@ -167,7 +195,7 @@ extension AuthLoginForm on _AuthScreenState {
               ),
             ),
             child: Text(
-              'Agza bolmak',
+              t.authRegisterTitle,
               style: TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.w600,

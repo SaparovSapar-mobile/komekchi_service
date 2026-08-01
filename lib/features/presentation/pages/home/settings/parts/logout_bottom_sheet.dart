@@ -16,10 +16,9 @@ class _LogOutBottomSheetState extends State<LogOutBottomSheet> {
   Widget build(BuildContext context) {
     final TextStyle textStyle = AppTextStyle.semiBold18;
     final TextStyle textStyle1 = AppTextStyle.semiBold16;
-    final isDark = Theme.of(context).brightness == Brightness.dark;
     final textColor = AppColor.titleText(context);
-    final bg = isDark ? AppColor.bgPageDark : AppColor.bgPageLight;
-    final cardBg = isDark ? AppColor.bgBlogDark : AppColor.bgBlogLight;
+    final bg = AppColor.pageBg(context);
+    final cardBg = AppColor.cardBg(context);
     return Column(
       mainAxisAlignment: MainAxisAlignment.end,
       children: [

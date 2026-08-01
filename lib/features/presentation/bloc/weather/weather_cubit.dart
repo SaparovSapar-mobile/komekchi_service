@@ -1,6 +1,6 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:komekchi_service/features/data/datasource/weather_api_service.dart';
-import 'package:komekchi_service/features/data/models/weather_model.dart';
+import 'package:komekchi_service/features/domain/entities/weather.dart';
+import 'package:komekchi_service/features/domain/usecases/weather_usecase.dart';
 
 part 'weather_state.dart';
 
@@ -9,20 +9,18 @@ const double _asgabatLat = 37.9601;
 const double _asgabatLon = 58.3261;
 
 class WeatherCubit extends Cubit<WeatherState> {
-  final WeatherApiService weatherApiService;
+  final GetWeatherUsecase getWeatherUsecase;
 
-  WeatherCubit({required this.weatherApiService}) : super(WeatherInitial());
+  WeatherCubit({required this.getWeatherUsecase}) : super(WeatherInitial());
 
   Future<void> fetchWeather() async {
     emit(WeatherLoading());
-    try {
-      final weather = await weatherApiService.getWeatherByCoordinates(
-        _asgabatLat,
-        _asgabatLon,
-      );
-      emit(WeatherLoaded(weather));
-    } catch (e) {
-      emit(WeatherError(e.toString()));
-    }
+    final result = await getWeatherUsecase(
+      const GetWeatherParams(lat: _asgabatLat, lon: _asgabatLon),
+    );
+    result.fold(
+      (failure) => emit(WeatherError(failure.message)),
+      (weather) => emit(WeatherLoaded(weather)),
+    );
   }
 }

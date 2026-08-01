@@ -1,28 +1,25 @@
 import 'package:dartz/dartz.dart';
 import 'package:komekchi_service/features/domain/entities/complaint.dart';
-import 'package:komekchi_service/features/domain/repositories/repository_app.dart';
+import 'package:komekchi_service/features/domain/repositories/complaint_repository.dart';
 
-import '../../../core/error/faiulre.dart';
-import '../../../core/usecase/usecase.dart';
+import '../../../core/error/failure.dart';
 
-class GetComplaintsUsecase implements UseCases<List<ComplaintItem>, NoParams> {
-  final GetAppRepository getAppsRepository;
+class GetComplaintsUsecase {
+  final ComplaintRepository repository;
 
-  GetComplaintsUsecase({required this.getAppsRepository});
+  GetComplaintsUsecase({required this.repository});
 
-  @override
-  Future<Either<Failure, List<ComplaintItem>>> call(NoParams params) {
-    return getAppsRepository.getComplaints();
+  Future<Either<Failure, List<ComplaintItem>>> call() {
+    return repository.getComplaints();
   }
 }
 
-class SubmitComplaintUsecase implements UseCases<void, String> {
-  final GetAppRepository getAppsRepository;
+class SubmitComplaintUsecase {
+  final ComplaintRepository repository;
 
-  SubmitComplaintUsecase({required this.getAppsRepository});
+  SubmitComplaintUsecase({required this.repository});
 
-  @override
   Future<Either<Failure, void>> call(String message) {
-    return getAppsRepository.submitComplaint(message: message);
+    return repository.submitComplaint(message: message);
   }
 }

@@ -19,6 +19,8 @@ class SubcategoryItemModel extends SubcategoryItem {
     required super.isFeatured,
     required super.paymentMethod,
     required super.warningDesc,
+    required super.avgRating,
+    required super.ratingCount,
     required super.createdAt,
     required super.updatedAt,
   });
@@ -39,6 +41,8 @@ class SubcategoryItemModel extends SubcategoryItem {
       isFeatured: json['is_featured'] ?? false,
       paymentMethod: PaymentMethodModel.fromJson(json['payment_method']),
       warningDesc: WarningDescModel.fromJson(json['warning_desc']),
+      avgRating: (json['avg_rating'] as num?)?.toDouble() ?? 0,
+      ratingCount: (json['rating_count'] as num?)?.toInt() ?? 0,
       createdAt: json['created_at'] ?? '',
       updatedAt: json['updated_at'] ?? '',
     );

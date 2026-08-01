@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:komekchi_service/core/utils/app_constants.dart';
+import 'package:komekchi_service/core/utils/localized_field.dart';
 import 'package:komekchi_service/features/presentation/bloc/search/search_cubit.dart';
 
 import '../../../../../../core/utils/theme/app_colors.dart';
@@ -78,7 +79,7 @@ class SearchResultsView extends StatelessWidget {
                           ),
                         ),
                         title: Text(
-                          category.nameTm,
+                          category.name(context),
                           style: TextStyle(
                             fontSize: 15,
                             color: AppColor.titleText(context),
@@ -94,7 +95,7 @@ class SearchResultsView extends StatelessWidget {
                             "/categoryId",
                             extra: {
                               'uuid': category.uuid,
-                              'title': category.nameTm,
+                              'title': category.name(context),
                             },
                           );
                         },

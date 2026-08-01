@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:komekchi_service/core/utils/app_constants.dart';
+import 'package:komekchi_service/core/utils/localized_field.dart';
 import 'package:komekchi_service/features/domain/entities/category.dart';
 import 'package:komekchi_service/features/presentation/bloc/category/get_category_cubit.dart';
 import 'package:komekchi_service/features/presentation/pages/home/home_screen.dart';
@@ -36,9 +37,9 @@ class _AllCategoryScreenState extends State<AllCategoryScreen> {
     final textColor = AppColor.titleText(context);
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
-    final bg = isDark ? AppColor.bgPageDark : AppColor.bgPageLight;
-    final cardBg = isDark ? AppColor.bgBlogDark : AppColor.bgBlogLight;
-    final borderColor = isDark ? const Color(0xFF333333) : AppColor.borderColor;
+    final bg = AppColor.pageBg(context);
+    final cardBg = AppColor.cardBg(context);
+    final borderColor = AppColor.border(context);
 
     // final screenWidth = MediaQuery.of(context).size.width;
 
@@ -192,7 +193,7 @@ class _CategoryTile extends StatelessWidget {
       onTap: () {
         context.push(
           '/categoryId',
-          extra: {'uuid': item.uuid, 'title': item.nameTm},
+          extra: {'uuid': item.uuid, 'title': item.name(context), 'icon': item.iconImg},
         );
       },
       child: Container(
@@ -229,7 +230,7 @@ class _CategoryTile extends StatelessWidget {
             const SizedBox(width: 14),
             Expanded(
               child:  Text(
-                item.nameTm,
+                item.name(context),
                 style: TextStyle(
                   fontSize: 15,
                   fontWeight: FontWeight.w500,

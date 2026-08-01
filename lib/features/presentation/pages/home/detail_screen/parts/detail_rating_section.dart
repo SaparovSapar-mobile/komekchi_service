@@ -2,6 +2,7 @@ part of '../detail_screen.dart';
 
 extension DetailRatingSection on _DetailScreenState {
   Widget _buildRatingsSection(BuildContext context) {
+    final t = AppLocalizations.of(context)!;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -10,9 +11,9 @@ extension DetailRatingSection on _DetailScreenState {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text(
-                'Bahalar',
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+              Text(
+                t.ratingsTitle,
+                style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
               ),
               TextButton(
                 onPressed: () => showRateServiceSheet(
@@ -21,9 +22,9 @@ extension DetailRatingSection on _DetailScreenState {
                   onSubmitted: () =>
                       _ratingCubit.fetchRatings(subcategoryUuid: widget.uuid),
                 ),
-                child: const Text(
-                  'Baha bermek',
-                  style: TextStyle(
+                child: Text(
+                  t.rateService,
+                  style: const TextStyle(
                     fontSize: 13,
                     fontWeight: FontWeight.w600,
                     color: AppColor.primary,
@@ -79,8 +80,7 @@ class _RatingCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    final bg = isDark ? AppColor.bgPageDark : AppColor.bgPageLight;
+    final bg = AppColor.pageBg(context);
     final textColor = AppColor.titleText(context);
 
     return Container(

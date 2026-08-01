@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:komekchi_service/core/utils/app_constants.dart';
+import 'package:komekchi_service/core/utils/localized_field.dart';
 import 'package:komekchi_service/core/utils/theme/app_text_style.dart';
+import 'package:komekchi_service/features/domain/entities/category.dart';
 import 'package:komekchi_service/features/presentation/bloc/category/get_category_cubit.dart';
 
 import '../../../../../../core/utils/theme/app_colors.dart';
@@ -15,8 +17,7 @@ class SearchCategoryBrowse extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final TextStyle textStyle = AppTextStyle.medium12;
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    final bg = isDark ? AppColor.bgPageDark : AppColor.bgPageLight;
+    final bg = AppColor.pageBg(context);
 
     return BlocBuilder<GetCategoryCubit, GetCategoryState>(
       builder: (context, state) {
@@ -31,7 +32,7 @@ class SearchCategoryBrowse extends StatelessWidget {
           );
         }
 
-        final items = state is GetCategorySucces
+        final List<CategoryItem> items = state is GetCategorySucces
             ? state.dataCategory
             : const [];
 
@@ -85,7 +86,7 @@ class SearchCategoryBrowse extends StatelessWidget {
                         ),
                       ),
                       title: Text(
-                        item.nameTm,
+                        item.name(context),
                         style: textStyle.copyWith(
                           color: AppColor.titleText(context),
                         ),
@@ -97,7 +98,7 @@ class SearchCategoryBrowse extends StatelessWidget {
                       onTap: () {
                         context.push(
                           "/categoryId",
-                          extra: {'uuid': item.uuid, 'title': item.nameTm},
+                          extra: {'uuid': item.uuid, 'title': item.name(context)},
                         );
                       },
                     );

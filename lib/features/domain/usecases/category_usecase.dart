@@ -1,8 +1,8 @@
 import 'package:dartz/dartz.dart';
 import 'package:komekchi_service/features/domain/entities/category.dart';
 import 'package:komekchi_service/features/domain/entities/common.dart';
-import 'package:komekchi_service/features/domain/repositories/repository_app.dart';
-import '../../../core/error/faiulre.dart';
+import 'package:komekchi_service/features/domain/repositories/category_repository.dart';
+import '../../../core/error/failure.dart';
 
 class GetCategoriesParams {
   final int page;
@@ -11,26 +11,23 @@ class GetCategoriesParams {
 }
 
 class GetCategoriesUsecase {
-  final GetAppRepository getAppsRepository;
+  final CategoryRepository repository;
 
-  GetCategoriesUsecase({required this.getAppsRepository});
+  GetCategoriesUsecase({required this.repository});
 
   Future<Either<Failure, PaginatedResult<CategoryItem>>> call(
     GetCategoriesParams params,
   ) {
-    return getAppsRepository.getCategories(
-      page: params.page,
-      limit: params.limit,
-    );
+    return repository.getCategories(page: params.page, limit: params.limit);
   }
 }
 
 class GetCategoryByIdUsecase {
-  final GetAppRepository getAppsRepository;
+  final CategoryRepository repository;
 
-  GetCategoryByIdUsecase({required this.getAppsRepository});
+  GetCategoryByIdUsecase({required this.repository});
 
   Future<Either<Failure, CategoryItem>> call(String uuid) {
-    return getAppsRepository.getCategoryById(uuid);
+    return repository.getCategoryById(uuid);
   }
 }

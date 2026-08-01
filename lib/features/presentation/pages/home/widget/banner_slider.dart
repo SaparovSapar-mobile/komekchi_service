@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:komekchi_service/core/utils/app_constants.dart';
+import 'package:komekchi_service/core/utils/localized_field.dart';
 import 'package:komekchi_service/features/domain/entities/banners.dart';
 import '../../../../../core/utils/theme/app_colors.dart';
 import '../../../../../core/widgets/branded_shimmer.dart';
@@ -109,69 +110,9 @@ class _BannerSliderState extends State<BannerSlider> {
                         setState(() => _currentPage = index);
                       },
                       itemBuilder: (context, index) {
-                        return _buildBannerItem(banners[index]);
+                        return _buildBannerItem(context, banners[index]);
                       },
                     ),
-
-                    // Левая стрелка
-                    // Positioned(
-                    //   left: 8,
-                    //   top: 0,
-                    //   bottom: 0,
-                    //   child: Center(
-                    //     child: GestureDetector(
-                    //       onTap: () {
-                    //         _pageController.previousPage(
-                    //           duration: const Duration(milliseconds: 400),
-                    //           curve: Curves.easeInOut,
-                    //         );
-                    //       },
-                    //       child: Container(
-                    //         width: 28,
-                    //         height: 28,
-                    //         decoration: BoxDecoration(
-                    //           color: Colors.white.withOpacity(0.5),
-                    //           borderRadius: BorderRadius.circular(10),
-                    //         ),
-                    //         child: const Icon(
-                    //           Icons.chevron_left,
-                    //           size: 20,
-                    //           color: Colors.black,
-                    //         ),
-                    //       ),
-                    //     ),
-                    //   ),
-                    // ),
-
-                    // Правая стрелка
-                    // Positioned(
-                    //   right: 8,
-                    //   top: 0,
-                    //   bottom: 0,
-                    //   child: Center(
-                    //     child: GestureDetector(
-                    //       onTap: () {
-                    //         _pageController.nextPage(
-                    //           duration: const Duration(milliseconds: 400),
-                    //           curve: Curves.easeInOut,
-                    //         );
-                    //       },
-                    //       child: Container(
-                    //         width: 28,
-                    //         height: 28,
-                    //         decoration: BoxDecoration(
-                    //           color: Colors.white.withOpacity(0.5),
-                    //           borderRadius: BorderRadius.circular(10),
-                    //         ),
-                    //         child: const Icon(
-                    //           Icons.chevron_right,
-                    //           size: 20,
-                    //           color: Colors.black,
-                    //         ),
-                    //       ),
-                    //     ),
-                    //   ),
-                    // ),
 
                     // Индикаторы
                     Positioned(
@@ -217,8 +158,8 @@ class _BannerSliderState extends State<BannerSlider> {
     );
   }
 
-  Widget _buildBannerItem(BannerItem item) {
-    final url = ApiConstants.imageUrl(item.imgTm);
+  Widget _buildBannerItem(BuildContext context, BannerItem item) {
+    final url = ApiConstants.imageUrl(item.img(context));
     return Stack(
       fit: StackFit.expand,
       children: [
@@ -233,33 +174,6 @@ class _BannerSliderState extends State<BannerSlider> {
             return Image.asset('assets/images/banner.png', fit: BoxFit.cover);
           },
         ),
-        // Тёмный градиент
-        // Container(
-        //   decoration: BoxDecoration(
-        //     gradient: LinearGradient(
-        //       colors: [Colors.black.withOpacity(0.4), Colors.transparent],
-        //       begin: Alignment.centerLeft,
-        //       end: Alignment.centerRight,
-        //     ),
-        //   ),
-        // ),
-        // Текст
-        // Positioned(
-        //   left: 40,
-        //   right: 60,
-        //   top: 0,
-        //   bottom: 0,
-        //   child: Center(
-        //     child: Text(
-        //       item.name,
-        //       style: const TextStyle(
-        //         color: Colors.white,
-        //         fontSize: 21.97,
-        //         fontWeight: FontWeight.bold,
-        //       ),
-        //     ),
-        //   ),
-        // ),
       ],
     );
   }

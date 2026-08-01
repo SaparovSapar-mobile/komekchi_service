@@ -11,6 +11,7 @@ import 'package:komekchi_service/injector.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../../../core/utils/theme/app_colors.dart';
+import '../../../../../l10n/gen/app_localizations.dart';
 import 'bron_card.dart';
 
 /// Backend order.status values assumed as: pending, cancelled, completed.
@@ -46,11 +47,11 @@ class _BronlarScreenState extends State<BronlarScreen> {
   /// null while checking, then true/false once resolved.
   bool? _isLoggedIn;
 
-  final List<String> tabs = [
-    'Hemmesi',
-    'Garasylyar',
-    'Ýatyryldy',
-    'Tamamlanan',
+  List<String> _tabs(AppLocalizations t) => [
+    t.tabAll,
+    t.tabPending,
+    t.tabCancelled,
+    t.tabCompleted,
   ];
 
   static const List<String?> _statusFilters = [
@@ -83,19 +84,20 @@ class _BronlarScreenState extends State<BronlarScreen> {
   }
 
   Future<void> _cancelOrder(OrderItem order) async {
+    final t = AppLocalizations.of(context)!;
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('Bron ýatyrylsynmy?'),
-        content: Text('N°${order.uuid.substring(0, 6)} bronyny ýatyrmak isleýärsiňizmi?'),
+        title: Text(t.cancelBookingTitle),
+        content: Text(t.cancelBookingBody(order.uuid.substring(0, 6))),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx, false),
-            child: const Text('Ýok'),
+            child: Text(t.no),
           ),
           TextButton(
             onPressed: () => Navigator.pop(ctx, true),
-            child: const Text('Howa'),
+            child: Text(t.yes),
           ),
         ],
       ),
@@ -117,9 +119,11 @@ class _BronlarScreenState extends State<BronlarScreen> {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final bg = isDark ? AppColor.bgBlogDark : AppColor.bgBlogLight;
+    final bg = AppColor.cardBg(context);
     final textColor = AppColor.titleText(context);
     final TextStyle textStyle = AppTextStyle.semiBold16;
+    final t = AppLocalizations.of(context)!;
+    final tabs = _tabs(t);
 
     return Container(
       width: double.infinity,
@@ -138,7 +142,7 @@ class _BronlarScreenState extends State<BronlarScreen> {
           Padding(
             padding: EdgeInsets.symmetric(horizontal: 15, vertical: 12),
             child: Text(
-              'Bronlarym',
+              t.bronlarTitle,
               style: textStyle.copyWith(color: AppColor.titleText(context)),
             ),
           ),
@@ -213,7 +217,7 @@ class _BronlarScreenState extends State<BronlarScreen> {
                               const SizedBox(height: 8),
                               TextButton(
                                 onPressed: () => _selectTab(_selectedTab),
-                                child: const Text('Gaýtadan synanyşmak'),
+                                child: Text(t.retry),
                               ),
                             ],
                           ),
