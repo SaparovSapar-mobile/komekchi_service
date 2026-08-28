@@ -57,8 +57,8 @@ class _TkCupertinoLocalizationsDelegate
 ValueNotifier<Locale?> localeNotifier = ValueNotifier(null);
 
 void main() async {
-  await dotenv.load(fileName: ".env");
   WidgetsFlutterBinding.ensureInitialized();
+  await dotenv.load(fileName: ".env");
   await init();
 
   final prefs = await SharedPreferences.getInstance();

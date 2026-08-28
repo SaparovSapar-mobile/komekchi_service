@@ -1,0 +1,32 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(curl -s -o /tmp/swagger_index.html -w \"%{http_code}\\\\n\" http://216.250.12.53:8124/swagger/index.html)",
+      "Bash(curl -s http://216.250.12.53:8124/swagger/index.html)",
+      "WebFetch(domain:216.250.12.53)",
+      "Bash(curl -s -v -m 10 http://216.250.12.53:8124/swagger/index.html)",
+      "Bash(dart analyze *)",
+      "Bash(dart format *)",
+      "Bash(flutter analyze *)",
+      "mcp__ide__getDiagnostics",
+      "Bash(xargs grep -n \"intent-filter\\\\|autoVerify\\\\|scheme\")",
+      "Bash(flutter pub *)",
+      "Bash(flutter build *)",
+      "Bash(grep -rniE \"tel:|url_launcher|phone_number|companyPhone|supportPhone|\\\\\"\\\\\\\\+993|'\\\\\\\\+993\" lib --include=*.dart)",
+      "Bash(flutter run *)",
+      "Bash(./gradlew.bat :app:checkDebugAarMetadata --no-daemon)",
+      "Bash(mkdir -p \"c:/flutter_projects/komekchi_service/lib/features/presentation/pages/home/detail_screen/parts\")",
+      "Bash(flutter --version)",
+      "Bash(where flutter *)",
+      "Bash(flutter clean *)",
+      "Bash(timeout 10 curl -sI https://pub.dev)",
+      "Bash(curl -sI --max-time 8 https://pub.dev)",
+      "Bash(echo \"EXIT:$?\")",
+      "Bash(dart pub *)",
+      "Bash(env)"
+    ],
+    "additionalDirectories": [
+      "c:\\flutter_projects\\komekchi_service\\lib\\features\\presentation\\pages\\home\\detail_screen"
+    ]
+  }
+}
